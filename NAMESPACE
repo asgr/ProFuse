@@ -1,0 +1,12 @@
+exportPattern("^[[:alpha:]]+")
+
+import("ProFit")
+import("ProFound")
+import("ProSpect")
+import("ParmOff")
+import("Highlander")
+import("magicaxis")
+
+importFrom("graphics", "image", "legend")
+importFrom("stats", "median", "smooth.spline")
+importFrom("utils", "packageVersion")
