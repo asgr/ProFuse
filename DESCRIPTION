@@ -11,4 +11,5 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.6)
 Imports: ProFit (>= 2.2.0), ProFound (>= 1.17.12), ProSpect (>= 1.1.5), ParmOff (>= 0.1.1), Highlander (>= 0.2.0), magicaxis
-Suggests: Rfits
+Suggests: Rfits, knitr, rmarkdown, ProTools
+VignetteBuilder: knitr
