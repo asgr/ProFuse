@@ -1,10 +1,10 @@
 ---
-title: "ProFit + ProSpect = ProFuse"
+title: "ProFound + ProFit + ProSpect = ProFuse"
 author: "Aaron Robotham"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ProFit + ProSpect = ProFuse}
+  %\VignetteIndexEntry{ProFound + ProFit + ProSpect = ProFuse}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -148,7 +148,7 @@ MultiFit = profuseMultiBandFound2Fit(image_list=image_list,
                                                          speclib=BC03lr,
                                                          Dale=Dale_NormTot,
                                                          filtout=filtout,
-                                                         z=0.1,
+                                                         z=redshift,
                                                          Z=Zfunc_massmap_lin,
                                                          agemax=agemax
                                                          )
@@ -164,7 +164,7 @@ highfit = Highlander(
   likefunc = profitLikeModel,
   seed = 666,
   ablim = 1,
-  Niters = c(200, 200),
+  Niters = c(1e3, 1e3),
   applyintervals = FALSE,
   applyconstraints = FALSE
 )

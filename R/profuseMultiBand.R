@@ -1,4 +1,5 @@
 profuseMultiBandFound2Fit = function(image_list,
+                                     segim_list = NULL,
                                     sky_list = NULL,
                                     skyRMS_list = NULL,
                                     loc = NULL,
@@ -37,8 +38,14 @@ profuseMultiBandFound2Fit = function(image_list,
                                             skyRMS = skyRMS_list[i][[1]],
                                             magzero = magzero[i],
                                             ...)
-      image_list[[i]] = image_list[[i]] - profound$sky
-      skyRMS_list[[i]] = profound$skyRMS
+      if(is.null(sky_list[i])){
+        image_list[[i]] = image_list[[i]] - profound$sky
+      }else{
+        image_list[[i]] = image_list[[i]] - sky_list[i]
+      }
+      if(is.null(skyRMS_list[i])){
+        skyRMS_list[[i]] = profound$skyRMS
+      }
     }
 
     if(is.null(psf_list[i][[1]])){
@@ -142,12 +149,18 @@ profuseMultiBandFound2Fit = function(image_list,
       plot = FALSE
     )
 
+    if(!is.null(segim_list[[i]])){
+      segim_use = F2Fstack$Data$segim
+    }else{
+      segim_use = segim_list[[i]]
+    }
+
     message("Image ",i,": running SetupData")
     Data_list[[i]] = profitSetupData(
       image = image_list[[i]][xlo:xhi,ylo:yhi],
       region = F2Fstack$Data$region[xlo:xhi,ylo:yhi],
       sigma = sigma[xlo:xhi,ylo:yhi],
-      segim = F2Fstack$Data$segim[xlo:xhi,ylo:yhi],
+      segim = segim_use[xlo:xhi,ylo:yhi],
       psf = psf_list[[i]],
       modellist = F2Fstack$Data$modellist,
       tofit = F2Fstack$Data$tofit,
@@ -220,6 +233,7 @@ profuseMultiBandFound2Fit = function(image_list,
 }
 
 profuseMultiBandDoFit = function(image_list,
+                                 segim_list = NULL,
                                 sky_list = NULL,
                                 skyRMS_list = NULL,
                                 loc = NULL,
@@ -240,6 +254,7 @@ profuseMultiBandDoFit = function(image_list,
   message('Running MultiBandFound2Fit')
   Data_list = profuseMultiBandFound2Fit(
     image_list = image_list,
+    segim_list = segim_list,
     sky_list = sky_list,
     skyRMS_list = skyRMS_list,
     loc = loc,

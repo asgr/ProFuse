@@ -9,26 +9,35 @@ ProFound + ProFit + ProSpect Multi-Band Fitting
 Functions to easily take users from multi-band image pixel data all the way to fully fitted physical profiles using \code{ProSpect}.
 }
 \usage{
-profuseMultiBandFound2Fit(image_list, sky_list = NULL, skyRMS_list = NULL, loc = NULL,
-  parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2",
-  "sersic.axrat2"), Ncomp = 2, cutbox = dim(image), psf_list = NULL, magdiff = 2.5,
-  magzero = rep(0,length(image_list)), gain = NULL, sing_nser = 2, bulge_nser = 4,
-  disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
-  bulge_circ =  TRUE, star_rough = TRUE, fit_rough = FALSE, psf_dim = c(51, 51),
-  star_circ = TRUE, tightcrop = TRUE, wave = NULL, smooth.parm = NULL,
-  parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
+profuseMultiBandFound2Fit(image_list, segim_list = NULL, sky_list = NULL,
+  skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1", "sersic.ycen1",
+  "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
+  psf_list = NULL, magdiff = 2.5, magzero = rep(0,length(image_list)), gain = NULL,
+  sing_nser = 2, bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE,
+  bulge_nser_fit = FALSE, disk_nser_fit = FALSE, bulge_circ =  TRUE, star_rough = TRUE,
+  fit_rough = FALSE, psf_dim = c(51, 51), star_circ = TRUE, tightcrop = TRUE, wave = NULL,
+  smooth.parm = NULL, parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
   intervals_ProSpect = NULL, ...)
 
-profuseMultiBandDoFit(image_list, sky_list = NULL, skyRMS_list = NULL, loc = NULL,
-  parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2",
+profuseMultiBandDoFit(image_list, segim_list = NULL, sky_list = NULL, skyRMS_list = NULL,
+  loc = NULL, parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2",
   "sersic.axrat2"), Ncomp = 2, cutbox = dim(image), psf_list = NULL,
   magzero = rep(0, length(image_list)), psf_dim = c(51, 51), star_rough = TRUE,
   fit_rough = FALSE, seed = 666, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{image}{
-Numeric matrix; required, the galaxy image we want to fit a galaxy of PSF/star model to. For convenience this can also be an Rfits_pointer object for very large on disk images. Critically, this input \option{image} needs to be well background subtracted (this is not done again internally).
+  \item{image_list}{
+List; required, a list a numeric matrices (one image per target band). This list should exactly match the length of \option{segim_list}, \option{sky_list}, \option{skyRMS_list}, \option{psf_list}, \option{magzero} if these are supplied.
+}
+  \item{segim_list}{
+List; optional, a list of integer matrix segmentation maps (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the stacked \option{image_list} segmentation map and use this instead.
+}
+  \item{sky_list}{
+List; optional, a list of numeric matrix sky images (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the per band sky.
+}
+  \item{skyRMS_list}{
+List; optional, a list of numeric matrix sky RMS images (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the per band sky RMS.
 }
   \item{loc}{
 Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be cut out. The default is NULL, which does no cutout at all.
@@ -38,15 +47,6 @@ Integer scalar; optional, number of components to fit to galaxy. Options for gal
 }
   \item{cutbox}{
 Numeric vector; optional, the dimensions of the box to cut out from \option{image} centred on \option{loc}. This is ignored if \option{loc} is NULL (default). This can be useful if the target \option{image} is very large since a part of this process is to run \code{profoundProFound}, where we only really care about the solution near our object of interest.
-}
-  \item{image_list}{
-List; required, a list a numeric matrices (one image per target band). This list should exactly match the length of \option{sky_list}, \option{skyRMS_list}, \option{psf_list}, \option{magzero} if these are supplied.
-}
-  \item{sky_list}{
-List; optional, a list a numeric matrices (one sky per target band). This list should exactly match the length of \option{image_list}, \option{skyRMS_list}, \option{psf_list}, \option{magzero} if these are supplied. If not present \code{profoundProFound} will be run to estimate the per band sky.
-}
-  \item{skyRMS_list}{
-List; optional, a list a numeric matrices (one sky per target band). This list should exactly match the length of \option{image_list}, \option{sky_list}, \option{psf_list}, \option{magzero} if these are supplied. If not present \code{profoundProFound} will be run to estimate the per band sky.
 }
   \item{parm_global}{
 Vector; optional, a vector specifying the positions or names of parameters that should be considered global. These are still optimised over, but the optimised values are shared across all bands. This is usually appropriate for parameters related to xcen, ycen, axrat and ang, since these should be common between images in most cases. The default case is reasonably sensible for a two component fitting problem (the default). For convenience, if NULL then all parameters are treated as global.
