@@ -1,5 +1,6 @@
 profuseMultiBandFound2Fit = function(image_list,
                                      segim_list = NULL,
+                                     segim_global = NULL,
                                     sky_list = NULL,
                                     skyRMS_list = NULL,
                                     loc = NULL,
@@ -71,10 +72,12 @@ profuseMultiBandFound2Fit = function(image_list,
 
   message("Running ProFound on stack")
 
-  multi_stack_pro = ProFound::profoundProFound(multi_stack$image,
+  multi_stack_pro = ProFound::profoundProFound(image=multi_stack$image,
+                                               segim=segim_global,
                                                sky=0,
                                                skyRMS=multi_stack$skyRMS,
                                                redosky=FALSE,
+                                               static_photom=TRUE,
                                                ...)
 
   message("Running Found2Fit on stack")
@@ -234,6 +237,7 @@ profuseMultiBandFound2Fit = function(image_list,
 
 profuseMultiBandDoFit = function(image_list,
                                  segim_list = NULL,
+                                 segim_global = NULL,
                                 sky_list = NULL,
                                 skyRMS_list = NULL,
                                 loc = NULL,
@@ -255,6 +259,7 @@ profuseMultiBandDoFit = function(image_list,
   Data_list = profuseMultiBandFound2Fit(
     image_list = image_list,
     segim_list = segim_list,
+    segim_global = segim_global,
     sky_list = sky_list,
     skyRMS_list = skyRMS_list,
     loc = loc,

@@ -174,9 +174,9 @@ We can now extract the star formation histories for the bulge and the disk separ
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit$parm["mpeak_1"],mperiod=10^highfit$parm["mperiod_1"],
-  mskew=highfit$parm["mskew_1"], magemax=agemax),0,13.8e9,add=FALSE,col='red', ylim=c(0,10),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13.8e9,add=FALSE,col='red', ylim=c(0,2),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
-  mskew=highfit$parm["mskew_2"], magemax=agemax),0,13.8e9,add=TRUE,col='blue', ylim=c(0,10),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+  mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13.8e9,add=TRUE,col='blue', ylim=c(0,2),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
 legend('bottomright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)
 ```
 

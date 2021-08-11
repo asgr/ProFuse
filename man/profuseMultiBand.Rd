@@ -9,21 +9,21 @@ ProFound + ProFit + ProSpect Multi-Band Fitting
 Functions to easily take users from multi-band image pixel data all the way to fully fitted physical profiles using \code{ProSpect}.
 }
 \usage{
-profuseMultiBandFound2Fit(image_list, segim_list = NULL, sky_list = NULL,
-  skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1", "sersic.ycen1",
-  "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
-  psf_list = NULL, magdiff = 2.5, magzero = rep(0,length(image_list)), gain = NULL,
-  sing_nser = 2, bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE,
-  bulge_nser_fit = FALSE, disk_nser_fit = FALSE, bulge_circ =  TRUE, star_rough = TRUE,
-  fit_rough = FALSE, psf_dim = c(51, 51), star_circ = TRUE, tightcrop = TRUE, wave = NULL,
-  smooth.parm = NULL, parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
-  intervals_ProSpect = NULL, ...)
+profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
+ sky_list = NULL, skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1",
+ "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
+ cutbox = dim(image), psf_list = NULL, magdiff = 2.5, magzero = rep(0,length(image_list)),
+ gain = NULL, sing_nser = 2, bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE,
+ bulge_nser_fit = FALSE, disk_nser_fit = FALSE, bulge_circ =  TRUE, star_rough = TRUE,
+ fit_rough = FALSE, psf_dim = c(51, 51), star_circ = TRUE, tightcrop = TRUE, wave = NULL,
+ smooth.parm = NULL, parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
+ intervals_ProSpect = NULL, ...)
 
-profuseMultiBandDoFit(image_list, segim_list = NULL, sky_list = NULL, skyRMS_list = NULL,
-  loc = NULL, parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2",
-  "sersic.axrat2"), Ncomp = 2, cutbox = dim(image), psf_list = NULL,
-  magzero = rep(0, length(image_list)), psf_dim = c(51, 51), star_rough = TRUE,
-  fit_rough = FALSE, seed = 666, ...)
+profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL, sky_list = NULL,
+ skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1", "sersic.ycen1",
+ "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
+ psf_list = NULL, magzero = rep(0, length(image_list)), psf_dim = c(51, 51),
+ star_rough = TRUE, fit_rough = FALSE, seed = 666, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,6 +32,9 @@ List; required, a list a numeric matrices (one image per target band). This list
 }
   \item{segim_list}{
 List; optional, a list of integer matrix segmentation maps (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the stacked \option{image_list} segmentation map and use this instead.
+}
+  \item{segim_global}{
+Integer matrix; optional, an input segmentation map to use on the stacked images to get rough initial guesses for the \code{ProFit} model. This will also be used to calculate bounds if \option{tightcrop} = TRUE.
 }
   \item{sky_list}{
 List; optional, a list of numeric matrix sky images (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the per band sky.
