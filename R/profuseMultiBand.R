@@ -44,7 +44,7 @@ profuseMultiBandFound2Fit = function(image_list,
       }else{
         image_list[[i]] = image_list[[i]] - sky_list[i]
       }
-      if(is.null(skyRMS_list[i])){
+      if(is.null(skyRMS_list[i][[1]])){
         skyRMS_list[[i]] = profound$skyRMS
       }
     }
