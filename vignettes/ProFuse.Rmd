@@ -177,7 +177,7 @@ magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit
   mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13.8e9,add=FALSE,col='red', ylim=c(0,2),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
   mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13.8e9,add=TRUE,col='blue', ylim=c(0,2),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
-legend('bottomright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)
+legend('topright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)
 ```
 
 And we can check the final model image per band:
