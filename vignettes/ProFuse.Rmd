@@ -1,13 +1,15 @@
 ---
-title: "ProFound + ProFit + ProSpect = ProFuse"
+title: "ProFuse Basics"
 author: "Aaron Robotham"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ProFound + ProFit + ProSpect = ProFuse}
+  %\VignetteIndexEntry{ProFuse Basics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+# ProFound + ProFit + ProSpect = ProFuse
 
 Here we show the minimal working example of full multi-band simultaneous **ProFit** and **ProSpect** fitting, this has been nick-named **ProFuse**, but this is not really the official name (yet...).  The idea is that rather than fitting **ProFit** for each image individually, or even with priors informed by earlier fits and/or a forced smooth relationship of the **ProFit** parameters as a function of wavelength (which might look nice, but could well be unphysical) we use **ProSpect** to fit a true star formation and dust attenuation law etc along with certain **ProFit** properties. The end result is that the likelihood is computed at the per band-image level, and the outcome is we compute a separate star formation / metallicity history etc for the bulge and disk components.
 
@@ -189,6 +191,8 @@ profitLikeModel(highfit$parm, MultiFit, makeplots = TRUE)
 We can also look at the SED per component, where as we might expect the bulge light is 'redder' than the disk light.
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
+if(highfit$parm[11] > log10(0.05)){highfit$parm[11] = log10(0.05)}
+if(highfit$parm[16] > log10(0.05)){highfit$parm[16] = log10(0.05)}
 bulgeSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11]), MultiFit$data_ProSpect), .strip = '_1', .logged=c('mSFR', 'mperiod', 'Zfinal'))
 diskSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11+5]), MultiFit$data_ProSpect), .strip = '_2', .logged=c('mSFR', 'mperiod', 'Zfinal'))
 

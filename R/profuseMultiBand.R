@@ -11,6 +11,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                     magdiff = 2.5,
                                     magzero = rep(0,length(image_list)),
                                     gain = NULL,
+                                    resamp = NULL,
                                     sing_nser = 2,
                                     bulge_nser = 4,
                                     disk_nser = 1,
@@ -32,9 +33,9 @@ profuseMultiBandFound2Fit = function(image_list,
                                     ...){
   Nim = length(image_list)
   for(i in 1:Nim){
-    if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){
+    if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){ #[i][[1]] looks silly, but it will return NULL when sky_list = NULL for any i (default). [[i]] will error in this case
       message("Image ",i,": running initial ProFound")
-      profound = ProFound::profoundProFound(image = image_list[i][[1]],
+      profound = ProFound::profoundProFound(image = image_list[[i]],
                                             sky = sky_list[i][[1]],
                                             skyRMS = skyRMS_list[i][[1]],
                                             magzero = magzero[i],
@@ -51,7 +52,8 @@ profuseMultiBandFound2Fit = function(image_list,
 
     if(is.null(psf_list[i][[1]])){
       message("Image ",i,": running AllStarDoFit")
-      psf_list[[i]] = profuseAllStarDoFit(image = image_list[i][[1]],
+      psf_list[[i]] = profuseAllStarDoFit(image = image_list[[i]],
+                                          resamp = resamp[i][[1]],
                                          psf_dim = psf_dim,
                                          star_circ = star_circ,
                                          magzero = magzero[i],
@@ -138,10 +140,10 @@ profuseMultiBandFound2Fit = function(image_list,
   Data_list = list()
 
   for(i in 1:Nim){
-    if(is.null(gain[i])){
+    if(is.null(gain[[i]])){
      gain_loc = ProFound::profoundGainEst(image_list[[i]], objects=multi_stack_pro$objects, sky = 0)
     }else{
-      gain_loc = gain[i]
+      gain_loc = gain[[i]]
     }
     sigma = ProFound::profoundMakeSigma(
       image = image_list[[i]],
@@ -152,7 +154,13 @@ profuseMultiBandFound2Fit = function(image_list,
       plot = FALSE
     )
 
-    if(!is.null(segim_list[[i]])){
+    if(!is.null(resamp[i][[1]])){
+      if(resamp[i][[1]] > 1){
+        sigma = sigma*resamp[i][[1]]
+      }
+    }
+
+    if(!is.null(segim_list[i][[1]])){
       segim_use = F2Fstack$Data$segim
     }else{
       segim_use = segim_list[[i]]

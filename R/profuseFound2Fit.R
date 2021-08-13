@@ -8,6 +8,7 @@ profuseFound2Fit = function(image,
                            magdiff = 2.5,
                            magzero = 0,
                            gain = NULL,
+                           resamp = NULL,
                            loc_use = FALSE,
                            loc_fit = TRUE,
                            mag_fit = TRUE,
@@ -102,6 +103,12 @@ profuseFound2Fit = function(image,
       skyRMS = mini_profound$skyRMS,
       plot = FALSE
     )
+  }
+
+  if(!is.null(resamp)){
+    if(resamp > 1){
+      cutsigma = cutsigma*resamp
+    }
   }
 
   if(deblend_extra & fit_extra==FALSE){

@@ -1,8 +1,8 @@
 Package: ProFuse
 Type: Package
 Title: Physical Multi-Band Fitting
-Version: 0.1.1
-Date: 2021-08-11
+Version: 0.1.2
+Date: 2021-08-13
 Author: Aaron Robotham
 Maintainer: Aaron Robotham <aaron.robotham@uwa.edu.au>
 Description: This package combines all of the ProTools into a powerful physical model of a galaxy. ProFound + ProFit + ProSpect = ProFuse.

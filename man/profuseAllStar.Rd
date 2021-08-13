@@ -10,8 +10,8 @@ Functions to identify stars from \code{ProFound} and fit them with \code{ProFit}
 }
 \usage{
 profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, magzero = 0,
-  psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE, rough = FALSE,
-  star_dom_mag = NULL, Nstar = 4, ...)
+  resamp = NULL, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
+  rough = FALSE, star_dom_mag = NULL, Nstar = 4, ...)
 
 profuseAllStarDoFit(image, sigma = NULL, locs = NULL, magzero = 0, psf_dim = c(51,51),
   rough = FALSE, plot = FALSE, seed = 666, ...)
@@ -32,6 +32,9 @@ Numeric matrix; optional, the [X,Y] locations of target stars on the original \o
 }
   \item{magzero}{
 Numeric scalar/vector; optional, the magnitude zero point, where values become scaled by the standard scale=10^(-0.4*(mag-magzero)). For \option{profoundMultiBandFound2Fit} this vector should exactly match the length of \option{sky_list}, \option{skyRMS_list}, \option{image_list}, \option{psf_list} if these are supplied.
+}
+  \item{resamp}{
+Numeric scalar; optional, reampling factors for the \option{image}. If you have warped natively low resolution data (say, FIR) to match higher resolution optical data the resampling factor for the FIR will be larger than 1 (less than 1 is ignored) which modifies the measure sky RMS. In simple terms, by over-sampling lower resolution data and conserving flux you reduce the estimated RMS likelihood (your RMS per new pixel will be a factor \option{resamp} larger, but you have \option{resamp}^2 fewer pixels).
 }
   \item{star_con}{
 Numeric scalar; optional, start value (or fixed value if \option{star_con_fit} = FALSE) of the Moffat profile concentration index for star fitting.

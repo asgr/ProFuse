@@ -13,11 +13,11 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
  sky_list = NULL, skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1",
  "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
  cutbox = dim(image), psf_list = NULL, magdiff = 2.5, magzero = rep(0,length(image_list)),
- gain = NULL, sing_nser = 2, bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE,
- bulge_nser_fit = FALSE, disk_nser_fit = FALSE, bulge_circ =  TRUE, star_rough = TRUE,
- fit_rough = FALSE, psf_dim = c(51, 51), star_circ = TRUE, tightcrop = TRUE, wave = NULL,
- smooth.parm = NULL, parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
- intervals_ProSpect = NULL, ...)
+ gain = NULL, resamp = NULL, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
+ sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE, bulge_circ =  TRUE,
+ star_rough = TRUE, fit_rough = FALSE, psf_dim = c(51, 51), star_circ = TRUE,
+ tightcrop = TRUE, wave = NULL, smooth.parm = NULL, parm_ProSpect = NULL,
+ data_ProSpect = NULL, logged_ProSpect = NULL, intervals_ProSpect = NULL, ...)
 
 profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL, sky_list = NULL,
  skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1", "sersic.ycen1",
@@ -61,10 +61,13 @@ List; optional, a list of numeric matrices (one PSF per target band). This list 
 Numeric scalar; optional, the maximum magnitude difference for modelling nearby objects (if \option{} = TRUE) that have a segment touching the object of interest. The default of 2.5 means objects have to have at least 10\% the flux of our target object to be modelled. Dropping this too low might mean a lot of time is spent modelling with ProFit for little gain in the fiddelity of the measurement.
 }
   \item{magzero}{
-Numeric vector; optional, the magnitude zero point, where values become scaled by the standard scale=10^(-0.4*(mag-magzero)). This vector should exactly match the length of \option{sky_list}, \option{skyRMS_list}, \option{image_list}, \option{psf_list} if these are supplied.
+Numeric vector; optional, the magnitude zero point for the corresponding \option{image_list}, where values become scaled by the standard scale=10^(-0.4*(mag-magzero)). This vector should exactly match the length of \option{image_list}.
 }
   \item{gain}{
-Numeric vector; the gain (in photo-electrons per ADU). This is only used to compute object shot-noise component of the flux error. If NULL then it is approximated from the image directly from Poisson statistics using \code{\link{profoundGainEst}}.
+Numeric vector; gain (in photo-electrons per ADU) for the corresponding \option{image_list}. This is only used to compute object shot-noise component of the flux error. If NULL then it is approximated from the image directly from Poisson statistics using \code{\link{profoundGainEst}}.
+}
+  \item{resamp}{
+Numeric vector; optional, reampling factors for the corresponding \option{image_list}. If you have warped natively low resolution data (say, FIR) to match higher resolution optical data the resampling factor for the FIR will be larger than 1 (less than 1 is ignored) which modifies the measure sky RMS. In simple terms, by over-sampling lower resolution data and conserving flux you reduce the estimated RMS likelihood (your RMS per new pixel will be a factor \option{resamp} larger, but you have \option{resamp}^2 fewer pixels).
 }
   \item{sing_nser}{
 Numeric scalar; optional, start value (or fixed value if \option{sing_nser_fit} = FALSE) of the single Sersic profile index. Only relevant for \option{Ncomp} = 1 fits.

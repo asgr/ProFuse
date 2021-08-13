@@ -3,6 +3,7 @@ profuseAllStarFound2Fit = function(image,
                            locs = NULL,
                            segim = NULL,
                            magzero = 0,
+                           resamp = NULL,
                            psf_dim = c(51,51),
                            star_con = 2,
                            star_con_fit = TRUE,
@@ -51,6 +52,12 @@ profuseAllStarFound2Fit = function(image,
       skyRMS = mini_profound$skyRMS,
       plot = FALSE
     )
+  }
+
+  if(!is.null(resamp)){
+    if(resamp > 1){
+      sigma = sigma*resamp
+    }
   }
 
   if(is.null(locs)){

@@ -10,7 +10,7 @@ Functions to easily take users from image pixel data all the way to fully fitted
 }
 \usage{
 profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
-  cutbox = dim(image), psf = NULL, magdiff = 2.5, magzero = 0, gain = NULL,
+  cutbox = dim(image), psf = NULL, magdiff = 2.5, magzero = 0, gain = NULL, resamp = NULL,
   loc_use = FALSE, loc_fit =  TRUE, mag_fit = TRUE, sing_nser = 2, bulge_nser = 4,
   disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
   bulge_circ =  TRUE, star_con = 2, star_con_fit = TRUE, star_circ = TRUE, offset = NULL,
@@ -47,10 +47,13 @@ Image matrix; required, an empirical point spread function (PSF) image matrix th
 Numeric scalar; optional, the maximum magnitude difference for modelling nearby objects (if \option{} = TRUE) that have a segment touching the object of interest. The default of 2.5 means objects have to have at least 10\% the flux of our target object to be modelled. Dropping this too low might mean a lot of time is spent modelling with ProFit for little gain in the fiddelity of the measurement.
 }
   \item{magzero}{
-Numeric scalar; optional, the magnitude zero point, where values become scaled by the standard scale=10^(-0.4*(mag-magzero)).
+Numeric scalar; optional, the magnitude zero points for the \option{image}, where values become scaled by the standard scale=10^(-0.4*(mag-magzero)).
 }
   \item{gain}{
-Numeric scalar; the gain (in photo-electrons per ADU). This is only used to compute object shot-noise component of the flux error. If NULL then it is approximated from the image directly from Poisson statistics using \code{\link{profoundGainEst}}.
+Numeric scalar; optional, gain (in photo-electrons per ADU) for the \option{image}. This is only used to compute object shot-noise component of the flux error. If NULL then it is approximated from the image directly from Poisson statistics using \code{\link{profoundGainEst}}.
+}
+  \item{resamp}{
+Numeric scalar; optional, reampling factors for the \option{image}. If you have warped natively low resolution data (say, FIR) to match higher resolution optical data the resampling factor for the FIR will be larger than 1 (less than 1 is ignored) which modifies the measure sky RMS. In simple terms, by over-sampling lower resolution data and conserving flux you reduce the estimated RMS likelihood (your RMS per new pixel will be a factor \option{resamp} larger, but you have \option{resamp}^2 fewer pixels).
 }
   \item{loc_use}{
 Logical; optional, should the provided \option{loc} be used to represent the starting [X,Y] coordinates of the model? If FALSE (default) then the \option{xcen} and \option{ycen} provided by \code{profoundProFound} is used instead. If users are very certain that the centre of the object should be precisely at \option{loc} then \option{loc_use} should be TRUE.
