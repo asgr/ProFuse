@@ -14,7 +14,8 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
   loc_use = FALSE, loc_fit =  TRUE, mag_fit = TRUE, sing_nser = 2, bulge_nser = 4,
   disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
   bulge_circ =  TRUE, star_con = 2, star_con_fit = TRUE, star_circ = TRUE, offset = NULL,
-  rough = FALSE, tightcrop = TRUE, deblend_extra = TRUE, fit_extra = FALSE, ...)
+  rough = FALSE, tightcrop = TRUE, deblend_extra = TRUE, fit_extra = FALSE,
+  pos_delta = 10, ...)
 
 profuseDoFit(image, sigma = NULL, loc = NULL, Ncomp = 2, cutbox = dim(image), psf,
   magdiff = 2.5, magzero = 0, psf_dim = c(51,51), rough = FALSE, plot = FALSE,
@@ -111,6 +112,9 @@ Logical; optional, if TRUE (and \option{fit_extra} is FALSE) then the image will
 }
   \item{fit_extra}{
 Logical; optional, should extra objects near to the primary target also be fitted in parallel? Default is FALSE. The other important option if this is TRUE is \option{magdiff}, that controls how bright (relatively speaking) the nearby sources need to be before they are modelled by \code{ProFit}. In multi-band mode you might want to set this to FALSE because it can be hard to predict how many extra objects are found in each band, and therefore constructing the correct \option{parm} input can be very complicated. Cannot be used in conjunction with \option{deblend_extra} (i.e. if \option{fit_extra} is TRUE then \option{deblend_extra} is treated as FALSE no matter what the user sets it to).
+}
+  \item{pos_delta}{
+Numeric scalar; allowed range of [x,y] centring compared to the initial guess. The default of 10 works well for most cases, but very large galaxies with complex structure might need this set higher to better allow the true centre to be recovered.
 }
   \item{plot}{
 Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.

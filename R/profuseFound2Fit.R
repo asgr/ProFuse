@@ -27,7 +27,7 @@ profuseFound2Fit = function(image,
                            tightcrop = TRUE,
                            deblend_extra = TRUE,
                            fit_extra = FALSE,
-
+                           pos_delta=10,
                            ...) {
   if(Ncomp >= 1 & is.null(psf)){stop('Need PSF for Ncomp >= 1')}
   if(Ncomp == 0.5){psf = NULL}
@@ -164,6 +164,9 @@ profuseFound2Fit = function(image,
     xcen = mini_profound$segstats[loc_tar, 'xcen']
     ycen = mini_profound$segstats[loc_tar, 'ycen']
   }
+
+  xcen_int = xcen + c(-pos_delta,pos_delta)
+  ycen_int = ycen + c(-pos_delta,pos_delta)
 
   if (Ncomp == 0.5) {
     if(star_circ){
@@ -343,8 +346,8 @@ profuseFound2Fit = function(image,
 
   if (Ncomp == 0.5) {
     intervals = list(moffat = list(
-      xcen = list(c(0, dim(cutim)[1])),
-      ycen = list(c(0, dim(cutim)[2])),
+      xcen = list(xcen_int),
+      ycen = list(ycen_int),
       mag = list(c(0, 40)),
       fwhm = list(c(0.5, maxsize)),
       con = list(c(1, 10)),
@@ -353,8 +356,8 @@ profuseFound2Fit = function(image,
     ))
   } else if (Ncomp == 1) {
     intervals = list(sersic = list(
-      xcen = list(c(0, dim(cutim)[1])),
-      ycen = list(c(0, dim(cutim)[2])),
+      xcen = list(xcen_int),
+      ycen = list(ycen_int),
       mag = list(c(0, 40)),
       re = list(c(1, maxsize)),
       nser = list(c(0.5, 5.3)),
@@ -364,8 +367,8 @@ profuseFound2Fit = function(image,
   } else if (Ncomp == 2) {
     intervals = list(
       sersic = list(
-        xcen = list(c(0, dim(cutim)[1]), c(0, dim(cutim)[1])),
-        ycen = list(c(0, dim(cutim)[2]), c(0, dim(cutim)[2])),
+        xcen = list(xcen_int, xcen_int),
+        ycen = list(ycen_int, ycen_int),
         mag = list(c(0, 40), c(0, 40)),
         re = list(c(1, maxsize), c(1, maxsize)),
         nser = list(c(2, 5.3), c(0.5, 2)),
@@ -376,8 +379,8 @@ profuseFound2Fit = function(image,
   } else if (Ncomp == 1.5) {
     intervals = list(
       sersic = list(
-        xcen = list(c(0, dim(cutim)[1])),
-        ycen = list(c(0, dim(cutim)[2])),
+        xcen = list(xcen_int),
+        ycen = list(ycen_int),
         mag = list(c(0, 40)),
         re = list(c(1, maxsize)),
         nser = list(c(0.5, 5.3)),
@@ -385,8 +388,8 @@ profuseFound2Fit = function(image,
         axrat = list(c(0.01, 1))
       ),
       pointsource = list(
-        xcen = list(c(0, dim(cutim)[1])),
-        ycen = list(c(0, dim(cutim)[2])),
+        xcen = list(xcen_int),
+        ycen = list(ycen_int),
         mag = list(c(0, 40))
       )
     )
@@ -442,8 +445,8 @@ profuseFound2Fit = function(image,
     intervals = c(intervals,
                   list(
                     sersic = list(
-                      xcen = rep(list(c(0, dim(cutim)[1])), N_ext),
-                      ycen = rep(list(c(0, dim(cutim)[2])), N_ext),
+                      xcen = rep(list(xcen_int), N_ext),
+                      ycen = rep(list(ycen_int), N_ext),
                       mag = rep(list(c(0, 40)), N_ext),
                       re = rep(list(c(1, maxsize)), N_ext),
                       nser = rep(list(c(0.5, 5.3)), N_ext),
