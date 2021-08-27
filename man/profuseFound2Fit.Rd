@@ -17,9 +17,9 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
   rough = FALSE, tightcrop = TRUE, deblend_extra = TRUE, fit_extra = FALSE,
   pos_delta = 10, ...)
 
-profuseDoFit(image, sigma = NULL, loc = NULL, Ncomp = 2, cutbox = dim(image), psf,
-  magdiff = 2.5, magzero = 0, psf_dim = c(51,51), rough = FALSE, plot = FALSE,
-  seed = 666, ...)
+profuseDoFit(image, sigma = NULL, loc = NULL, F2F = NULL, Ncomp = 2, cutbox = dim(image),
+  psf, magdiff = 2.5, magzero = 0, psf_dim = c(51,51), rough = FALSE, plot = FALSE,
+  seed = 666, optim_iters = 2, Niters = c(100,100), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -31,6 +31,9 @@ Numeric matrix; optional, the sigma map of the \option{image} data we want to fi
 }
   \item{loc}{
 Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be cut out. The default is NULL, which does no cutout at all.
+}
+  \item{F2F}{
+List; output of \code{profuseFound2Fit}. If this is provided then the \code{profuseFound2Fit} step of \code{profuseDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_F2F}} on the \option{F2F} object if you are using across different session to regenerate the PSF convolution pointer.
 }
   \item{segim}{
 Integer matrix; optional, users can pass in their own segmentation maps, which should be pixel matched to the input \option{image}. This will be used instead of the internal \code{ProFound} run, although the segmentation statistics will still be recomputed.
@@ -121,6 +124,12 @@ Logical; optional, should a before and after modelling plot be created? This is 
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
+}
+  \item{optim_iters}{
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}.
+}
+  \item{Niters}{
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.

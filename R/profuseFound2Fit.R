@@ -154,19 +154,22 @@ profuseFound2Fit = function(image,
     if(loc_use){
       xcen = loc[1] - xlo + 1
       ycen = loc[2] - ylo + 1
+      xcen_int = xcen + c(-pos_delta,pos_delta)
+      ycen_int = ycen + c(-pos_delta,pos_delta)
     }else{
       xcen = mini_profound$segstats[loc_tar, 'xcen'] - xlo + 1
       ycen = mini_profound$segstats[loc_tar, 'ycen'] - ylo + 1
+      xcen_int = xcen + c(-pos_delta,pos_delta)
+      ycen_int = ycen + c(-pos_delta,pos_delta)
     }
   }else{
     xlo = 1L
     ylo = 1L
     xcen = mini_profound$segstats[loc_tar, 'xcen']
     ycen = mini_profound$segstats[loc_tar, 'ycen']
+    xcen_int = xcen + c(-pos_delta,pos_delta)
+    ycen_int = ycen + c(-pos_delta,pos_delta)
   }
-
-  xcen_int = xcen + c(-pos_delta,pos_delta)
-  ycen_int = ycen + c(-pos_delta,pos_delta)
 
   if (Ncomp == 0.5) {
     if(star_circ){
@@ -481,6 +484,7 @@ profuseFound2Fit = function(image,
 profuseDoFit = function(image,
                        sigma = NULL,
                        loc = NULL,
+                       F2F = NULL,
                        Ncomp = 2,
                        cutbox = dim(image),
                        psf = NULL,
@@ -490,25 +494,30 @@ profuseDoFit = function(image,
                        rough = FALSE,
                        plot = FALSE,
                        seed = 666,
+                       optim_iters = 2,
+                       Niters = c(100,100),
                        ...) {
 
   timestart = proc.time()[3] # start timer
   call = match.call(expand.dots=TRUE)
 
-  message('Running Found2Fit')
-  found2fit = profuseFound2Fit(
-    image = image,
-    sigma = sigma,
-    loc = loc,
-    Ncomp = Ncomp,
-    cutbox = cutbox,
-    psf = psf,
-    magdiff = magdiff,
-    magzero = magzero,
-    rough = rough,
-    ...
-  )
-  Data = found2fit$Data
+  if(is.null(F2F)){
+    message('Running Found2Fit')
+    F2F = profuseFound2Fit(
+      image = image,
+      sigma = sigma,
+      loc = loc,
+      Ncomp = Ncomp,
+      cutbox = cutbox,
+      psf = psf,
+      magdiff = magdiff,
+      magzero = magzero,
+      rough = rough,
+      ...
+    )
+  }
+
+  Data = F2F$Data
 
   if (plot) {
     profitLikeModel(parm = Data$init,
@@ -534,7 +543,9 @@ profuseDoFit = function(image,
     lower = lowers,
     upper = uppers,
     applyintervals = FALSE,
-    applyconstraints = FALSE
+    applyconstraints = FALSE,
+    optim_iters = optim_iters,
+    Niters = Niters
   )
   names(highfit$parm) = names(Data$init)
 
@@ -543,7 +554,7 @@ profuseDoFit = function(image,
     legend('topright', legend = 'After')
   }
 
-  highfit$profound = found2fit$profound
+  highfit$profound = F2F$profound
   highfit$Data = Data
   highfit$initmodel = profitRemakeModellist(Data$init, Data = Data)
   highfit$finalmodel = profitRemakeModellist(highfit$parm, Data = Data)

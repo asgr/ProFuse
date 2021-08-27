@@ -73,7 +73,7 @@ image_list = list(
 The reasonably minimal run of MultiBandFound2Fit, which sets everything up for later fitting. Here we are mostly setting the **ProSpect** related inputs (most of the **ProFit** ones are either reasonable to assume, or can be estimated from the **ProFound** outputs). Note this takes a few minutes to run, because we are also fitting the PSF per band by automatically extracting stars from the image and fitting them. If you already have PSFs for some bands you can provide them in *psf_list*, leaving unknown PSF entries as NULL.
 
 ```{r eval=evalglobal, message=FALSE, warning=FALSE}
-MultiFit = profuseMultiBandFound2Fit(image_list=image_list,
+MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                     magzero=c(0,0,0,0,30,30,30,30,30),
                                     tolerance=20,
                                     parm_global = c("sersic.xcen1", "sersic.ycen1",
@@ -159,7 +159,7 @@ MultiFit = profuseMultiBandFound2Fit(image_list=image_list,
 
 Now we actually run the fit with **Highlander**:
 
-```{r, eval=evalglobal}
+```{r, eval=FALSE}
 highfit = Highlander(
   parm = MultiFit$init,
   Data = MultiFit,
@@ -170,6 +170,10 @@ highfit = Highlander(
   applyintervals = FALSE,
   applyconstraints = FALSE
 )
+```
+
+```{r}
+highlander = profuseMultiBandDoFit(MF2F=MF2F, Niters = c(1e3, 1e3))
 ```
 
 We can now extract the star formation histories for the bulge and the disk separately:

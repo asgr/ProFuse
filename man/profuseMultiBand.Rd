@@ -12,7 +12,7 @@ Functions to easily take users from multi-band image pixel data all the way to f
 profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
  sky_list = NULL, skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1",
  "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
- cutbox = dim(image), psf_list = NULL, magdiff = 2.5, magzero = rep(0,length(image_list)),
+ cutbox = dim(image), psf_list = NULL, magdiff = 2.5, magzero = NULL,
  gain = NULL, resamp = NULL, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
  sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE, bulge_circ =  TRUE,
  star_rough = TRUE, fit_rough = FALSE, psf_dim = c(51, 51), star_circ = TRUE,
@@ -20,10 +20,11 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
  data_ProSpect = NULL, logged_ProSpect = NULL, intervals_ProSpect = NULL, ...)
 
 profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL, sky_list = NULL,
- skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1", "sersic.ycen1",
- "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
- psf_list = NULL, magzero = rep(0, length(image_list)), psf_dim = c(51, 51),
- star_rough = TRUE, fit_rough = FALSE, seed = 666, ...)
+ skyRMS_list = NULL, loc = NULL, MF2F = NULL, parm_global = c("sersic.xcen1",
+ "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
+ cutbox = dim(image), psf_list = NULL, magzero = NULL,
+ psf_dim = c(51, 51), star_rough = TRUE, fit_rough = FALSE, seed = 666, optim_iters = 2,
+ Niters = c(100,100), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -44,6 +45,9 @@ List; optional, a list of numeric matrix sky RMS images (one per target band). T
 }
   \item{loc}{
 Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be cut out. The default is NULL, which does no cutout at all.
+}
+  \item{MF2F}{
+List; output of \code{profuseMultiBandFound2Fit}. If this is provided then the \code{profuseMultiBandFound2Fit} step of \code{profuseMultiBandDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_MF2F}} on the \option{MF2F} object if you are using across different session to regenerate the PSF convolution pointers.
 }
   \item{Ncomp}{
 Integer scalar; optional, number of components to fit to galaxy. Options for galaxies are "1" (single Sersic profile), "1.5" (disk Sersic profile with a central PSF to model the bulge) and "2" (double Sersic profile, the default), and in this case an input \option{psf} should be supplied. To fit a star with a Moffat profile set Ncomp to "0.5", and in this case no input \option{psf} should be supplied.
@@ -125,6 +129,12 @@ Logical; optional, should the image be cut down to the tightest fitting box that
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
+}
+  \item{optim_iters}{
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}.
+}
+  \item{Niters}{
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.

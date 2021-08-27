@@ -9,7 +9,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                     cutbox = dim(image),
                                     psf_list = NULL,
                                     magdiff = 2.5,
-                                    magzero = rep(0,length(image_list)),
+                                    magzero = NULL,
                                     gain = NULL,
                                     resamp = NULL,
                                     sing_nser = 2,
@@ -32,6 +32,9 @@ profuseMultiBandFound2Fit = function(image_list,
                                     intervals_ProSpect = NULL,
                                     ...){
   Nim = length(image_list)
+  if(is.null(magzero)){
+    magzero = rep(0, Nim)
+  }
   for(i in 1:Nim){
     if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){ #[i][[1]] looks silly, but it will return NULL when sky_list = NULL for any i (default). [[i]] will error in this case
       message("Image ",i,": running initial ProFound")
@@ -111,8 +114,35 @@ profuseMultiBandFound2Fit = function(image_list,
     ylo = min(regionlim[,2])
     yhi = max(regionlim[,2])
 
-    F2Fstack$Data$modellist$sersic$xcen = F2Fstack$Data$modellist$sersic$xcen - xlo + 1
-    F2Fstack$Data$modellist$sersic$ycen = F2Fstack$Data$modellist$sersic$ycen - ylo + 1
+    if(!is.null(F2Fstack$Data$modellist$sersic)){
+      F2Fstack$Data$modellist$sersic$xcen = F2Fstack$Data$modellist$sersic$xcen - xlo + 1
+      F2Fstack$Data$modellist$sersic$ycen = F2Fstack$Data$modellist$sersic$ycen - ylo + 1
+
+      for(i in 1:length(F2Fstack$Data$intervals$sersic$xcen)){
+        F2Fstack$Data$intervals$sersic$xcen[[i]] = F2Fstack$Data$intervals$sersic$xcen[[i]] - xlo + 1
+        F2Fstack$Data$intervals$sersic$ycen[[i]] = F2Fstack$Data$intervals$sersic$ycen[[i]] - ylo + 1
+      }
+    }
+
+    if(!is.null(F2Fstack$Data$modellist$moffat)){
+      F2Fstack$Data$modellist$moffat$xcen = F2Fstack$Data$modellist$moffat$xcen - xlo + 1
+      F2Fstack$Data$modellist$moffat$ycen = F2Fstack$Data$modellist$moffat$ycen - ylo + 1
+
+      for(i in 1:length(F2Fstack$Data$intervals$moffat$xcen)){
+        F2Fstack$Data$intervals$moffat$xcen[[i]] = F2Fstack$Data$intervals$moffat$xcen[[i]] - xlo + 1
+        F2Fstack$Data$intervals$moffat$ycen[[i]] = F2Fstack$Data$intervals$moffat$ycen[[i]] - ylo + 1
+      }
+    }
+
+    if(!is.null(F2Fstack$Data$modellist$pointsource)){
+      F2Fstack$Data$modellist$pointsource$xcen = F2Fstack$Data$modellist$pointsource$xcen - xlo + 1
+      F2Fstack$Data$modellist$pointsource$ycen = F2Fstack$Data$modellist$pointsource$ycen - ylo + 1
+
+      for(i in 1:length(F2Fstack$Data$intervals$pointsource$xcen)){
+        F2Fstack$Data$intervals$pointsource$xcen[[i]] = F2Fstack$Data$intervals$pointsource$xcen[[i]] - xlo + 1
+        F2Fstack$Data$intervals$pointsource$ycen[[i]] = F2Fstack$Data$intervals$pointsource$ycen[[i]] - ylo + 1
+      }
+    }
 
     xcenloc = grep('xcen', F2Fstack$Data$parm.names)
     if(length(xcenloc) > 0){
@@ -121,7 +151,7 @@ profuseMultiBandFound2Fit = function(image_list,
 
     ycenloc = grep('ycen', F2Fstack$Data$parm.names)
     if(length(ycenloc) > 0){
-      F2Fstack$Data$init[ycenloc] = F2Fstack$Data$init[ycenloc] - xlo + 1
+      F2Fstack$Data$init[ycenloc] = F2Fstack$Data$init[ycenloc] - ylo + 1
     }
 
   }else{
@@ -137,7 +167,7 @@ profuseMultiBandFound2Fit = function(image_list,
 
   mag_stack = ProFound::profoundFlux2Mag(flux=sum(multi_stack$image[F2Fstack$Data$region], na.rm=TRUE), magzero=0)
 
-  Data_list = list()
+  MF2F = list()
 
   for(i in 1:Nim){
     if(is.null(gain[[i]])){
@@ -167,7 +197,7 @@ profuseMultiBandFound2Fit = function(image_list,
     }
 
     message("Image ",i,": running SetupData")
-    Data_list[[i]] = profitSetupData(
+    MF2F[[i]] = profitSetupData(
       image = image_list[[i]][xlo:xhi,ylo:yhi],
       region = F2Fstack$Data$region[xlo:xhi,ylo:yhi],
       sigma = sigma[xlo:xhi,ylo:yhi],
@@ -185,13 +215,13 @@ profuseMultiBandFound2Fit = function(image_list,
     )
   }
 
-  names(Data_list) = names(image_list)
+  names(MF2F) = names(image_list)
 
   #Check below for ProFuse- how this all works could be complicated... see also profitLikeModel and profitRemakeModelList
   if(is.null(parm_global)){
     parm = F2Fstack$Data$init
     for(i in 1:Nim){
-      Data_list[[i]]$parmuse = 1:length(parm)
+      MF2F[[i]]$parmuse = 1:length(parm)
     }
   }else{
     parm_init = F2Fstack$Data$init
@@ -210,9 +240,9 @@ profuseMultiBandFound2Fit = function(image_list,
         parmuse = 1:Nparm
         parmuse[parm_global] = 1:length(parm_global)
         parmuse[parm_local] = length(parm_global) + 1:length(parm_local) + (i-1)*length(parm_local) #define parmuse location in parent parm object - check for ProFuse
-        Data_list[[i]]$parmuse = parmuse
+        MF2F[[i]]$parmuse = parmuse
       }else{
-        Data_list[[i]]$parmuse = 1:Nparm
+        MF2F[[i]]$parmuse = 1:Nparm
       }
     }
   }
@@ -227,20 +257,20 @@ profuseMultiBandFound2Fit = function(image_list,
     parm[sel] = parm[sel] - mag_diff
   }
 
-  Data_list$init = c(parm, unlist(parm_ProSpect))
-  Data_list$parm.names = names(Data_list$init)
-  Data_list$mon.names = F2Fstack$Data$mon.names
-  Data_list$Nim = Nim #Number of images
-  Data_list$Ncomp = Ncomp #Number of components
-  Data_list$N = F2Fstack$Data$N #This is the number of fitting pixels (cannot rename)
-  Data_list$wave = wave
-  Data_list$smooth.parm = smooth.parm
-  Data_list$parm_ProSpect = parm_ProSpect
-  Data_list$data_ProSpect = data_ProSpect
-  Data_list$logged_ProSpect = logged_ProSpect
-  Data_list$intervals_ProSpect = intervals_ProSpect
+  MF2F$init = c(parm, unlist(parm_ProSpect))
+  MF2F$parm.names = names(MF2F$init)
+  MF2F$mon.names = F2Fstack$Data$mon.names
+  MF2F$Nim = Nim #Number of images
+  MF2F$Ncomp = Ncomp #Number of components
+  MF2F$N = F2Fstack$Data$N #This is the number of fitting pixels (cannot rename)
+  MF2F$wave = wave
+  MF2F$smooth.parm = smooth.parm
+  MF2F$parm_ProSpect = parm_ProSpect
+  MF2F$data_ProSpect = data_ProSpect
+  MF2F$logged_ProSpect = logged_ProSpect
+  MF2F$intervals_ProSpect = intervals_ProSpect
 
-  return(Data_list)
+  return(MF2F)
 }
 
 profuseMultiBandDoFit = function(image_list,
@@ -249,61 +279,90 @@ profuseMultiBandDoFit = function(image_list,
                                 sky_list = NULL,
                                 skyRMS_list = NULL,
                                 loc = NULL,
+                                MF2F = NULL,
                                 parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
                                 Ncomp = 2,
                                 cutbox = dim(image),
                                 psf_list = NULL,
-                                magzero = rep(0, length(image_list)),
+                                magzero = NULL,
                                 psf_dim = c(51,51),
                                 star_rough = TRUE,
                                 fit_rough = FALSE,
                                 seed = 666,
+                                optim_iters = 2,
+                                Niters = c(100,100),
                                 ...) {
 
   timestart = proc.time()[3] # start timer
   call = match.call(expand.dots=TRUE)
 
-  message('Running MultiBandFound2Fit')
-  Data_list = profuseMultiBandFound2Fit(
-    image_list = image_list,
-    segim_list = segim_list,
-    segim_global = segim_global,
-    sky_list = sky_list,
-    skyRMS_list = skyRMS_list,
-    loc = loc,
-    parm_global = parm_global,
-    Ncomp = Ncomp,
-    cutbox = cutbox,
-    psf_list = psf_list,
-    magzero = magzero,
-    star_rough = star_rough,
-    fit_rough = fit_rough,
-    ...
-  )
+  if(is.null(MF2F)){
+    message('Running MultiBandFound2Fit')
+    MF2F = profuseMultiBandFound2Fit(
+      image_list = image_list,
+      segim_list = segim_list,
+      segim_global = segim_global,
+      sky_list = sky_list,
+      skyRMS_list = skyRMS_list,
+      loc = loc,
+      parm_global = parm_global,
+      Ncomp = Ncomp,
+      cutbox = cutbox,
+      psf_list = psf_list,
+      magzero = magzero,
+      star_rough = star_rough,
+      fit_rough = fit_rough,
+      ...
+    )
+  }
+
+  lower_profit = {}
+  upper_profit = {}
+  logged_profit = {}
+
+  for(i in 1:length(MF2F[[1]]$intervals)){ #loop over profiles
+    for(j in 1:length(MF2F[[1]]$intervals[[1]][[1]])){ #loop over components
+      for(k in 1:length(MF2F[[1]]$intervals[[1]])){ #loop over parameters
+        if(isTRUE(MF2F[[1]]$tofit[[i]][[k]][[j]])){
+          lower_profit = c(lower_profit, MF2F[[1]]$intervals[[i]][[k]][[j]][1])
+          upper_profit = c(upper_profit, MF2F[[1]]$intervals[[i]][[k]][[j]][2])
+          logged_profit = c(logged_profit, MF2F[[1]]$tolog[[i]][[k]][[j]])
+        }
+      }
+    }
+  }
+
+  lower_profit[logged_profit] = log10(lower_profit[logged_profit])
+  upper_profit[logged_profit] = log10(upper_profit[logged_profit])
+
+  lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
+  upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
 
   message('Running Highander on multi-band data')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
   highfit = Highlander::Highlander(
-    parm = Data_list$init,
-    Data = Data_list,
+    parm = MF2F$init,
+    Data = MF2F,
     likefunc = profitLikeModel,
     seed = seed,
-    ablim = 1,
-
+    lower = lower,
+    upper = upper,
     applyintervals = FALSE,
-    applyconstraints = FALSE
+    applyconstraints = FALSE,
+    optim_iters = optim_iters,
+    Niters = Niters
   )
 
-  highfit$Data_list = Data_list
+  highfit$MF2F = MF2F
   highfit$error = apply(highfit$LD_last$Posterior1,
                         MARGIN = 2,
                         FUN = 'sd')
 
-  if(!is.null(Data_list$smooth.parm) & !is.null(Data_list$wave)){
-    namevec = names(Data_list$smooth.parm)
+  if(!is.null(MF2F$smooth.parm) & !is.null(MF2F$wave)){
+    namevec = names(MF2F$smooth.parm)
     highfit$parm_smooth = highfit$parm
-    for(i in 1:length(Data_list$smooth.parm)){
-      highfit$parm_smooth = .smooth_parm(parm=highfit$parm_smooth, Data_list$parm.names, extract=namevec[i], wave=Data_list$wave, func=Data_list$smooth.parm[[i]])
+    for(i in 1:length(MF2F$smooth.parm)){
+      highfit$parm_smooth = .smooth_parm(parm=highfit$parm_smooth, MF2F$parm.names, extract=namevec[i], wave=MF2F$wave, func=MF2F$smooth.parm[[i]])
     }
   }else{
     highfit$parm_smooth = NULL
