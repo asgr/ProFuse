@@ -257,11 +257,15 @@ profuseMultiBandFound2Fit = function(image_list,
     parm[sel] = parm[sel] - mag_diff
   }
 
+  if(is.null(data_ProSpect$LumDist_Mpc)){
+    data_ProSpect$LumDist_Mpc = cosdistLumDist(data_ProSpect$z, H0 = 67.8, OmegaM = 0.308)
+  }
+
   MF2F$init = c(parm, unlist(parm_ProSpect))
   MF2F$parm.names = names(MF2F$init)
   MF2F$mon.names = F2Fstack$Data$mon.names
   MF2F$Nim = Nim #Number of images
-  MF2F$Ncomp = Ncomp #Number of components
+  MF2F$Ncomp = ceiling(Ncomp) #Number of components 1.5->2 and 2.5->3
   MF2F$N = F2Fstack$Data$N #This is the number of fitting pixels (cannot rename)
   MF2F$wave = wave
   MF2F$smooth.parm = smooth.parm
