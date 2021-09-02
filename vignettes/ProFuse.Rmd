@@ -22,7 +22,7 @@ To keep things feasible (both in terms of coding and fitting) only a restrictive
 Set global evaluate:
 
 ```{r}
-evalglobal = FALSE
+evalglobal = TRUE
 ```
 
 Load the required packages (**ProTools** basically load all of my packages in one go):
@@ -152,7 +152,9 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                                          filtout=filtout,
                                                          z=redshift,
                                                          Z=Zfunc_massmap_lin,
-                                                         agemax=agemax
+                                                         agemax=agemax,
+                                                         magemax=agemax/1e9,
+                                                         Zagemax=agemax/1e9
                                                          )
                                     )
 ```
