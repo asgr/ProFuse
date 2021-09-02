@@ -154,19 +154,22 @@ profuseFound2Fit = function(image,
     if(loc_use){
       xcen = loc[1] - xlo + 1
       ycen = loc[2] - ylo + 1
+      xcen_int = xcen + c(-pos_delta,pos_delta)
+      ycen_int = ycen + c(-pos_delta,pos_delta)
     }else{
       xcen = mini_profound$segstats[loc_tar, 'xcen'] - xlo + 1
       ycen = mini_profound$segstats[loc_tar, 'ycen'] - ylo + 1
+      xcen_int = xcen + c(-pos_delta,pos_delta)
+      ycen_int = ycen + c(-pos_delta,pos_delta)
     }
   }else{
     xlo = 1L
     ylo = 1L
     xcen = mini_profound$segstats[loc_tar, 'xcen']
     ycen = mini_profound$segstats[loc_tar, 'ycen']
+    xcen_int = xcen + c(-pos_delta,pos_delta)
+    ycen_int = ycen + c(-pos_delta,pos_delta)
   }
-
-  xcen_int = xcen + c(-pos_delta,pos_delta)
-  ycen_int = ycen + c(-pos_delta,pos_delta)
 
   if (Ncomp == 0.5) {
     if(star_circ){
@@ -227,6 +230,18 @@ profuseFound2Fit = function(image,
         xcen = mini_profound$segstats[loc_tar, 'xcen'],
         ycen = mini_profound$segstats[loc_tar, 'ycen'],
         mag = mini_profound$segstats[loc_tar, 'mag'] + 0.752575
+      )
+    )
+  } else if (Ncomp == 2.5) {
+    modellist = list(
+      sersic = list(
+        xcen = rep(xcen, 3),
+        ycen = rep(ycen, 3),
+        mag = rep(mini_profound$segstats[loc_tar, 'mag'], 3) + 0.4771213,
+        re = mini_profound$segstats[loc_tar, 'R50'] * c(0.5, 2, 1),
+        nser = c(bulge_nser, disk_nser, disk_nser),
+        ang = c(ifelse(bulge_circ, 0, mini_profound$segstats[loc_tar, 'ang']), rep(mini_profound$segstats[loc_tar, 'ang'],2)),
+        axrat = c(1, rep(mini_profound$segstats[loc_tar, 'axrat'],2))
       )
     )
   }
@@ -290,6 +305,22 @@ profuseFound2Fit = function(image,
       modellist[[2]]$ycen = modellist[[1]]$ycen
       return(modellist)
     }
+  } else if (Ncomp == 2.5) {
+    tofit = list(sersic = list(
+      xcen = c(loc_fit, NA, NA), #The NA couples the components together
+      ycen = c(loc_fit, NA, NA), #The NA couples the components together
+      mag = rep(mag_fit, 3),
+      re = rep(TRUE, 3),
+      nser = c(bulge_nser_fit, disk_nser_fit, FALSE),
+      ang = c(!bulge_circ, TRUE, FALSE),
+      axrat = c(!bulge_circ, TRUE, FALSE)
+    ))
+    constraints = function(modellist) {
+      modellist[[1]]$nser[3] = modellist[[1]]$nser[2]
+      modellist[[1]]$ang[3] = modellist[[1]]$ang[2]
+      modellist[[1]]$axrat[3] = modellist[[1]]$axrat[2]
+      return(modellist)
+    }
   }
 
   if (Ncomp == 0.5) {
@@ -337,6 +368,20 @@ profuseFound2Fit = function(image,
         xcen = FALSE,
         ycen = FALSE,
         mag = FALSE
+      )
+    )
+  } else if (Ncomp == 2.5) {
+    tolog = list(
+      sersic = list(
+        xcen = rep(FALSE, 3),
+        ycen = rep(FALSE, 3),
+        mag = rep(FALSE, 3),
+        re = rep(TRUE, 3),
+        #re is best fit in log space
+        nser = rep(TRUE, 3),
+        #nser is best fit in log space
+        ang = rep(FALSE, 3),
+        axrat = rep(TRUE, 3) #axrat is best fit in log space
       )
     )
   }
@@ -391,6 +436,18 @@ profuseFound2Fit = function(image,
         xcen = list(xcen_int),
         ycen = list(ycen_int),
         mag = list(c(0, 40))
+      )
+    )
+  } else if (Ncomp == 2.5) {
+    intervals = list(
+      sersic = list(
+        xcen = list(xcen_int, xcen_int, xcen_int),
+        ycen = list(ycen_int, ycen_int, ycen_int),
+        mag = list(c(0, 40), c(0, 40), c(0, 40)),
+        re = list(c(1, maxsize), c(1, maxsize), c(1, maxsize)),
+        nser = list(c(2, 5.3), c(0.5, 2), c(0.5, 2)),
+        ang = list(c(-180, 360), c(-180, 360), c(-180, 360)),
+        axrat = list(c(0.01, 1), c(0.01, 1), c(0.01, 1))
       )
     )
   }
@@ -481,6 +538,7 @@ profuseFound2Fit = function(image,
 profuseDoFit = function(image,
                        sigma = NULL,
                        loc = NULL,
+                       F2F = NULL,
                        Ncomp = 2,
                        cutbox = dim(image),
                        psf = NULL,
@@ -490,25 +548,30 @@ profuseDoFit = function(image,
                        rough = FALSE,
                        plot = FALSE,
                        seed = 666,
+                       optim_iters = 2,
+                       Niters = c(100,100),
                        ...) {
 
   timestart = proc.time()[3] # start timer
   call = match.call(expand.dots=TRUE)
 
-  message('Running Found2Fit')
-  found2fit = profuseFound2Fit(
-    image = image,
-    sigma = sigma,
-    loc = loc,
-    Ncomp = Ncomp,
-    cutbox = cutbox,
-    psf = psf,
-    magdiff = magdiff,
-    magzero = magzero,
-    rough = rough,
-    ...
-  )
-  Data = found2fit$Data
+  if(is.null(F2F)){
+    message('Running Found2Fit')
+    F2F = profuseFound2Fit(
+      image = image,
+      sigma = sigma,
+      loc = loc,
+      Ncomp = Ncomp,
+      cutbox = cutbox,
+      psf = psf,
+      magdiff = magdiff,
+      magzero = magzero,
+      rough = rough,
+      ...
+    )
+  }
+
+  Data = F2F$Data
 
   if (plot) {
     profitLikeModel(parm = Data$init,
@@ -534,7 +597,9 @@ profuseDoFit = function(image,
     lower = lowers,
     upper = uppers,
     applyintervals = FALSE,
-    applyconstraints = FALSE
+    applyconstraints = FALSE,
+    optim_iters = optim_iters,
+    Niters = Niters
   )
   names(highfit$parm) = names(Data$init)
 
@@ -543,7 +608,7 @@ profuseDoFit = function(image,
     legend('topright', legend = 'After')
   }
 
-  highfit$profound = found2fit$profound
+  highfit$profound = F2F$profound
   highfit$Data = Data
   highfit$initmodel = profitRemakeModellist(Data$init, Data = Data)
   highfit$finalmodel = profitRemakeModellist(highfit$parm, Data = Data)

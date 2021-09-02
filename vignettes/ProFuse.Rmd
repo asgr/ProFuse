@@ -73,7 +73,7 @@ image_list = list(
 The reasonably minimal run of MultiBandFound2Fit, which sets everything up for later fitting. Here we are mostly setting the **ProSpect** related inputs (most of the **ProFit** ones are either reasonable to assume, or can be estimated from the **ProFound** outputs). Note this takes a few minutes to run, because we are also fitting the PSF per band by automatically extracting stars from the image and fitting them. If you already have PSFs for some bands you can provide them in *psf_list*, leaving unknown PSF entries as NULL.
 
 ```{r eval=evalglobal, message=FALSE, warning=FALSE}
-MultiFit = profuseMultiBandFound2Fit(image_list=image_list,
+MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                     magzero=c(0,0,0,0,30,30,30,30,30),
                                     tolerance=20,
                                     parm_global = c("sersic.xcen1", "sersic.ycen1",
@@ -157,12 +157,12 @@ MultiFit = profuseMultiBandFound2Fit(image_list=image_list,
                                     )
 ```
 
-Now we actually run the fit with **Highlander**:
+Now we actually run the fit with **Highlander** (this is the example fit as run for the associated paper):
 
 ```{r, eval=evalglobal}
 highfit = Highlander(
-  parm = MultiFit$init,
-  Data = MultiFit,
+  parm = MF2F$init,
+  Data = MF2F,
   likefunc = profitLikeModel,
   seed = 666,
   ablim = 1,
@@ -172,20 +172,26 @@ highfit = Highlander(
 )
 ```
 
+For convenience we can also just pass our *MF2F* object into the *profuseMultiBandDoFit* function. This will still run Highlander (with slightly restricted options availble), but it has the advantage that it will properly pass all of the fitting limits through (a non-trivial task with many image and complex combinations of logged parameters).
+
+```{r, eval=FALSE}
+highfit = profuseMultiBandDoFit(MF2F=MF2F, Niters = c(1e3, 1e3))
+```
+
 We can now extract the star formation histories for the bulge and the disk separately:
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit$parm["mpeak_1"],mperiod=10^highfit$parm["mperiod_1"],
-  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13.8e9,add=FALSE,col='red', ylim=c(0,2),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13.8e9,add=FALSE,col='red', ylim=c(0,2.5),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
-  mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13.8e9,add=TRUE,col='blue', ylim=c(0,2),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+  mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13.8e9,add=TRUE,col='blue')
 legend('topright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)
 ```
 
 And we can check the final model image per band:
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
-profitLikeModel(highfit$parm, MultiFit, makeplots = TRUE)
+profitLikeModel(highfit$parm, MF2F, makeplots = TRUE)
 ```
 
 We can also look at the SED per component, where as we might expect the bulge light is 'redder' than the disk light.
@@ -193,8 +199,8 @@ We can also look at the SED per component, where as we might expect the bulge li
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
 if(highfit$parm[11] > log10(0.05)){highfit$parm[11] = log10(0.05)}
 if(highfit$parm[16] > log10(0.05)){highfit$parm[16] = log10(0.05)}
-bulgeSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11]), MultiFit$data_ProSpect), .strip = '_1', .logged=c('mSFR', 'mperiod', 'Zfinal'))
-diskSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11+5]), MultiFit$data_ProSpect), .strip = '_2', .logged=c('mSFR', 'mperiod', 'Zfinal'))
+bulgeSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11]), MF2F$data_ProSpect), .strip = '_1', .logged=c('mSFR', 'mperiod', 'Zfinal'))
+diskSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11+5]), MF2F$data_ProSpect), .strip = '_2', .logged=c('mSFR', 'mperiod', 'Zfinal'))
 
 magplot(cenwaves, Jansky2magAB(bulgeSED$Photom), log='', col='red', ylim=c(22,15), type='l', xlab='Wave / Ang', ylab='Mag')
 lines(cenwaves, Jansky2magAB(diskSED$Photom), col='blue')
