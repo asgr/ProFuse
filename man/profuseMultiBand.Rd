@@ -24,7 +24,7 @@ profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL, sky_li
  "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
  cutbox = dim(image), psf_list = NULL, magzero = NULL,
  psf_dim = c(51, 51), star_rough = TRUE, fit_rough = FALSE, seed = 666, optim_iters = 2,
- Niters = c(100,100), ...)
+ Niters = c(1e3,1e3), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -261,6 +261,18 @@ profuseMultiBandFound2Fit = function(image_list,
     data_ProSpect$LumDist_Mpc = cosdistLumDist(data_ProSpect$z, H0 = 67.8, OmegaM = 0.308)
   }
 
+  if(is.null(data_ProSpect$magemax)){
+    if(!is.null(data_ProSpect$agemax)){
+      data_ProSpect$magemax = data_ProSpect$agemax/1e9
+    }
+  }
+
+  if(is.null(data_ProSpect$Zagemax)){
+    if(!is.null(data_ProSpect$agemax)){
+      data_ProSpect$Zagemax = data_ProSpect$agemax/1e9
+    }
+  }
+
   MF2F$init = c(parm, unlist(parm_ProSpect))
   MF2F$parm.names = names(MF2F$init)
   MF2F$mon.names = F2Fstack$Data$mon.names
@@ -294,7 +306,7 @@ profuseMultiBandDoFit = function(image_list,
                                 fit_rough = FALSE,
                                 seed = 666,
                                 optim_iters = 2,
-                                Niters = c(100,100),
+                                Niters = c(1e3,1e3),
                                 ...) {
 
   timestart = proc.time()[3] # start timer
@@ -351,7 +363,7 @@ profuseMultiBandDoFit = function(image_list,
     seed = seed,
     lower = lower,
     upper = upper,
-    applyintervals = FALSE,
+    applyintervals = TRUE,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
     Niters = Niters

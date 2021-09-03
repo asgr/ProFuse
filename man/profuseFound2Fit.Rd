@@ -19,7 +19,7 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
 
 profuseDoFit(image, sigma = NULL, loc = NULL, F2F = NULL, Ncomp = 2, cutbox = dim(image),
   psf, magdiff = 2.5, magzero = 0, psf_dim = c(51,51), rough = FALSE, plot = FALSE,
-  seed = 666, optim_iters = 2, Niters = c(100,100), ...)
+  seed = 666, optim_iters = 2, Niters = c(1e3,1e3), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

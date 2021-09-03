@@ -22,7 +22,7 @@ To keep things feasible (both in terms of coding and fitting) only a restrictive
 Set global evaluate:
 
 ```{r}
-evalglobal = FALSE
+evalglobal = TRUE
 ```
 
 Load the required packages (**ProTools** basically load all of my packages in one go):
@@ -157,32 +157,32 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                     )
 ```
 
-Now we actually run the fit with **Highlander** (this is the example fit as run for the associated paper):
+<!-- Now we actually run the fit with **Highlander** (this is the example fit as run for the associated paper): -->
 
-```{r, eval=evalglobal}
-highfit = Highlander(
-  parm = MF2F$init,
-  Data = MF2F,
-  likefunc = profitLikeModel,
-  seed = 666,
-  ablim = 1,
-  Niters = c(1e3, 1e3),
-  applyintervals = FALSE,
-  applyconstraints = FALSE
-)
-```
+<!-- ```{r, eval=FALSE} -->
+<!-- highfit = Highlander( -->
+<!--   parm = MF2F$init, -->
+<!--   Data = MF2F, -->
+<!--   likefunc = profitLikeModel, -->
+<!--   seed = 666, -->
+<!--   ablim = 1, -->
+<!--   Niters = c(1e3, 1e3), -->
+<!--   applyintervals = FALSE, -->
+<!--   applyconstraints = FALSE -->
+<!-- ) -->
+<!-- ``` -->
 
-For convenience we can also just pass our *MF2F* object into the *profuseMultiBandDoFit* function. This will still run Highlander (with slightly restricted options availble), but it has the advantage that it will properly pass all of the fitting limits through (a non-trivial task with many image and complex combinations of logged parameters).
+For convenience we can also just pass our *MF2F* object into the *profuseMultiBandDoFit* function. This will still run Highlander (with slightly restricted options available), but it has the advantage that it will properly pass all of the fitting limits through (a non-trivial task with many image and complex combinations of logged parameters).
 
-```{r, eval=FALSE}
-highfit = profuseMultiBandDoFit(MF2F=MF2F, Niters = c(1e3, 1e3))
+```{r, eval=TRUE}
+highfit = profuseMultiBandDoFit(MF2F=MF2F)
 ```
 
 We can now extract the star formation histories for the bulge and the disk separately:
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit$parm["mpeak_1"],mperiod=10^highfit$parm["mperiod_1"],
-  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13.8e9,add=FALSE,col='red', ylim=c(0,2.5),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13.8e9,add=FALSE,col='red', ylim=c(0,10),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
   mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13.8e9,add=TRUE,col='blue')
 legend('topright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)

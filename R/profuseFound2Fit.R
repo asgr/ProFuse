@@ -549,7 +549,7 @@ profuseDoFit = function(image,
                        plot = FALSE,
                        seed = 666,
                        optim_iters = 2,
-                       Niters = c(100,100),
+                       Niters = c(1e3,1e3),
                        ...) {
 
   timestart = proc.time()[3] # start timer
