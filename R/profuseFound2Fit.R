@@ -232,7 +232,7 @@ profuseFound2Fit = function(image,
         mag = mini_profound$segstats[loc_tar, 'mag'] + 0.752575
       )
     )
-  } else if (Ncomp == 2.5) {
+  } else if (Ncomp == 3) {
     modellist = list(
       sersic = list(
         xcen = rep(xcen, 3),
@@ -305,7 +305,7 @@ profuseFound2Fit = function(image,
       modellist[[2]]$ycen = modellist[[1]]$ycen
       return(modellist)
     }
-  } else if (Ncomp == 2.5) {
+  } else if (Ncomp == 3) {
     tofit = list(sersic = list(
       xcen = c(loc_fit, NA, NA), #The NA couples the components together
       ycen = c(loc_fit, NA, NA), #The NA couples the components together
@@ -370,7 +370,7 @@ profuseFound2Fit = function(image,
         mag = FALSE
       )
     )
-  } else if (Ncomp == 2.5) {
+  } else if (Ncomp == 3) {
     tolog = list(
       sersic = list(
         xcen = rep(FALSE, 3),
@@ -438,7 +438,7 @@ profuseFound2Fit = function(image,
         mag = list(c(0, 40))
       )
     )
-  } else if (Ncomp == 2.5) {
+  } else if (Ncomp == 3) {
     intervals = list(
       sersic = list(
         xcen = list(xcen_int, xcen_int, xcen_int),

@@ -50,7 +50,7 @@ Numeric vector; optional, the [X,Y] location of our target galaxy on the origina
 List; output of \code{profuseMultiBandFound2Fit}. If this is provided then the \code{profuseMultiBandFound2Fit} step of \code{profuseMultiBandDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_MF2F}} on the \option{MF2F} object if you are using across different session to regenerate the PSF convolution pointers.
 }
   \item{Ncomp}{
-Integer scalar; optional, number of components to fit to galaxy. Options for galaxies are "1" (single Sersic profile), "1.5" (disk Sersic profile with a central PSF to model the bulge) and "2" (double Sersic profile, the default), and in this case an input \option{psf} should be supplied. To fit a star with a Moffat profile set Ncomp to "0.5", and in this case no input \option{psf} should be supplied.
+Integer scalar; optional, number of components to fit to galaxy. Options for galaxies are "1" (single Sersic profile); "1.5" (disk Sersic profile with a central PSF to model the bulge); "2" (double Sersic profile, the default); and "3" (triple Sersic profile with one bulge and two [thin/thick] disks). In these cases an input \option{psf} should be supplied. To fit a star with a Moffat profile set Ncomp to "0.5". In this case no input \option{psf} should be supplied.
 }
   \item{cutbox}{
 Numeric vector; optional, the dimensions of the box to cut out from \option{image} centred on \option{loc}. This is ignored if \option{loc} is NULL (default). This can be useful if the target \option{image} is very large since a part of this process is to run \code{profoundProFound}, where we only really care about the solution near our object of interest.
