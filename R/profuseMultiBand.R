@@ -366,7 +366,8 @@ profuseMultiBandDoFit = function(image_list,
     applyintervals = TRUE,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
-    Niters = Niters
+    Niters = Niters,
+    parm.names = MF2F$parm.names
   )
 
   highfit$MF2F = MF2F

@@ -599,7 +599,8 @@ profuseDoFit = function(image,
     applyintervals = FALSE,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
-    Niters = Niters
+    Niters = Niters,
+    parm.names = Data$parm.names
   )
   names(highfit$parm) = names(Data$init)
 

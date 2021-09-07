@@ -4,7 +4,7 @@ author: "Aaron Robotham"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ProFit: Multi-frame and Multi-band Fitting}
+  %\VignetteIndexEntry{ProFuse: Multi-frame and Multi-band Fitting}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

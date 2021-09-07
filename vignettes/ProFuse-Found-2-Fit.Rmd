@@ -4,7 +4,7 @@ author: "Aaron Robotham"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ProFit: Found 2 Fit}
+  %\VignetteIndexEntry{ProFuse: Found 2 Fit}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

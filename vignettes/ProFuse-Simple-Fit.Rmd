@@ -17,12 +17,12 @@ Doing all of this is fairly expensive (example below takes about an hour), but i
 
 To keep things feasible (both in terms of coding and fitting) only a restrictive subset of **ProFit** component combinations are possible- basically the most popular and useful subset of bulge and disk fitting (with flexibility of free Sersic bulge and/or disk etc). My experience has been nobody uses the more complicated and flexible profiling options (sad-face) so until these are under serious demand this will probably be the limit of profiling options.
 
-## Minimal Example
+## Minimal Bulge-Disk Example (with fixed de-V bulge and Exp disk)
 
 Set global evaluate:
 
 ```{r}
-evalglobal = TRUE
+evalglobal = FALSE
 ```
 
 Load the required packages (**ProTools** basically load all of my packages in one go):
@@ -84,16 +84,11 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                       mpeak_1 = 10,
                                       mperiod_1 = 0.3,
                                       mskew_1 = 0,
-                                      #tau_screen_1 = -0.5,
-                                      #alpha_SF_screen_1 = 3,
                                       Zfinal_1 = -2,
-                                      
                                       mSFR_2 = 0,
                                       mpeak_2 = 1,
                                       mperiod_2 = 0.3,
                                       mskew_2 = 0,
-                                      #tau_screen_2 = -0.5,
-                                      #alpha_SF_screen_2 = 3
                                       Zfinal_2 = -2
                                     ),
                                     logged_ProSpect = c(
@@ -101,15 +96,11 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                       FALSE,                             #         mpeak_1 = 5,
                                       TRUE,                              #        mperiod_1 = 0.3,
                                       FALSE,                             #         mskew_1 = 0,
-                                      #TRUE,                              #        tau_screen_1 = -0.5,
-                                      #FALSE,                           #         alpha_SF_screen_1 = 3,
                                       TRUE,                              #        Zfinal_1 = -2,
                                       TRUE,                              #        mSFR_2 = 0,
                                       FALSE,                             #         mpeak_2 = 5,
                                       TRUE,                              #        mperiod_2 = 0.3,
                                       FALSE,                             #         mskew_2 = 0,
-                                      #TRUE,                              #        tau_screen_2 = -0.5,
-                                      #FALSE                              #        alpha_SF_screen_2 = 3
                                       TRUE                              #        Zfinal_2 = -2,
                                     ),
                                     intervals_ProSpect = list(
@@ -118,15 +109,11 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                         0,                               #       mpeak_1 = 5,
                                         -0.5,                            #          mperiod_1 = 0.3,
                                         -1,                              #        mskew_1 = 0,
-                                        #-2.5,                            #          tau_screen_1 = -0.5,
-                                        #0,                               #       alpha_SF_screen_1 = 3,
                                         -4,                              #        Zfinal_1 = -2,
                                         -4,                              #        mSFR_2 = 0,
                                         0,                               #       mpeak_2 = 5,
                                         -0.5,                            #          mperiod_2 = 0.3,
                                         -1,                              #        mskew_2 = 0,
-                                        #-2.5,                            #          tau_screen_2 = -0.5,
-                                        #0                                #      alpha_SF_screen_2 = 3
                                         -4                               #        Zfinal_2 = -2,
                                       ),
                                       hi=c(
@@ -134,15 +121,11 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                         10,                              #        mpeak_1 = 5,
                                         1,                               #       mperiod_1 = 0.3,
                                         1,                               #       mskew_1 = 0,
-                                        #1,                               #       tau_screen_1 = -0.5,
-                                        #4,                               #       alpha_SF_screen_1 = 3,
                                         -1.3,                              #        Zfinal_1 = -2,
                                         3,                               #       mSFR_2 = 0,
                                         10,                              #        mpeak_2 = 5,
                                         1,                               #       mperiod_2 = 0.3,
                                         1,                               #       mskew_2 = 0,
-                                        #1,                               #       tau_screen_2 = -0.5,
-                                        #4                                #      alpha_SF_screen_2 = 3
                                         -1.3                              #        Zfinal_2 = -2,
                                       )
                                     ),
@@ -174,7 +157,7 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
 
 For convenience we can also just pass our *MF2F* object into the *profuseMultiBandDoFit* function. This will still run Highlander (with slightly restricted options available), but it has the advantage that it will properly pass all of the fitting limits through (a non-trivial task with many image and complex combinations of logged parameters).
 
-```{r, eval=TRUE}
+```{r, eval=evalglobal}
 highfit = profuseMultiBandDoFit(MF2F=MF2F)
 ```
 
@@ -182,9 +165,9 @@ We can now extract the star formation histories for the bulge and the disk separ
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit$parm["mpeak_1"],mperiod=10^highfit$parm["mperiod_1"],
-  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13.8e9,add=FALSE,col='red', ylim=c(0,10),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13e9,add=FALSE,col='red', ylim=c(0,10),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
-  mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13.8e9,add=TRUE,col='blue')
+  mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13e9,add=TRUE,col='blue')
 legend('topright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)
 ```
 
@@ -204,4 +187,63 @@ diskSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11+5]), MF2F$dat
 
 magplot(cenwaves, Jansky2magAB(bulgeSED$Photom), log='', col='red', ylim=c(22,15), type='l', xlab='Wave / Ang', ylab='Mag')
 lines(cenwaves, Jansky2magAB(diskSED$Photom), col='blue')
+```
+
+## Minimal Single Sersic Example (with free nser)
+
+Setup up a single Sersic profile fit:
+
+```{r, eval=evalglobal}
+MF2F2 = profuseMultiBandFound2Fit(image_list=image_list,
+                                 magzero=c(0,0,0,0,30,30,30,30,30),
+                                 tolerance=20,
+                                 Ncomp=1,
+                                 parm_global = c("sersic.xcen", "sersic.ycen",
+                                                 "sersic.re", "sersic.nser",
+                                                 "sersic.ang","sersic.axrat"),
+                                 parm_ProSpect = list(
+                                     mSFR_1 = 0,
+                                     mpeak_1 = 10,
+                                     mperiod_1 = 0.3,
+                                     mskew_1 = 0,
+                                     Zfinal_1 = -2
+                                 ),
+                                 logged_ProSpect = c(
+                                     TRUE,                              #         mSFR_1 = 0,
+                                     FALSE,                             #         mpeak_1 = 5,
+                                     TRUE,                              #        mperiod_1 = 0.3,
+                                     FALSE,                             #         mskew_1 = 0,
+                                     TRUE                              #        Zfinal_1 = -2,
+                                 ),
+                                 intervals_ProSpect = list(
+                                     lo=c(
+                                         -4,                              #       mSFR_1 = 0,
+                                         0,                               #       mpeak_1 = 5,
+                                         -0.5,                            #          mperiod_1 = 0.3,
+                                         -1,                              #        mskew_1 = 0,
+                                         -4                              #        Zfinal_1 = -2,
+                                     ),
+                                     hi=c(
+                                         3,                               #       mSFR_1 = 0,
+                                         10,                              #        mpeak_1 = 5,
+                                         1,                               #       mperiod_1 = 0.3,
+                                         1,                               #       mskew_1 = 0,
+                                         -1.3                              #        Zfinal_1 = -2,
+                                     )
+                                 ),
+                                 data_ProSpect = list(massfunc=massfunc_snorm_trunc,
+                                                      speclib=BC03lr,
+                                                      Dale=Dale_NormTot,
+                                                      filtout=filtout,
+                                                      z=redshift,
+                                                      Z=Zfunc_massmap_lin,
+                                                      agemax=agemax
+                                 )
+)
+```
+
+And fit it:
+
+```{r, eval=evalglobal}
+highfit2 = profuseMultiBandDoFit(MF2F=MF2F2)
 ```
