@@ -140,21 +140,6 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                     )
 ```
 
-<!-- Now we actually run the fit with **Highlander** (this is the example fit as run for the associated paper): -->
-
-<!-- ```{r, eval=FALSE} -->
-<!-- highfit = Highlander( -->
-<!--   parm = MF2F$init, -->
-<!--   Data = MF2F, -->
-<!--   likefunc = profitLikeModel, -->
-<!--   seed = 666, -->
-<!--   ablim = 1, -->
-<!--   Niters = c(1e3, 1e3), -->
-<!--   applyintervals = FALSE, -->
-<!--   applyconstraints = FALSE -->
-<!-- ) -->
-<!-- ``` -->
-
 For convenience we can also just pass our *MF2F* object into the *profuseMultiBandDoFit* function. This will still run Highlander (with slightly restricted options available), but it has the advantage that it will properly pass all of the fitting limits through (a non-trivial task with many image and complex combinations of logged parameters).
 
 ```{r, eval=evalglobal}
