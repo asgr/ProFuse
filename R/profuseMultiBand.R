@@ -330,6 +330,8 @@ profuseMultiBandDoFit = function(image_list,
       fit_rough = fit_rough,
       ...
     )
+  }else{
+    MF2F = profuseRegenPSF_MF2F(MF2F)
   }
 
   lower_profit = {}

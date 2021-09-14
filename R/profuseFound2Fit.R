@@ -569,6 +569,8 @@ profuseDoFit = function(image,
       rough = rough,
       ...
     )
+  }else{
+    F2F = profuseRegenPSF_F2F(F2F)
   }
 
   Data = F2F$Data

@@ -129,13 +129,18 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                         -1.3                              #        Zfinal_2 = -2,
                                       )
                                     ),
-                                    data_ProSpect = list(massfunc=massfunc_snorm_trunc,
-                                                         speclib=BC03lr,
-                                                         Dale=Dale_NormTot,
-                                                         filtout=filtout,
-                                                         z=redshift,
-                                                         Z=Zfunc_massmap_lin,
-                                                         agemax=agemax
+                                    data_ProSpect = list(massfunc = massfunc_snorm_trunc,
+                                                         speclib = BC03lr,
+                                                         Dale = Dale_NormTot,
+                                                         filtout = filtout,
+                                                         z = redshift,
+                                                         Z = Zfunc_massmap_lin,
+                                                         agemax = agemax,
+                                                         #Set no dust in bulge
+                                                         tau_screen_1 = 0,
+                                                         #Set to Thorne 2020 medians for disk
+                                                         tau_screen_2 = 0.16,
+                                                         tau_birth_2 = 0.63
                                                          )
                                     )
 ```
@@ -150,7 +155,7 @@ We can now extract the star formation histories for the bulge and the disk separ
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit$parm["mpeak_1"],mperiod=10^highfit$parm["mperiod_1"],
-  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13e9,add=FALSE,col='red', ylim=c(0,10),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13e9,add=FALSE,col='red', ylim=c(0,4.5),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
   mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13e9,add=TRUE,col='blue')
 legend('topright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)
@@ -165,8 +170,8 @@ profitLikeModel(highfit$parm, MF2F, makeplots = TRUE)
 We can also look at the SED per component, where as we might expect the bulge light is 'redder' than the disk light.
 
 ```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
-if(highfit$parm[11] > log10(0.05)){highfit$parm[11] = log10(0.05)}
-if(highfit$parm[16] > log10(0.05)){highfit$parm[16] = log10(0.05)}
+if(highfit$parm["Zfinal_1"] > log10(0.05)){highfit$parm["Zfinal_1"] = log10(0.05)}
+if(highfit$parm["Zfinal_2"] > log10(0.05)){highfit$parm["Zfinal_2"] = log10(0.05)}
 bulgeSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11]), MF2F$data_ProSpect), .strip = '_1', .logged=c('mSFR', 'mperiod', 'Zfinal'))
 diskSED = ParmOff(ProSpectSED, .args = c(as.list(highfit$parm[7:11+5]), MF2F$data_ProSpect), .strip = '_2', .logged=c('mSFR', 'mperiod', 'Zfinal'))
 
@@ -176,7 +181,7 @@ lines(cenwaves, Jansky2magAB(diskSED$Photom), col='blue')
 
 ## Minimal Single Sersic Example (with free nser)
 
-Setup up a single Sersic profile fit:
+Setup up a single Sersic profile fit. Here we fit for dust parameters:
 
 ```{r, eval=evalglobal}
 MF2F2 = profuseMultiBandFound2Fit(image_list=image_list,
@@ -191,6 +196,8 @@ MF2F2 = profuseMultiBandFound2Fit(image_list=image_list,
                                      mpeak_1 = 10,
                                      mperiod_1 = 0.3,
                                      mskew_1 = 0,
+                                     tau_screen_1 = -0.8,
+                                     tau_birth_1 = -0.2,
                                      Zfinal_1 = -2
                                  ),
                                  logged_ProSpect = c(
@@ -198,6 +205,8 @@ MF2F2 = profuseMultiBandFound2Fit(image_list=image_list,
                                      FALSE,                             #         mpeak_1 = 5,
                                      TRUE,                              #        mperiod_1 = 0.3,
                                      FALSE,                             #         mskew_1 = 0,
+                                     TRUE,                             #         tau_screen_1 = -0.8,
+                                     TRUE,                             #         tau_birth_1 = -0.2,
                                      TRUE                              #        Zfinal_1 = -2,
                                  ),
                                  intervals_ProSpect = list(
@@ -206,6 +215,8 @@ MF2F2 = profuseMultiBandFound2Fit(image_list=image_list,
                                          0,                               #       mpeak_1 = 5,
                                          -0.5,                            #          mperiod_1 = 0.3,
                                          -1,                              #        mskew_1 = 0,
+                                         -2.5,                             #        tau_screen_1 = -0.8,
+                                         -2.5,                             #        tau_birth_1 = -0.2,
                                          -4                              #        Zfinal_1 = -2,
                                      ),
                                      hi=c(
@@ -213,6 +224,8 @@ MF2F2 = profuseMultiBandFound2Fit(image_list=image_list,
                                          10,                              #        mpeak_1 = 5,
                                          1,                               #       mperiod_1 = 0.3,
                                          1,                               #       mskew_1 = 0,
+                                         1,                             #        tau_screen_1 = -0.8,
+                                         1,                             #        tau_birth_1 = -0.2,
                                          -1.3                              #        Zfinal_1 = -2,
                                      )
                                  ),
@@ -232,3 +245,34 @@ And fit it:
 ```{r, eval=evalglobal}
 highfit2 = profuseMultiBandDoFit(MF2F=MF2F2)
 ```
+
+We can now extract the star formation history for our single component fit:
+
+```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
+magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit2$parm["mSFR_1"],mpeak=highfit2$parm["mpeak_1"],mperiod=10^highfit2$parm["mperiod_1"],
+  mskew=highfit2$parm["mskew_1"], magemax=agemax/1e9),0,13e9,add=FALSE, ylim=c(0,4.5),xlab='Age (Yr)', ylab='SFR (Msol / Yr)')
+magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit$parm["mpeak_1"],mperiod=10^highfit$parm["mperiod_1"],
+  mskew=highfit$parm["mskew_1"], magemax=agemax/1e9),0,13e9,add=TRUE,col='red', lty=2)
+magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
+  mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13e9,add=TRUE,col='blue', lty=2)
+legend('topright', legend=c('Single','Bulge', 'Disk'), col=c('black','red', 'blue'), lty=c(1,2,2))
+```
+
+And we can check the final model image per band:
+
+```{r fig.width=5, fig.height=5, dpi=100, eval=evalglobal}
+profitLikeModel(highfit2$parm, MF2F2, makeplots = TRUE)
+```
+
+We can extract the full ProSpectSED outputs like before:
+
+```{r}
+if(highfit2$parm["Zfinal_1"] > log10(0.05)){highfit2$parm["Zfinal_1"] = log10(0.05)}
+singleSED = ParmOff(ProSpectSED, .args = c(as.list(highfit2$parm[7:11]), MF2F2$data_ProSpect), .strip = '_1', .logged=c('mSFR', 'mperiod', 'Zfinal'))
+magplot(cenwaves, Jansky2magAB(singleSED$Photom), log='', ylim=c(22,15), type='l', xlab='Wave / Ang', ylab='Mag')
+lines(cenwaves, Jansky2magAB(bulgeSED$Photom), col='red', lty=2)
+lines(cenwaves, Jansky2magAB(diskSED$Photom), col='blue', lty=2)
+lines(cenwaves, Jansky2magAB(bulgeSED$Photom + diskSED$Photom), col='darkgreen', lty=2)
+legend('bottomright', legend=c('Single','Bulge', 'Disk'), col=c('black','red', 'blue', 'darkgreen'), lty=c(1,2,2,2))
+```
+
