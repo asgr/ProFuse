@@ -31,6 +31,7 @@ profuseFound2Fit = function(image,
                            ...) {
   if(Ncomp >= 1 & is.null(psf)){stop('Need PSF for Ncomp >= 1')}
   if(Ncomp == 0.5){psf = NULL}
+  if(Ncomp == 0 & is.null(psf)){stop('Need PSF for Ncomp = 0')}
 
   if(!is.null(loc)){
     cutim = magicaxis::magcutout(image, loc = loc, box = cutbox)
@@ -171,7 +172,15 @@ profuseFound2Fit = function(image,
     ycen_int = ycen + c(-pos_delta,pos_delta)
   }
 
-  if (Ncomp == 0.5) {
+  if (Ncomp == 0) {
+    modellist = list(
+      pointsource = list(
+        xcen = mini_profound$segstats[loc_tar, 'xcen'],
+        ycen = mini_profound$segstats[loc_tar, 'ycen'],
+        mag = mini_profound$segstats[loc_tar, 'mag']
+      )
+    )
+  }else if(Ncomp == 0.5) {
     if(star_circ){
       ang = 0
       axrat = 1
@@ -246,7 +255,16 @@ profuseFound2Fit = function(image,
     )
   }
 
-  if (Ncomp == 0.5) {
+  if (Ncomp == 0) {
+    tofit = list(
+      pointsource = list(
+        xcen = loc_fit,
+        ycen = loc_fit,
+        mag = mag_fit
+      )
+    )
+    constraints = NULL
+  }else if (Ncomp == 0.5) {
     tofit = list(
       moffat = list(
         xcen = loc_fit,
@@ -323,7 +341,16 @@ profuseFound2Fit = function(image,
     }
   }
 
-  if (Ncomp == 0.5) {
+  if (Ncomp == 0) {
+    tolog = list(
+      pointsource = list(
+        xcen = FALSE,
+        ycen = FALSE,
+        mag = FALSE
+      )
+    )
+    constraints = NULL
+  }else if (Ncomp == 0.5) {
     tolog = list(
       moffat = list(
         xcen = rep(FALSE, Ncomp),
@@ -389,7 +416,13 @@ profuseFound2Fit = function(image,
   #maxsize = sqrt(dim(cutim)[1]^2 + dim(cutim)[2]^2)
   maxsize = mini_profound$segstats[loc_tar, 'R50'] * 4
 
-  if (Ncomp == 0.5) {
+  if (Ncomp == 0) {
+    intervals = list(pointsource = list(
+      xcen = list(xcen_int),
+      ycen = list(ycen_int),
+      mag = list(c(0, 40))
+    ))
+  } else if (Ncomp == 0.5) {
     intervals = list(moffat = list(
       xcen = list(xcen_int),
       ycen = list(ycen_int),

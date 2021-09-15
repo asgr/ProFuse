@@ -266,7 +266,7 @@ profitLikeModel(highfit2$parm, MF2F2, makeplots = TRUE)
 
 We can extract the full ProSpectSED outputs like before:
 
-```{r}
+```{r, eval=evalglobal}
 if(highfit2$parm["Zfinal_1"] > log10(0.05)){highfit2$parm["Zfinal_1"] = log10(0.05)}
 singleSED = ParmOff(ProSpectSED, .args = c(as.list(highfit2$parm[7:11]), MF2F2$data_ProSpect), .strip = '_1', .logged=c('mSFR', 'mperiod', 'Zfinal'))
 magplot(cenwaves, Jansky2magAB(singleSED$Photom), log='', ylim=c(22,15), type='l', xlab='Wave / Ang', ylab='Mag')
