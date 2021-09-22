@@ -8,6 +8,6 @@ import("Highlander")
 import("magicaxis")
 
 importFrom("graphics", "image", "legend")
-importFrom("stats", "median", "smooth.spline")
+importFrom("stats", "median", "smooth.spline", "quantile")
 importFrom("utils", "packageVersion")
 importFrom("celestial", "cosdistLumDist")

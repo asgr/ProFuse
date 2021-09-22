@@ -33,6 +33,9 @@ profuseFound2Fit = function(image,
   if(Ncomp == 0.5){psf = NULL}
   if(Ncomp == 0 & is.null(psf)){stop('Need PSF for Ncomp = 0')}
 
+  image[image < quantile(image, 0.01, na.rm=TRUE)*10] = NA
+  image[image > quantile(image, 0.99, na.rm=TRUE)*10] = NA
+
   if(!is.null(loc)){
     cutim = magicaxis::magcutout(image, loc = loc, box = cutbox)
     loc_cut = cutim$loc

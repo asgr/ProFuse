@@ -16,6 +16,9 @@ profuseAllStarFound2Fit = function(image,
   message('    Running ProFound')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The ProFound package is required to run this function!')}
 
+  image[image < quantile(image, 0.01, na.rm=TRUE)*10] = NA
+  image[image > quantile(image, 0.99, na.rm=TRUE)*10] = NA
+
   if(is.null(segim)){
     mini_profound = ProFound::profoundProFound(
       image = image,
@@ -120,7 +123,7 @@ profuseAllStarFound2Fit = function(image,
     region_psf[subx,suby] = magcutout(region, loc=c(xcen[i],ycen[i]), box=psf_dim)$image
   }
 
-  region_psf[is.na(region_psf)] = 0
+  region_psf[is.na(image_psf) | is.na(region_psf)] = 0
 
   if(star_circ){
     ang = 0
