@@ -19,19 +19,32 @@ profuseFound2Fit = function(image,
                            bulge_nser_fit = FALSE,
                            disk_nser_fit = FALSE,
                            bulge_circ = TRUE,
+                           star_rough = TRUE,
+                           fit_rough = FALSE,
+                           psf_dim = c(51, 51),
                            star_con = 2,
                            star_con_fit = TRUE,
                            star_circ = TRUE,
                            offset = NULL,
-                           rough = FALSE,
                            tightcrop = TRUE,
                            deblend_extra = TRUE,
                            fit_extra = FALSE,
                            pos_delta=10,
                            ...) {
-  if(Ncomp >= 1 & is.null(psf)){stop('Need PSF for Ncomp >= 1')}
   if(Ncomp == 0.5){psf = NULL}
-  if(Ncomp == 0 & is.null(psf)){stop('Need PSF for Ncomp = 0')}
+  if((Ncomp >= 1 & is.null(psf)) | (Ncomp == 0 & is.null(psf))){
+    message('Need PSF for Ncomp >= 1 or Ncomp == 0. Running AllStarDoFit!')
+    psf = profuseAllStarDoFit(image = image,
+                              resamp = resamp,
+                              psf_dim = psf_dim,
+                              star_con = star_con,
+                              star_con_fit = star_con_fit,
+                              star_circ = star_circ,
+                              magzero = magzero,
+                              rough = star_rough,
+                              skycut = 2, #works well for stars
+                              SBdilate = 2)$psf #works well for stars
+  }
 
   image[image < quantile(image, 0.01, na.rm=TRUE)*10] = NA
   image[image > quantile(image, 0.99, na.rm=TRUE)*10] = NA
@@ -565,7 +578,7 @@ profuseFound2Fit = function(image,
     algo.func = 'LD',
     verbose = FALSE,
     offset = offset,
-    rough = rough
+    rough = fit_rough
   )
   Data$Nmod = Ncomp + N_ext
   return(invisible(list(profound = mini_profound, Data = Data)))
@@ -581,7 +594,8 @@ profuseDoFit = function(image,
                        magdiff = 2.5,
                        magzero = 0,
                        psf_dim = c(51,51),
-                       rough = FALSE,
+                       star_rough = TRUE,
+                       fit_rough = FALSE,
                        plot = FALSE,
                        seed = 666,
                        optim_iters = 2,
@@ -602,7 +616,7 @@ profuseDoFit = function(image,
       psf = psf,
       magdiff = magdiff,
       magzero = magzero,
-      rough = rough,
+      fit_rough = fit_rough,
       ...
     )
   }else{

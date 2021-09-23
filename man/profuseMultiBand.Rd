@@ -10,21 +10,23 @@ Functions to easily take users from multi-band image pixel data all the way to f
 }
 \usage{
 profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
- sky_list = NULL, skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1",
- "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
- cutbox = dim(image), psf_list = NULL, magdiff = 2.5, magzero = NULL,
- gain = NULL, resamp = NULL, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
- sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE, bulge_circ =  TRUE,
- star_rough = TRUE, fit_rough = FALSE, psf_dim = c(51, 51), star_circ = TRUE,
- tightcrop = TRUE, wave = NULL, smooth.parm = NULL, parm_ProSpect = NULL,
- data_ProSpect = NULL, logged_ProSpect = NULL, intervals_ProSpect = NULL, ...)
+    sky_list = NULL, skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1",
+        "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
+    Ncomp = 2, cutbox = dim(image), psf_list = NULL, magdiff = 2.5,
+    magzero = NULL, gain = NULL, resamp = NULL, sing_nser = 2,
+    bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
+    disk_nser_fit = FALSE, bulge_circ = TRUE, star_rough = TRUE,
+    fit_rough = FALSE, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
+    star_circ = TRUE, tightcrop = TRUE, wave = NULL, smooth.parm = NULL,
+    parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
+    intervals_ProSpect = NULL, ...)
 
-profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL, sky_list = NULL,
- skyRMS_list = NULL, loc = NULL, MF2F = NULL, parm_global = c("sersic.xcen1",
- "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
- cutbox = dim(image), psf_list = NULL, magzero = NULL,
- psf_dim = c(51, 51), star_rough = TRUE, fit_rough = FALSE, seed = 666, optim_iters = 2,
- Niters = c(1e3,1e3), ...)
+profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL,
+    sky_list = NULL, skyRMS_list = NULL, loc = NULL, MF2F = NULL,
+    parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1",
+        "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
+    psf_list = NULL, magzero = NULL, psf_dim = c(51, 51), star_rough = TRUE,
+    fit_rough = FALSE, seed = 666, optim_iters = 2, Niters = c(1000, 1000), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -94,11 +96,23 @@ Logical; optional, should the double Sersic profile disk index be optimised duri
   \item{bulge_circ}{
 Logical; optional, should the bulge be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. Only relevant for \option{Ncomp} = 2 fits.
 }
-  \item{star_circ}{
-Logical; optional, should the star be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1.
+  \item{star_rough}{
+Logical; optional, specifies whether \code{profitAllStarDoFit} should be run with 'rough' profiles (default TRUE, since we just want to generate PSF images).
+}
+  \item{fit_rough}{
+Logical; optional, specifies whether the main galaxy fitting using \code{profitDoFit} should be run with 'rough' profiles (default FALSE).
 }
   \item{psf_dim}{
 Integer vector; optional, the dimensions of the output PSF generated when fitting a star with \option{Ncomp} = 0.5. The PSF will be centrally located in the image. The dimensions will be forced to be odd (adding 1 if required) to ensure the PSF mode is at the centre of the middle pixel.
+}
+  \item{star_con}{
+Numeric scalar; optional, start value (or fixed value if \option{star_con_fit} = FALSE) of the Moffat profile concentration index for star fitting.
+}
+  \item{star_con_fit}{
+Logical; optional, should the Moffat profile concentration index be optimised during fitting? If FALSE then is will be fixed at \option{star_con}.
+}
+  \item{star_circ}{
+Logical; optional, should the star be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1.
 }
   \item{wave}{
 Numeric vector; optional. This is only relevant if you are providing smoothing functions via \option{smooth.parm}. If provided it should be the wavelength of each image in \option{image_list}, where \option{image_list} then needs to be in ascending (blue to red) wavelength order.
@@ -118,12 +132,6 @@ Logical vector; optional; match length of \option{parm_ProSpect}, and elements s
   \item{intervals_ProSpect}{
 List, optional; has elements \option{lo} and \option{hi} which if provided must be the same length as \option{parm_ProSpect}. These specify the lower and upper limits in the same linear/log space as \option{parm_ProSpect}, i.e. set \option{lo} to -1 if you do not want to logged unit to go below 0.1.
 }
-  \item{star_rough}{
-Logical; optional, specifies whether \code{profitAllStarDoFit} should be run with 'rough' profiles (default TRUE, since we just want to generate PSF images).
-}
-  \item{fit_rough}{
-Logical; optional, specifies whether the main galaxy fitting using \code{profitDoFit} should be run with 'rough' profiles (default FALSE).
-}
   \item{tightcrop}{
 Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
 }
@@ -141,19 +149,9 @@ For \code{*DoFit} functions dots are passed into the similarly titled \code{*Fou
 }
 }
 \details{
-\code{profitFound2Fit} produces everything you need to start fitting (which is usually just the \option{Data} structure), and also produces the intermediate \option{profound} output to check for the quality of the automatic segmentation etc. This means a user who wants more control over the final fitting can use the outputs of \code{profitFound2Fit} and put them into their own optimisation method. This route to fitting is probably for more experienced / confident users, and for people who want to optimise the \code{profoundProFound} stage of the process. \code{profitFound2Fit} also tightly crops the image down to the pixels needed for fitting (which improves ProFit fitting performance since the memory footprint is as small as it can be).
-
-\code{profitDoFit} also carries out the optimisation, using the default settings of \code{Highlander}. For the typical user this might be all they need to get the results they want. Additional neighbouring sources that are detected during the \code{ProFound} stage are modelled as single Sersic profiles in a separate model list, which is usually reasonable enough to get a good solution for the target source of interest. To fit a single star with a Moffat profile you can use the \option{Ncomp} = 0.5 option, but in this case the model image will not be convolved with a target PSF image (because that is what we are trying to estimate). As such, if there are any other objects close by the Moffat profile might be compromised by the imperfect light profiling of these non-convolved single Sersic sources.
-
-\code{profitAllStarFound2Fit} is a high-level and simplified PSF focussed version of \code{profitFound2Fit}. For many users who wish to fit stars to find the PSF this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
-
-\code{profitAllStarDoFit} is a high-level and simplified PSF focussed version of \code{profitDoFit}. For many users who wish to fit stars to find the PSF,this is probably the easiest entry point unless you really need to lower level control provided by \code{profitDoFit}.
-
 \code{profitMultiBandFound2Fit} is a high-level and simplified multi-band focussed version of \code{profitFound2Fit}. For many users who wish to fit across multiple bands of data this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
 
 \code{profitMultiBandDoFit} is a high-level and simplified multi-band focussed version of \code{profitDoFit}. For many users who wish to fit across multiple bands of data this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
-
-If you are doing more complex fitting (e.g. potentially using a different optimiser than \code{Highlander}, or wanting to make use of parameter priors) then you should probably use \code{profitFound2Fit} to create an intermediary version of the \option{Data} structure, which you can then edit and add to as required.
 }
 \value{
 The output of \code{profitFound2Fit} and \code{profitAllStarFound2Fit} is:
@@ -192,59 +190,9 @@ Aaron Robotham
 }
 
 \seealso{
-\code{\link{profitSetupData}}, \code{\link{profitLikeModel}}
+\code{\link{profuseFound2Fit}}, \code{\link{profuseDoFit}}, \code{\link{profuseAllStarFound2Fit}}, \code{\link{profuseAllStarDoFit}}, \code{\link{profitSetupData}}, \code{\link{profitLikeModel}}
 }
 \examples{
-library(Rfits)
-library(ProFit)
-
-image = Rfits_read_image(system.file("extdata", 'VIKING/mystery_VIKING_Z.fits',
-  package="ProFound"))$imDat
-
-psf_modellist=list(
-  moffat=list(
-    xcen=75/2,
-    ycen=75/2,
-    mag=0,
-    fwhm=3.8,
-    con=2.04,
-    ang=0,
-    axrat=1,
-    box=0
-  )
-)
-psf = profitMakeModel(modellist=psf_modellist, dim=c(75,75))$z
-
-\dontrun{
-#Setting SBdilate to between 2-4 is often appropriate
-example_f2f = profuseFound2Fit(image=image, psf=psf, magzero=30, SBdilate=2)
-
-plot(example_f2f$profound) #The ProFound output
-profitLikeModel(example_f2f$Data$init, Data=example_f2f$Data, makeplots=TRUE,
-  plotchisq=TRUE) #Starting guess for optimisation. Target source is in the top-left.
-
-example_fit = profuseDoFit(image=image, psf=psf, magzero=30, SBdilate=2, plot=TRUE)
-
-#Example single PSF/star fit:
-
-star = profuseDoFit(image, loc=c(149,73), Ncomp=0.5, plot=TRUE, magzero=30, SBdilate=2)
-magimage(star$psf)
-
-#Example All PSF/star fit:
-
-profound = profoundProFound(image, magzero=30)
-sel = which(profound$segstats$mag < 23 & profound$segstats$R50 < 3.5)
-
-#We pass in 21 possible star positions, choosing the best 4 by default:
-
-stars_man = profuseAllStarDoFit(image, loc=profound$segstats[sel,c('xcen','ycen')],
-  plot=TRUE, magzero=30, SBdilate=2)
-magimage(stars_man$psf)
-
-#We can run again, letting it figure out automatically which objects are stars:
-
-stars_auto = profuseAllStarDoFit(image, plot=TRUE, magzero=30, SBdilate=2)
-magimage(stars_auto$psf)
-}
+#See vignettes for using profuseMultiBand functions.
 }
 \concept{ fit }

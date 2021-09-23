@@ -68,19 +68,9 @@ For \code{*DoFit} functions dots are passed into the similarly titled \code{*Fou
 }
 }
 \details{
-\code{profitFound2Fit} produces everything you need to start fitting (which is usually just the \option{Data} structure), and also produces the intermediate \option{profound} output to check for the quality of the automatic segmentation etc. This means a user who wants more control over the final fitting can use the outputs of \code{profitFound2Fit} and put them into their own optimisation method. This route to fitting is probably for more experienced / confident users, and for people who want to optimise the \code{profoundProFound} stage of the process. \code{profitFound2Fit} also tightly crops the image down to the pixels needed for fitting (which improves ProFit fitting performance since the memory footprint is as small as it can be).
-
-\code{profitDoFit} also carries out the optimisation, using the default settings of \code{Highlander}. For the typical user this might be all they need to get the results they want. Additional neighbouring sources that are detected during the \code{ProFound} stage are modelled as single Sersic profiles in a separate model list, which is usually reasonable enough to get a good solution for the target source of interest. To fit a single star with a Moffat profile you can use the \option{Ncomp} = 0.5 option, but in this case the model image will not be convolved with a target PSF image (because that is what we are trying to estimate). As such, if there are any other objects close by the Moffat profile might be compromised by the imperfect light profiling of these non-convolved single Sersic sources.
-
 \code{profitAllStarFound2Fit} is a high-level and simplified PSF focussed version of \code{profitFound2Fit}. For many users who wish to fit stars to find the PSF this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
 
 \code{profitAllStarDoFit} is a high-level and simplified PSF focussed version of \code{profitDoFit}. For many users who wish to fit stars to find the PSF,this is probably the easiest entry point unless you really need to lower level control provided by \code{profitDoFit}.
-
-\code{profitMultiBandFound2Fit} is a high-level and simplified multi-band focussed version of \code{profitFound2Fit}. For many users who wish to fit across multiple bands of data this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
-
-\code{profitMultiBandDoFit} is a high-level and simplified multi-band focussed version of \code{profitDoFit}. For many users who wish to fit across multiple bands of data this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
-
-If you are doing more complex fitting (e.g. potentially using a different optimiser than \code{Highlander}, or wanting to make use of parameter priors) then you should probably use \code{profitFound2Fit} to create an intermediary version of the \option{Data} structure, which you can then edit and add to as required.
 }
 \value{
 The output of \code{profitAllStarFound2Fit} is:
@@ -119,7 +109,7 @@ Aaron Robotham
 }
 
 \seealso{
-\code{\link{profitSetupData}}, \code{\link{profitLikeModel}}
+\code{\link{profuseFound2Fit}}, \code{\link{profuseDoFit}}, \code{\link{profuseMultiBandFound2Fit}}, \code{\link{profuseMultiBandDoFit}}, \code{\link{profitSetupData}}, \code{\link{profitLikeModel}}
 }
 \examples{
 library(Rfits)
@@ -143,14 +133,6 @@ psf_modellist=list(
 psf = profitMakeModel(modellist=psf_modellist, dim=c(75,75))$z
 
 \dontrun{
-#Setting SBdilate to between 2-4 is often appropriate
-example_f2f = profuseFound2Fit(image=image, psf=psf, magzero=30, SBdilate=2)
-
-plot(example_f2f$profound) #The ProFound output
-profitLikeModel(example_f2f$Data$init, Data=example_f2f$Data, makeplots=TRUE,
-  plotchisq=TRUE) #Starting guess for optimisation. Target source is in the top-left.
-
-example_fit = profuseDoFit(image=image, psf=psf, magzero=30, SBdilate=2, plot=TRUE)
 
 #Example single PSF/star fit:
 
