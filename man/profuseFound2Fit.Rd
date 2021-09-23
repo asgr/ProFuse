@@ -198,10 +198,9 @@ library(ProFit)
 image = Rfits_read_image(system.file("extdata", 'VIKING/mystery_VIKING_Z.fits',
   package="ProFound"))$imDat
 
-lazy = profuseDoFit(image=image$imDat, loc=c(178,178), magzero=30)
+lazy = profuseDoFit(image=image, magzero=30)
 
-#That was easy! The only arguments you need to think about carefully is 'loc', which is
-#the location of your object of interest in the provided image.
+#That was easy!
 
 #There are complex types of fits that you might need to do more manually with ProFit,
 #but the above appears to cover 99\% of fitting situations in practice.
