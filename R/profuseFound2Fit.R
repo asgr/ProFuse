@@ -639,7 +639,7 @@ profuseDoFit = function(image,
   uppers[unlist(Data$tolog) == T] = log10(uppers[unlist(Data$tolog) == T])
   uppers = uppers[which(unlist(Data$tofit))]
 
-  message('Running Highander')
+  message('Running Highlander')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
   highfit = Highlander::Highlander(
     parm = Data$init,

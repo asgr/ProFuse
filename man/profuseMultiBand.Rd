@@ -46,7 +46,7 @@ List; optional, a list of numeric matrix sky images (one per target band). This 
 List; optional, a list of numeric matrix sky RMS images (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the per band sky RMS.
 }
   \item{loc}{
-Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be cut out. The default is NULL, which does no cutout at all.
+Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
 }
   \item{MF2F}{
 List; output of \code{profuseMultiBandFound2Fit}. If this is provided then the \code{profuseMultiBandFound2Fit} step of \code{profuseMultiBandDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_MF2F}} on the \option{MF2F} object if you are using across different session to regenerate the PSF convolution pointers.

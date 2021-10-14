@@ -32,7 +32,7 @@ Numeric matrix; required, the galaxy image we want to fit a galaxy of PSF/star m
 Numeric matrix; optional, the sigma map of the \option{image} data we want to fit a model to. If not provided this will be estimated by running \code{profoundProFound} (to find the sky and skyRMS), \code{profoundGainEst} (to find the gain) and \code{profoundMakeSigma} to make a decent effort at creating an appropriate sigma map. Users should usually try to provide this themselves for critical fitting, but the automatic sigma map is usually good enough for testing purposes. For convenience this can also be an Rfits_pointer object for very large on disk sigma maps.
 }
   \item{loc}{
-Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be cut out. The default is NULL, which does no cutout at all.
+Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
 }
   \item{F2F}{
 List; output of \code{profuseFound2Fit}. If this is provided then the \code{profuseFound2Fit} step of \code{profuseDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_F2F}} on the \option{F2F} object if you are using across different session to regenerate the PSF convolution pointer.
