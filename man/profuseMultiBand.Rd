@@ -97,7 +97,7 @@ Logical; optional, should the double Sersic profile disk index be optimised duri
 Logical; optional, should the bulge be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. Only relevant for \option{Ncomp} = 2 fits.
 }
   \item{nser_upper}{
-Numeric scalar; optional, upper limit of the sersic index value. Relevant for \option{Ncomp} = 1, 1.5 or 2 fits. 
+Numeric scalar; optional, upper limit of the sersic index value. Relevant for \option{Ncomp} = 1, 1.5, 2, or 3 fits. 
 }
   \item{star_rough}{
 Logical; optional, specifies whether \code{profitAllStarDoFit} should be run with 'rough' profiles (default TRUE, since we just want to generate PSF images). This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
