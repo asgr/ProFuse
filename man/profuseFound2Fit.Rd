@@ -14,7 +14,7 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
     gain = NULL, resamp = NULL, loc_use = FALSE, loc_fit = TRUE,
     mag_fit = TRUE, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
     sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
-    bulge_circ = TRUE, star_rough = TRUE, fit_rough = FALSE,
+    bulge_circ = TRUE, nser_upper=5.3, star_rough = TRUE, fit_rough = FALSE,
     psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
     offset = NULL, tightcrop = TRUE, deblend_extra = TRUE, fit_extra = FALSE,
     pos_delta = 10, ...)
