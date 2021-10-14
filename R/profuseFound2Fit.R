@@ -556,7 +556,7 @@ profuseFound2Fit = function(image,
                       ycen = rep(list(ycen_int), N_ext),
                       mag = rep(list(c(0, 40)), N_ext),
                       re = rep(list(c(1, maxsize)), N_ext),
-                      nser = rep(list(c(0.5, 5.3)), N_ext),
+                      nser = rep(list(c(0.5, nser_upper)), N_ext),
                       ang = rep(list(c(-180, 360)), N_ext),
                       axrat = rep(list(c(0.01, 1)), N_ext)
                     )
