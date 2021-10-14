@@ -15,7 +15,7 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
     Ncomp = 2, cutbox = dim(image), psf_list = NULL, magdiff = 2.5,
     magzero = NULL, gain = NULL, resamp = NULL, sing_nser = 2,
     bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
-    disk_nser_fit = FALSE, bulge_circ = TRUE, star_rough = TRUE,
+    disk_nser_fit = FALSE, bulge_circ = TRUE, nser_upper = 5.3, star_rough = TRUE,
     fit_rough = FALSE, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
     star_circ = TRUE, tightcrop = TRUE, wave = NULL, smooth.parm = NULL,
     parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
@@ -95,6 +95,9 @@ Logical; optional, should the double Sersic profile disk index be optimised duri
 }
   \item{bulge_circ}{
 Logical; optional, should the bulge be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. Only relevant for \option{Ncomp} = 2 fits.
+}
+  \item{nser_upper}{
+Numeric scalar; optional, upper limit of the sersic index value. Relevant for \option{Ncomp} = 1, 1.5 or 2 fits. 
 }
   \item{star_rough}{
 Logical; optional, specifies whether \code{profitAllStarDoFit} should be run with 'rough' profiles (default TRUE, since we just want to generate PSF images). This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
