@@ -1,7 +1,7 @@
 Package: ProFuse
 Type: Package
 Title: Physical Multi-Band Fitting
-Version: 0.1.14
+Version: 0.1.15
 Date: 2021-10-15
 Author: Aaron Robotham
 Maintainer: Aaron Robotham <aaron.robotham@uwa.edu.au>
@@ -10,6 +10,6 @@ License: LGPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.6)
-Imports: ProFit (>= 2.2.1), ProFound (>= 1.17.12), ProSpect (>= 1.1.5), ParmOff (>= 0.1.1), Highlander (>= 0.2.2), magicaxis, celestial
+Imports: ProFit (>= 2.2.2), ProFound (>= 1.17.12), ProSpect (>= 1.1.5), ParmOff (>= 0.1.1), Highlander (>= 0.2.2), magicaxis (>= 2.2.6), celestial (>= 1.5.2)
 Suggests: Rfits, knitr, rmarkdown, ProTools
 VignetteBuilder: knitr
