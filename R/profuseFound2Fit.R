@@ -335,11 +335,7 @@ profuseFound2Fit = function(image,
         mag = mag_fit
       )
     )
-    constraints = function(modellist) {
-      modellist[[2]]$xcen = modellist[[1]]$xcen
-      modellist[[2]]$ycen = modellist[[1]]$ycen
-      return(modellist)
-    }
+    constraints = .constraints_func1_5
   } else if (Ncomp == 3) {
     tofit = list(sersic = list(
       xcen = c(loc_fit, NA, NA), #The NA couples the components together
@@ -350,12 +346,7 @@ profuseFound2Fit = function(image,
       ang = c(!bulge_circ, TRUE, FALSE),
       axrat = c(!bulge_circ, TRUE, FALSE)
     ))
-    constraints = function(modellist) {
-      modellist[[1]]$nser[3] = modellist[[1]]$nser[2]
-      modellist[[1]]$ang[3] = modellist[[1]]$ang[2]
-      modellist[[1]]$axrat[3] = modellist[[1]]$axrat[2]
-      return(modellist)
-    }
+    constraints = .constraints_func3
   }
 
   if (Ncomp == 0) {
@@ -709,4 +700,15 @@ profuseDoFit = function(image,
   return(highfit)
 }
 
+.constraints_func1_5 = function(modellist=NULL) {
+  modellist[[2]]$xcen = modellist[[1]]$xcen
+  modellist[[2]]$ycen = modellist[[1]]$ycen
+  return(modellist)
+}
 
+.constraints_func3 = function(modellist=NULL) {
+  modellist[[1]]$nser[3] = modellist[[1]]$nser[2]
+  modellist[[1]]$ang[3] = modellist[[1]]$ang[2]
+  modellist[[1]]$axrat[3] = modellist[[1]]$axrat[2]
+  return(modellist)
+}
