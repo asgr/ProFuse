@@ -175,16 +175,16 @@ profuseFound2Fit = function(image,
       xcen_int = xcen + c(-pos_delta,pos_delta)
       ycen_int = ycen + c(-pos_delta,pos_delta)
     }else{
-      xcen = mini_profound$segstats[loc_tar, 'xcen'] - xlo + 1
-      ycen = mini_profound$segstats[loc_tar, 'ycen'] - ylo + 1
+      xcen = mini_profound$segstats[loc_tar, 'xmax'] - xlo + 1
+      ycen = mini_profound$segstats[loc_tar, 'ymax'] - ylo + 1
       xcen_int = xcen + c(-pos_delta,pos_delta)
       ycen_int = ycen + c(-pos_delta,pos_delta)
     }
   }else{
     xlo = 1L
     ylo = 1L
-    xcen = mini_profound$segstats[loc_tar, 'xcen']
-    ycen = mini_profound$segstats[loc_tar, 'ycen']
+    xcen = mini_profound$segstats[loc_tar, 'xmax']
+    ycen = mini_profound$segstats[loc_tar, 'ymax']
     xcen_int = xcen + c(-pos_delta,pos_delta)
     ycen_int = ycen + c(-pos_delta,pos_delta)
   }
@@ -192,8 +192,8 @@ profuseFound2Fit = function(image,
   if (Ncomp == 0) {
     modellist = list(
       pointsource = list(
-        xcen = mini_profound$segstats[loc_tar, 'xcen'],
-        ycen = mini_profound$segstats[loc_tar, 'ycen'],
+        xcen = mini_profound$segstats[loc_tar, 'xmax'],
+        ycen = mini_profound$segstats[loc_tar, 'ymax'],
         mag = mini_profound$segstats[loc_tar, 'mag']
       )
     )
@@ -243,19 +243,19 @@ profuseFound2Fit = function(image,
     )
   } else if (Ncomp == 1.5) {
     modellist = list(
+      pointsource = list(
+        xcen = xcen,
+        ycen = ycen,
+        mag = mini_profound$segstats[loc_tar, 'mag'] + 0.752575
+      ),
       sersic = list(
         xcen = xcen,
         ycen = ycen,
         mag = mini_profound$segstats[loc_tar, 'mag'] + 0.752575,
         re = mini_profound$segstats[loc_tar, 'R50'],
-        nser = sing_nser,
+        nser = disk_nser,
         ang = mini_profound$segstats[loc_tar, 'ang'],
         axrat = mini_profound$segstats[loc_tar, 'axrat']
-      ),
-      pointsource = list(
-        xcen = mini_profound$segstats[loc_tar, 'xcen'],
-        ycen = mini_profound$segstats[loc_tar, 'ycen'],
-        mag = mini_profound$segstats[loc_tar, 'mag'] + 0.752575
       )
     )
   } else if (Ncomp == 3) {
@@ -320,6 +320,11 @@ profuseFound2Fit = function(image,
     constraints = NULL
   } else if (Ncomp == 1.5) {
     tofit = list(
+      pointsource = list(
+        xcen = FALSE,
+        ycen = FALSE,
+        mag = mag_fit
+      ),
       sersic = list(
         xcen = loc_fit,
         ycen = loc_fit,
@@ -328,11 +333,6 @@ profuseFound2Fit = function(image,
         nser = disk_nser_fit,
         ang = TRUE,
         axrat = TRUE
-      ),
-      pointsource = list(
-        xcen = FALSE,
-        ycen = FALSE,
-        mag = mag_fit
       )
     )
     constraints = .constraints_func1_5
@@ -346,7 +346,7 @@ profuseFound2Fit = function(image,
       ang = c(!bulge_circ, TRUE, FALSE),
       axrat = c(!bulge_circ, TRUE, FALSE)
     ))
-    constraints = .constraints_func3
+    constraints = NULL
   }
 
   if (Ncomp == 0) {
@@ -388,6 +388,11 @@ profuseFound2Fit = function(image,
     )
   } else if (Ncomp == 1.5) {
     tolog = list(
+      pointsource = list(
+        xcen = FALSE,
+        ycen = FALSE,
+        mag = FALSE
+      ),
       sersic = list(
         xcen = FALSE,
         ycen = FALSE,
@@ -398,11 +403,6 @@ profuseFound2Fit = function(image,
         #nser is best fit in log space
         ang = FALSE,
         axrat = TRUE #axrat is best fit in log space
-      ),
-      pointsource = list(
-        xcen = FALSE,
-        ycen = FALSE,
-        mag = FALSE
       )
     )
   } else if (Ncomp == 3) {
@@ -464,6 +464,11 @@ profuseFound2Fit = function(image,
     )
   } else if (Ncomp == 1.5) {
     intervals = list(
+      pointsource = list(
+        xcen = list(xcen_int),
+        ycen = list(ycen_int),
+        mag = list(c(0, 40))
+      ),
       sersic = list(
         xcen = list(xcen_int),
         ycen = list(ycen_int),
@@ -472,11 +477,6 @@ profuseFound2Fit = function(image,
         nser = list(c(0.5, nser_upper)),
         ang = list(c(-180, 360)),
         axrat = list(c(0.01, 1))
-      ),
-      pointsource = list(
-        xcen = list(xcen_int),
-        ycen = list(ycen_int),
-        mag = list(c(0, 40))
       )
     )
   } else if (Ncomp == 3) {
@@ -701,14 +701,14 @@ profuseDoFit = function(image,
 }
 
 .constraints_func1_5 = function(modellist=NULL) {
-  modellist[[2]]$xcen = modellist[[1]]$xcen
-  modellist[[2]]$ycen = modellist[[1]]$ycen
+  modellist$pointsource$xcen = modellist$sersic$xcen
+  modellist$pointsource$ycen = modellist$sersic$ycen
   return(modellist)
 }
 
-.constraints_func3 = function(modellist=NULL) {
-  modellist[[1]]$nser[3] = modellist[[1]]$nser[2]
-  modellist[[1]]$ang[3] = modellist[[1]]$ang[2]
-  modellist[[1]]$axrat[3] = modellist[[1]]$axrat[2]
-  return(modellist)
-}
+# .constraints_func3 = function(modellist=NULL) { #I don't think I actually need this
+#   modellist$sersic$nser[3] = modellist$sersic$nser[2]
+#   modellist$sersic$ang[3] = modellist$sersic$ang[2]
+#   modellist$sersic$axrat[3] = modellist$sersic$axrat[2]
+#   return(modellist)
+# }

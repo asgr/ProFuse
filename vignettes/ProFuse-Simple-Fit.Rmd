@@ -136,8 +136,9 @@ MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                                          z = redshift,
                                                          Z = Zfunc_massmap_lin,
                                                          agemax = agemax,
-                                                         #Set no dust in bulge
+                                                         #Set no ISM dust in bulge
                                                          tau_screen_1 = 0,
+                                                         tau_birth_1 = 0.63,
                                                          #Set to Thorne 2020 medians for disk
                                                          tau_screen_2 = 0.16,
                                                          tau_birth_2 = 0.63
