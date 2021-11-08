@@ -196,16 +196,19 @@ profuseMultiBandFound2Fit = function(image_list,
       }
     }
 
-    if(!is.null(segim_list[i][[1]])){
+    if(is.null(segim_list[i][[1]])){
       segim_use = F2Fstack$Data$segim
     }else{
-      segim_use = segim_list[[i]]
+      segim_use = segim_list[i][[1]]
     }
 
     message("Image ",i,": running SetupData")
+
+    region = (segim_use == which.max(tabulate(segim_use[F2Fstack$Data$region])))
+
     MF2F[[i]] = profitSetupData(
       image = image_list[[i]][xlo:xhi,ylo:yhi],
-      region = F2Fstack$Data$region[xlo:xhi,ylo:yhi],
+      region = region[xlo:xhi,ylo:yhi],
       sigma = sigma[xlo:xhi,ylo:yhi],
       segim = segim_use[xlo:xhi,ylo:yhi],
       psf = psf_list[[i]],
