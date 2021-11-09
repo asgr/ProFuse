@@ -21,7 +21,8 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
 
 profuseDoFit(image, sigma = NULL, loc = NULL, F2F = NULL, Ncomp = 2, cutbox = dim(image),
   psf, magdiff = 2.5, magzero = 0, psf_dim = c(51,51), star_rough = TRUE,
-  fit_rough = FALSE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(1e3,1e3), ...)
+  fit_rough = FALSE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(1e3,1e3),
+  NfinalMCMC = Niters[2], ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -92,7 +93,7 @@ Logical; optional, should the double Sersic profile disk index be optimised duri
 Logical; optional, should the bulge be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. Only relevant for \option{Ncomp} = 2 fits.
 }
   \item{nser_upper}{
-Numeric scalar; optional, upper limit of the sersic index value. Relevant for \option{Ncomp} = 1, 1.5, 2, or 3 fits. 
+Numeric scalar; optional, upper limit of the sersic index value. Relevant for \option{Ncomp} = 1, 1.5, 2, or 3 fits.
 }
   \item{star_rough}{
 Logical; optional, specifies whether \code{profitAllStarDoFit} should be run with 'rough' profiles (default TRUE, since we just want to generate PSF images). This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
@@ -138,6 +139,9 @@ Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}.
 }
   \item{Niters}{
 Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}.
+}
+  \item{NfinalMCMC}{
+Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.

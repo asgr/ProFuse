@@ -26,7 +26,8 @@ profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL,
     parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1",
         "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
     psf_list = NULL, magzero = NULL, psf_dim = c(51, 51), star_rough = TRUE,
-    fit_rough = FALSE, seed = 666, optim_iters = 2, Niters = c(1000, 1000), ...)
+    fit_rough = FALSE, seed = 666, optim_iters = 2, Niters = c(1000, 1000),
+    NfinalMCMC = Niters[2], ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -146,6 +147,9 @@ Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}.
 }
   \item{Niters}{
 Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}.
+}
+  \item{NfinalMCMC}{
+Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.
