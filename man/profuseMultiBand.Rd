@@ -37,7 +37,7 @@ List; required, a list a numeric matrices (one image per target band). This list
 List; optional, a list of integer matrix segmentation maps (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the stacked \option{image_list} segmentation map and use this instead.
 }
   \item{segim_global}{
-Integer matrix; optional, an input segmentation map to use on the stacked images to get rough initial guesses for the \code{ProFit} model. This will also be used to calculate bounds if \option{tightcrop} = TRUE.
+Integer matrix; optional, an input segmentation map to use on the stacked images to get rough initial guesses for the \code{ProFit} model. This will also be used to calculate bounds if \option{tightcrop} = TRUE. If this is not provided and \option{segim_list} is then a maximal \option{segim_global} will be computed internally using \code{\link{profuseSegimGlobal}}.
 }
   \item{sky_list}{
 List; optional, a list of numeric matrix sky images (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the per band sky.
@@ -97,7 +97,7 @@ Logical; optional, should the double Sersic profile disk index be optimised duri
 Logical; optional, should the bulge be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. Only relevant for \option{Ncomp} = 2 fits.
 }
   \item{nser_upper}{
-Numeric scalar; optional, upper limit of the sersic index value. Relevant for \option{Ncomp} = 1, 1.5, 2, or 3 fits. 
+Numeric scalar; optional, upper limit of the sersic index value. Relevant for \option{Ncomp} = 1, 1.5, 2, or 3 fits.
 }
   \item{star_rough}{
 Logical; optional, specifies whether \code{profitAllStarDoFit} should be run with 'rough' profiles (default TRUE, since we just want to generate PSF images). This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
@@ -193,7 +193,8 @@ Aaron Robotham
 }
 
 \seealso{
-\code{\link{profuseFound2Fit}}, \code{\link{profuseDoFit}}, \code{\link{profuseAllStarFound2Fit}}, \code{\link{profuseAllStarDoFit}}, \code{\link{profitSetupData}}, \code{\link{profitLikeModel}}
+\code{\link{profuseFound2Fit}}, \code{\link{profuseDoFit}}, \code{\link{profuseAllStarFound2Fit}}, \code{\link{profuseAllStarDoFit}}, \code{\link{profitSetupData}}, \code{\link{profitLikeModel}},
+\code{\link{profuseSegimGlobal}}
 }
 \examples{
 #See vignettes for using profuseMultiBand functions.

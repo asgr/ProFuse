@@ -1,8 +1,8 @@
 Package: ProFuse
 Type: Package
 Title: Physical Multi-Band Fitting
-Version: 0.2.1
-Date: 2021-11-08
+Version: 0.2.2
+Date: 2021-11-09
 Author: Aaron Robotham
 Maintainer: Aaron Robotham <aaron.robotham@uwa.edu.au>
 Description: This package combines all of the ProTools into a powerful physical model of a galaxy. ProFound + ProFit + ProSpect = ProFuse.
@@ -10,6 +10,6 @@ License: LGPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.6)
-Imports: ProFit (>= 2.2.2), ProFound (>= 1.17.12), ProSpect (>= 1.1.5), ParmOff (>= 0.1.1), Highlander (>= 0.2.2), magicaxis (>= 2.2.6), celestial (>= 1.5.2)
-Suggests: Rfits, knitr, rmarkdown, ProTools
+Imports: ProFit (>= 2.2.2), ProFound (>= 1.17.12), ProSpect (>= 1.1.5), ParmOff (>= 0.1.1), Highlander (>= 0.2.2), magicaxis (>= 2.2.6), celestial (>= 1.5.2), foreach
+Suggests: Rfits, knitr, rmarkdown, ProTools, imager
 VignetteBuilder: knitr

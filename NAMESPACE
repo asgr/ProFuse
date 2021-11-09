@@ -6,6 +6,7 @@ import("ProSpect")
 import("ParmOff")
 import("Highlander")
 import("magicaxis")
+import("foreach")
 
 importFrom("graphics", "image", "legend")
 importFrom("stats", "median", "smooth.spline", "quantile")

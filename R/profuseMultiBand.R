@@ -35,9 +35,11 @@ profuseMultiBandFound2Fit = function(image_list,
                                     intervals_ProSpect = NULL,
                                     ...){
   Nim = length(image_list)
+
   if(is.null(magzero)){
     magzero = rep(0, Nim)
   }
+
   for(i in 1:Nim){
     if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){ #[i][[1]] looks silly, but it will return NULL when sky_list = NULL for any i (default). [[i]] will error in this case
       message("Image ",i,": running initial ProFound")
@@ -81,6 +83,10 @@ profuseMultiBandFound2Fit = function(image_list,
   )
 
   message("Running ProFound on stack")
+
+  if(is.null(segim_global) & !is.null(segim_list)){
+    segim_global = profuseSegimGlobal(segim_list)
+  }
 
   multi_stack_pro = ProFound::profoundProFound(image=multi_stack$image,
                                                segim=segim_global,
@@ -414,4 +420,22 @@ profuseMultiBandDoFit = function(image_list,
 
   parm[parm_loc] = func(log(wave),parm[parm_loc])$y
   return(parm)
+}
+
+profuseSegimGlobal = function(segim_list){
+  if(requireNamespace("imager", quietly = TRUE)){
+    i=NULL
+    Csegim_list = foreach(i=1:length(segim_list))%do%{
+      temp=segim_list[[i]]
+      temp[temp==0L]=NA
+      imager::as.cimg(temp)
+    }
+    Csegim_list = imager::as.imlist(Csegim_list)
+    segim_global = imager::parmed(Csegim_list, na.rm=TRUE)
+    segim_global = as.matrix(segim_global)
+    segim_global[is.na(segim_global)] = 0L
+    return(segim_global)
+  }else{
+    stop('The imager package is needed for segim merging to work. Please install from CRAN.', call. = FALSE)
+  }
 }
