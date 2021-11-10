@@ -326,7 +326,7 @@ profuseMultiBandDoFit = function(image_list,
                                 ...) {
 
   timestart = proc.time()[3] # start timer
-  call = match.call(expand.dots=TRUE)
+  #call = match.call(expand.dots=TRUE)
 
   if(is.null(MF2F)){
     message('Running MultiBandFound2Fit')
@@ -406,11 +406,13 @@ profuseMultiBandDoFit = function(image_list,
 
   highfit$time = (proc.time()[3]-timestart)/60
   highfit$date = date()
-  highfit$call = call
+  #highfit$call = call
   highfit$ProFit.version = packageVersion('ProFit')
   highfit$ProFound.version = packageVersion('ProFound')
   highfit$Highlander.version = packageVersion('Highlander')
   highfit$R.version = R.version
+  highfit$LD_last$Call = NULL
+  highfit$LD_last$Model = NULL
 
   class(highfit) = 'profusemulti'
 

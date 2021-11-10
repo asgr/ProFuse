@@ -596,7 +596,7 @@ profuseDoFit = function(image,
                        ...) {
 
   timestart = proc.time()[3] # start timer
-  call = match.call(expand.dots=TRUE)
+  #call = match.call(expand.dots=TRUE)
 
   if(is.null(F2F)){
     message('Running Found2Fit')
@@ -693,11 +693,13 @@ profuseDoFit = function(image,
 
   highfit$time = (proc.time()[3]-timestart)/60
   highfit$date = date()
-  highfit$call = call
+  #highfit$call = call
   highfit$ProFit.version = packageVersion('ProFit')
   highfit$ProFound.version = packageVersion('ProFound')
   highfit$Highlander.version = packageVersion('Highlander')
   highfit$R.version = R.version
+  highfit$LD_last$Call = NULL
+  highfit$LD_last$Model = NULL
 
   return(highfit)
 }
