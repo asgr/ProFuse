@@ -321,7 +321,7 @@ profuseMultiBandDoFit = function(image_list,
                                 fit_rough = FALSE,
                                 seed = 666,
                                 optim_iters = 2,
-                                Niters = c(1e3,1e3),
+                                Niters = c(1000,1000),
                                 NfinalMCMC = Niters[2],
                                 ...) {
 
@@ -413,6 +413,7 @@ profuseMultiBandDoFit = function(image_list,
   highfit$R.version = R.version
   highfit$LD_last$Call = NULL
   highfit$LD_last$Model = NULL
+  highfit$RedChi2 = highfit$RedChi2/MF2F$Nim
 
   class(highfit) = 'profusemulti'
 

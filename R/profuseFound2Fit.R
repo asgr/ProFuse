@@ -591,7 +591,7 @@ profuseDoFit = function(image,
                        plot = FALSE,
                        seed = 666,
                        optim_iters = 2,
-                       Niters = c(1e3,1e3),
+                       Niters = c(1000,1000),
                        NfinalMCMC = Niters[2],
                        ...) {
 

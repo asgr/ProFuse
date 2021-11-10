@@ -21,7 +21,7 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
 
 profuseDoFit(image, sigma = NULL, loc = NULL, F2F = NULL, Ncomp = 2, cutbox = dim(image),
   psf, magdiff = 2.5, magzero = 0, psf_dim = c(51,51), star_rough = TRUE,
-  fit_rough = FALSE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(1e3,1e3),
+  fit_rough = FALSE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(1000,1000),
   NfinalMCMC = Niters[2], ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -152,7 +152,7 @@ For \code{*DoFit} functions dots are passed into the similarly titled \code{*Fou
 
 \code{profitDoFit} also carries out the optimisation, using the default settings of \code{Highlander}. For the typical user this might be all they need to get the results they want. Additional neighbouring sources that are detected during the \code{ProFound} stage are modelled as single Sersic profiles in a separate model list, which is usually reasonable enough to get a good solution for the target source of interest. To fit a single star with a Moffat profile you can use the \option{Ncomp} = 0.5 option, but in this case the model image will not be convolved with a target PSF image (because that is what we are trying to estimate). As such, if there are any other objects close by the Moffat profile might be compromised by the imperfect light profiling of these non-convolved single Sersic sources.
 
-If you are doing more complex fitting (e.g. potentially using a different optimiser than \code{Highlander}, or wanting to make use of parameter priors) then you should probably use \code{profitFound2Fit} to create an intermediary version of the \option{Data} structure, which you can then edit and add to as required.
+If you are doing more complex fitting (e.g. potentially using a different optimiser than \code{Highlander}, or wanting to make use of parameter priors) then you should probably use \code{profitFound2Fit} to create an intermediary version of the \option{Data} structure, which you can then edit and add to as required. The default combination of \option{optim_iters}, \option{Niters} and \option{NfinalMCMC} seems to work well in practice, and was used for the initial low redshift (z<=0.06) GAMA sample.
 
 Re \option{fit_rough} and \option{star_rough}: setting to TRUE is less accurate, and potentially much less for compact sources, but it also runs much faster. Potentially if the target object is very extended then this will be accurate enough and speed up fitting by a factor of a few usually. It is also useful for quick testing. For publishable results this should usually be left as the default of FALSE. For \code{AllStar} (so \option{star_rough}) setting this to FALSE is perhaps a good option if you do no care about the model parameters themselves (e.g. FWHM) and just want a decent PSF image.
 }

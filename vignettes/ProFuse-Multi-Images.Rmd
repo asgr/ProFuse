@@ -178,7 +178,7 @@ HighFit2$parm
 
 ## Fully Automatic Multi-band Fitting
 
-**ProFit** v2.0.0 and upwards support highly automated multi-band fitting via the **profuseMultiBandFound2Fit** and **profuseMultiBandDoFit** functions. These require the images provided to be exactly registered and cropped to the desired level (no offset or cut out options here). If this is not the case, then lower level functions (i.e. those above) probably need to be used instead. These functions will find stars and create per band PSFs automatically, so they might well covere the major use cases for many people.
+**ProFit** v2.0.0 and upwards support highly automated multi-band fitting via the **profuseMultiBandFound2Fit** and **profuseMultiBandDoFit** functions. These require the images provided to be exactly registered and cropped to the desired level (no offset or cut out options here). If this is not the case, then lower level functions (i.e. those above) probably need to be used instead. These functions will find stars and create per band PSFs automatically, so they might well cover the major use cases for many people.
 
 As an example we can load in 9 bands of data that come included in the **ProFound** package, and cut out around a bright spiral galaxy:
 

@@ -72,7 +72,7 @@ image_list = list(
 
 The reasonably minimal run of MultiBandFound2Fit, which sets everything up for later fitting. Here we are mostly setting the **ProSpect** related inputs (most of the **ProFit** ones are either reasonable to assume, or can be estimated from the **ProFound** outputs). Note this takes a few minutes to run, because we are also fitting the PSF per band by automatically extracting stars from the image and fitting them. If you already have PSFs for some bands you can provide them in *psf_list*, leaving unknown PSF entries as NULL.
 
-```{r eval=evalglobal, message=FALSE, warning=FALSE}
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
 MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                     magzero=c(0,0,0,0,30,30,30,30,30),
                                     tolerance=20,
@@ -160,6 +160,12 @@ magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_1"],mpeak=highfit
 magcurve(massfunc_snorm_trunc(age=x,mSFR=10^highfit$parm["mSFR_2"],mpeak=highfit$parm["mpeak_2"],mperiod=10^highfit$parm["mperiod_2"],
   mskew=highfit$parm["mskew_2"], magemax=agemax/1e9),0,13e9,add=TRUE,col='blue')
 legend('topright', legend=c('Bulge', 'Disk'), col=c('red', 'blue'), lty=1)
+```
+
+For reference if you have the ParmOff package you can achieve the above with something lie:
+
+```R
+magcurve(ParmOff(massfunc_snorm_trunc, .args=highfit$parm, .strip='_1', .logged = c('mSFR', 'mperiod'), age=x, magemax=agemax/1e9), 0, 13e9)
 ```
 
 And we can check the final model image per band:

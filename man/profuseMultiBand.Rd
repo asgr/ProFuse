@@ -26,7 +26,7 @@ profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL,
     parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1",
         "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
     psf_list = NULL, magzero = NULL, psf_dim = c(51, 51), star_rough = TRUE,
-    fit_rough = FALSE, seed = 666, optim_iters = 2, Niters = c(1000, 1000),
+    fit_rough = FALSE, seed = 666, optim_iters = 2, Niters = c(1000,1000),
     NfinalMCMC = Niters[2], ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -159,6 +159,8 @@ For \code{*DoFit} functions dots are passed into the similarly titled \code{*Fou
 \code{profitMultiBandFound2Fit} is a high-level and simplified multi-band focussed version of \code{profitFound2Fit}. For many users who wish to fit across multiple bands of data this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
 
 \code{profitMultiBandDoFit} is a high-level and simplified multi-band focussed version of \code{profitDoFit}. For many users who wish to fit across multiple bands of data this is probably the easiest entry point unless you really need to lower level control provided by \code{profitFound2Fit}.
+
+The default combination of \option{optim_iters}, \option{Niters} and \option{NfinalMCMC} seems to work well in practice, and was used for the initial low redshift (z<=0.06) GAMA sample.
 }
 \value{
 The output of \code{profitFound2Fit} and \code{profitAllStarFound2Fit} is:
