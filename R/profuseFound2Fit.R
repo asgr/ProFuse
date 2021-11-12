@@ -497,8 +497,8 @@ profuseFound2Fit = function(image,
     modellist = c(modellist,
                   list(
                     sersic = list(
-                      xcen = mini_profound$segstats[loc_ext, 'xcen'] - xlo + 1L,
-                      ycen = mini_profound$segstats[loc_ext, 'ycen'] - ylo + 1L,
+                      xcen = mini_profound$segstats[loc_ext, 'xmax'] - xlo + 1L,
+                      ycen = mini_profound$segstats[loc_ext, 'ymax'] - ylo + 1L,
                       mag = mini_profound$segstats[loc_ext, 'mag'],
                       re = mini_profound$segstats[loc_ext, 'R50'],
                       nser = rep(2, N_ext),
