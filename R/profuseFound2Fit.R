@@ -342,9 +342,9 @@ profuseFound2Fit = function(image,
       ycen = c(loc_fit, NA, NA), #The NA couples the components together
       mag = rep(mag_fit, 3),
       re = rep(TRUE, 3),
-      nser = c(bulge_nser_fit, disk_nser_fit, FALSE),
-      ang = c(!bulge_circ, TRUE, FALSE),
-      axrat = c(!bulge_circ, TRUE, FALSE)
+      nser = c(bulge_nser_fit, disk_nser_fit, NA),
+      ang = c(!bulge_circ, TRUE, NA),
+      axrat = c(!bulge_circ, TRUE, NA)
     ))
     constraints = NULL
   }
@@ -710,7 +710,7 @@ profuseDoFit = function(image,
   return(modellist)
 }
 
-# .constraints_func3 = function(modellist=NULL) { #I don't think I actually need this
+# .constraints_func3 = function(modellist=NULL) { #I don't think I actually need this, can use NA
 #   modellist$sersic$nser[3] = modellist$sersic$nser[2]
 #   modellist$sersic$ang[3] = modellist$sersic$ang[2]
 #   modellist$sersic$axrat[3] = modellist$sersic$axrat[2]
