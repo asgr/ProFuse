@@ -355,12 +355,12 @@ profuseMultiBandDoFit = function(image_list,
   logged_profit = {}
 
   for(i in 1:length(MF2F[[1]]$intervals)){ #loop over profiles
-    for(j in 1:length(MF2F[[1]]$intervals[[i]][[1]])){ #loop over components
-      for(k in 1:length(MF2F[[1]]$intervals[[i]])){ #loop over parameters
-        if(isTRUE(MF2F[[1]]$tofit[[i]][[k]][[j]])){
-          lower_profit = c(lower_profit, MF2F[[1]]$intervals[[i]][[k]][[j]][1])
-          upper_profit = c(upper_profit, MF2F[[1]]$intervals[[i]][[k]][[j]][2])
-          logged_profit = c(logged_profit, MF2F[[1]]$tolog[[i]][[k]][[j]])
+    for(j in 1:length(MF2F[[1]]$intervals[[i]])){ #loop over parameters
+      for(k in 1:length(MF2F[[1]]$intervals[[i]][[1]])){ #loop over components
+        if(isTRUE(MF2F[[1]]$tofit[[i]][[j]][[k]])){
+          lower_profit = c(lower_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][1])
+          upper_profit = c(upper_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][2])
+          logged_profit = c(logged_profit, MF2F[[1]]$tolog[[i]][[j]][[k]])
         }
       }
     }
