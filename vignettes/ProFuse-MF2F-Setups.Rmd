@@ -1,0 +1,427 @@
+---
+title: "ProFuse: MF2F Setup"
+author: "Aaron Robotham"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ProFuse: MF2F Setup}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Minimal MF2F Setup Calls
+
+Without seeing an example it can be subtle how best to setup the different type of **ProFuse** models. They are very similar looking, but have critical and easy to miss differences in terms of running the **profuseMultiBandFound2Fit** setup function. Below we show example for 1/1.5/2/3 component models that can be easily adapted for different use cases. Note here we run all 4 variants on the same galaxy, but there is then still the question of which of the 4 models does a better and more physical job of modelling the observations. But that model selection question is a matter for a different vignette.
+
+Set global evaluate:
+
+```{r}
+evalglobal = FALSE
+```
+
+Load the required packages (**ProTools** basically load all of my packages in one go):
+
+```{r}
+library(ProFuse)
+library(ProTools)
+library(ParmOff)
+```
+
+Minimal setup information. note we need to know the true redshift of our source (so this will change with every galaxy) and the cutout location.
+
+```{r}
+redshift = 0.0447
+data('BC03lr')
+data('Dale_NormTot')
+data('AGN_UnOb_Sparse')
+data('Dale_M2L_func')
+filters=c('u_VST', 'g_VST', 'r_VST', 'i_VST', 'Z_VISTA',
+          'Y_VISTA', 'J_VISTA', 'H_VISTA', 'Ks_VISTA')
+filtout={}
+for(i in filters){filtout=c(filtout,list(approxfun(getfilt(i))))}
+
+loc = c(1200,480)
+cut = -299:300
+
+cenwaves = cenwave[match(c('u_VST', 'g_VST', 'r_VST', 'i_VST', 'Z_VISTA', 'Y_VISTA', 'J_VISTA', 'H_VISTA', 'Ks_VISTA'), cenwave$filter),'cenwave']
+  
+agemax = 13.3e9 - cosdistTravelTime(z=redshift, H0 = 67.8, OmegaM = 0.308)*1e9
+```
+
+Cutout all of our images:
+
+```{r, eval=evalglobal}
+image_list = list(
+  u = Rfits_read_image(system.file("extdata", 'MultiBand/u.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  g = Rfits_read_image(system.file("extdata", 'MultiBand/g.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  r = Rfits_read_image(system.file("extdata", 'MultiBand/r.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  i = Rfits_read_image(system.file("extdata", 'MultiBand/i.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  Z = Rfits_read_image(system.file("extdata", 'MultiBand/Z.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  Y = Rfits_read_image(system.file("extdata", 'MultiBand/Y.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  J = Rfits_read_image(system.file("extdata", 'MultiBand/J.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  H = Rfits_read_image(system.file("extdata", 'MultiBand/H.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut],
+  Ks = Rfits_read_image(system.file("extdata", 'MultiBand/Ks.fits', package="ProFound"),ext=2)$imDat[loc[1] + cut, loc[2] + cut]
+)
+```
+
+Below we show the reasonably minimal run of **profuseMultiBandFound2Fit**, which sets everything up for later fitting. Here we are mostly setting the **ProSpect** related inputs (most of the **ProFit** ones are either reasonable to assume, or can be estimated from the **ProFound** outputs). Note this takes a few minutes to run, because we are also fitting the PSF per band by automatically extracting stars from the image and fitting them. If you already have PSFs for some bands you can provide them in *psf_list*, leaving unknown PSF entries as NULL.
+
+## Single Component Fit (Free Sersic, or FS)
+
+The single component fit (called FS in the **ProFuse** paper) is generally the preferred type when either you have a clearly dominant disk with little evidence of a bulge (in which case the Sersic index should come out near 1, i.e. exponential) or the galaxy is earlier type (e.g. elliptical, in which case the Sersic index should come out in range 4-8). Note we change the *nser_upper* to capture the fuller range we expect to see for true elliptical profiles. 
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+MF2F_Ncomp1 = profuseMultiBandFound2Fit(
+  image_list = image_list,
+  magzero = c(0, 0, 0, 0, 30, 30, 30, 30, 30),
+  tolerance = 20,
+  Ncomp = 1,
+  nser_upper = 8,
+  parm_global = c(
+    "sersic.xcen",
+    "sersic.ycen",
+    "sersic.re",
+    "sersic.nser",
+    "sersic.ang",
+    "sersic.axrat"
+  ),
+  parm_ProSpect = list(
+    mSFR_1 = 0,
+    mpeak_1 = 10,
+    mperiod_1 = 0.3,
+    mskew_1 = 0,
+    tau_screen_1 = -0.8,
+    tau_birth_1 = -0.2,
+    Zfinal_1 = -2
+  ),
+  logged_ProSpect = c(TRUE, FALSE, TRUE, FALSE, TRUE, TRUE, TRUE),
+  intervals_ProSpect = list(
+    lo = c(-4,  -2, -0.5 , -1, -2.5, -2.5, -4),
+    hi = c(3, agemax / 1e9, 1, 1, 1, 1, -1.3)
+  ),
+  data_ProSpect = list(
+    massfunc = massfunc_snorm_trunc,
+    speclib = BC03lr,
+    Dale = Dale_NormTot,
+    filtout = filtout,
+    z = redshift,
+    Z = Zfunc_massmap_lin,
+    agemax = agemax
+  )
+)
+```
+
+There are two good ways to check the setup is sensible. We can run it through **profitLikeModel**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+profitLikeModel(parm=MF2F_Ncomp1$init, Data=MF2F_Ncomp1, makeplots=TRUE)
+```
+
+And assuming that looks roughly sensible we can try a few iterations with **profuseMultiBandDoFit**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+high_Ncomp1 = profuseMultiBandDoFit(MF2F=MF2F_Ncomp1, Niters=c(10,10))
+```
+
+## 1.5 Component Fit (PSF-Bulge/Disk, or PD)
+
+The 1.5 component fit (called PD in the **ProFuse** paper) is generally the preferred type when either you have a clear disk with with an unresolved bulge. If the bulge is not well resolved then fitting the light profile will be quite degenerate. Instead we approximate the bulge as being a pure PSF component in the centre of the disk. By default we do not fit the disk Sersic parameter, it is set to 1 (exponential).
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+MF2F_Ncomp1p5 = profuseMultiBandFound2Fit(
+  image_list = image_list,
+  magzero = c(0, 0, 0, 0, 30, 30, 30, 30, 30),
+  tolerance = 20,
+  parm_global = c(
+    "sersic.xcen",
+    "sersic.ycen",
+    "sersic.re",
+    "sersic.ang",
+    "sersic.axrat"
+  ),
+  Ncomp = 1.5,
+  parm_ProSpect = list(
+    mSFR_1 = 0,
+    mpeak_1 = 10,
+    mperiod_1 = 0.3,
+    mskew_1 = 0,
+    Zfinal_1 = -2,
+    mSFR_2 = 0,
+    mpeak_2 = 1,
+    mperiod_2 = 0.3,
+    mskew_2 = 0,
+    Zfinal_2 = -2
+  ),
+  logged_ProSpect = c(TRUE,                              #         mSFR_1 = 0
+                      FALSE,                             #         mpeak_1 = 10
+                      TRUE,                              #        mperiod_1 = 0.3
+                      FALSE,                             #         mskew_1 = 0
+                      TRUE,                              #        Zfinal_1 = -2
+                      TRUE,                              #        mSFR_2 = 0
+                      FALSE,                             #         mpeak_2 = 1
+                      TRUE,                              #        mperiod_2 = 0.3
+                      FALSE,                             #         mskew_2 = 0
+                      TRUE                               #        Zfinal_2 = -2
+                      ),
+  intervals_ProSpect = list(
+    lo = c(-4,                              #       mSFR_1 = 0
+           0,                               #       mpeak_1 = 5
+           -0.5,                            #          mperiod_1 = 0.3
+           -1,                              #        mskew_1 = 0
+           -4,                              #        Zfinal_1 = -2
+           -4,                              #        mSFR_2 = 0
+           0,                               #       mpeak_2 = 5
+           -0.5,                            #          mperiod_2 = 0.3
+           -1,                              #        mskew_2 = 0
+           -4                               #        Zfinal_2 = -2
+    ),
+    hi = c(3,                               #       mSFR_1 = 0
+           10,                              #        mpeak_1 = 5
+           1,                               #       mperiod_1 = 0.3
+           1,                               #       mskew_1 = 0
+           -1.3,                            #        Zfinal_1 = -2
+           3,                               #       mSFR_2 = 0
+           10,                              #        mpeak_2 = 5
+           1,                               #       mperiod_2 = 0.3
+           1,                               #       mskew_2 = 0
+           -1.3                             #        Zfinal_2 = -2
+    )
+  ),
+  data_ProSpect = list(
+    massfunc = massfunc_snorm_trunc,
+    speclib = BC03lr,
+    Dale = Dale_NormTot,
+    filtout = filtout,
+    z = redshift,
+    Z = Zfunc_massmap_lin,
+    agemax = agemax,
+    #Set no dust in bulge
+    tau_screen_1 = 0,
+    #Set to Thorne 2020 medians for disk
+    tau_screen_2 = 0.16,
+    tau_birth_2 = 0.63
+  )
+)
+```
+
+There are two good ways to check the setup is sensible. We can run it through **profitLikeModel**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+profitLikeModel(parm=MF2F_Ncomp1p5$init, Data=MF2F_Ncomp1p5, makeplots=TRUE)
+```
+
+And assuming that looks roughly sensible we can try a few iterations with **profuseMultiBandDoFit**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+high_Ncomp1p5 = profuseMultiBandDoFit(MF2F=MF2F_Ncomp1p5, Niters=c(10,10))
+```
+
+## 2 Component Fit (Bulge/Disk, or BD)
+
+The 2 component fit (called BD in the **ProFuse** paper) is generally the preferred type when either you have a clear disk with with a resolved bulge. If the bulge is well resolved then fitting the light profile will produce a better global fit. By default we do not fit the bulge and disk Sersic parameters, they are set to 4 (de-Vaucouleurs) and 1 (exponential) respectively.
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+MF2F_Ncomp2 = profuseMultiBandFound2Fit(
+  image_list = image_list,
+  magzero = c(0, 0, 0, 0, 30, 30, 30, 30, 30),
+  tolerance = 20,
+  parm_global = c(
+    "sersic.xcen1",
+    "sersic.ycen1",
+    "sersic.re1",
+    "sersic.re2",
+    "sersic.ang2",
+    "sersic.axrat2"
+  ),
+  Ncomp = 2,
+  parm_ProSpect = list(
+    mSFR_1 = 0,
+    mpeak_1 = 10,
+    mperiod_1 = 0.3,
+    mskew_1 = 0,
+    Zfinal_1 = -2,
+    mSFR_2 = 0,
+    mpeak_2 = 1,
+    mperiod_2 = 0.3,
+    mskew_2 = 0,
+    Zfinal_2 = -2
+  ),
+  logged_ProSpect = c(TRUE,                              #         mSFR_1 = 0
+                      FALSE,                             #         mpeak_1 = 10
+                      TRUE,                              #        mperiod_1 = 0.3
+                      FALSE,                             #         mskew_1 = 0
+                      TRUE,                              #        Zfinal_1 = -2
+                      TRUE,                              #        mSFR_2 = 0
+                      FALSE,                             #         mpeak_2 = 1
+                      TRUE,                              #        mperiod_2 = 0.3
+                      FALSE,                             #         mskew_2 = 0
+                      TRUE                              #        Zfinal_2 = -2
+                      ),
+  intervals_ProSpect = list(
+    lo = c(-4,                              #       mSFR_1 = 0
+           0,                               #       mpeak_1 = 5
+           -0.5,                            #          mperiod_1 = 0.3
+           -1,                              #        mskew_1 = 0
+           -4,                              #        Zfinal_1 = -2
+           -4,                              #        mSFR_2 = 0
+           0,                               #       mpeak_2 = 5
+           -0.5,                            #          mperiod_2 = 0.3
+           -1,                              #        mskew_2 = 0
+           -4                               #        Zfinal_2 = -2
+    ),
+    hi = c(3,                               #       mSFR_1 = 0
+           10,                              #        mpeak_1 = 5
+           1,                               #       mperiod_1 = 0.3
+           1,                               #       mskew_1 = 0
+           -1.3,                            #        Zfinal_1 = -2
+           3,                               #       mSFR_2 = 0
+           10,                              #        mpeak_2 = 5
+           1,                               #       mperiod_2 = 0.3
+           1,                               #       mskew_2 = 0
+           -1.3                             #        Zfinal_2 = -2
+    )
+  ),
+  data_ProSpect = list(
+    massfunc = massfunc_snorm_trunc,
+    speclib = BC03lr,
+    Dale = Dale_NormTot,
+    filtout = filtout,
+    z = redshift,
+    Z = Zfunc_massmap_lin,
+    agemax = agemax,
+    #Set no ISM dust in bulge
+    tau_screen_1 = 0,
+    tau_birth_1 = 0.63,
+    #Set to Thorne 2020 medians for disk
+    tau_screen_2 = 0.16,
+    tau_birth_2 = 0.63
+  )
+  )
+```
+
+There are two good ways to check the setup is sensible. We can run it through **profitLikeModel**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+profitLikeModel(parm=MF2F_Ncomp2$init, Data=MF2F_Ncomp2, makeplots=TRUE)
+```
+
+And assuming that looks roughly sensible we can try a few iterations with **profuseMultiBandDoFit**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+high_Ncomp2 = profuseMultiBandDoFit(MF2F=MF2F_Ncomp2, Niters=c(10,10))
+```
+
+## 3 Component Fit (Bulge/Disk/Disk, or BDD)
+
+The 3 component fit (called BDD in the **ProFuse** paper) is generally the preferred type when either you have a clear disk with with a resolved bulge. If the bulge is well resolved then fitting the light profile will produce a better global fit. The two component disk is present to capture SFH and ZH profiles in the disk, i.e. linear colour gradients. You could attempt to interpret this model and a thick and thin disk, but in most cases it is really just capturing colour gradients in normal disks. By default we do not fit the bulge and disk Sersic parameters, they are set to 4 (de Vaucouleurs) and 1 (exponential) respectively. The two disk components have the same geometry for the axis ratio and orientation, the only different is the *Re* and the the **ProSpect** SFH and ZH parameters.
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+MF2F_Ncomp3 = profuseMultiBandFound2Fit(
+  image_list=image_list,
+  magzero=c(0,0,0,0,30,30,30,30,30),
+  tolerance=20,
+  parm_global = c("sersic.xcen1", "sersic.ycen1",
+                  "sersic.re1", "sersic.re2", "sersic.re3",
+                  "sersic.ang2", "sersic.axrat2"),
+  Ncomp = 3,
+  parm_ProSpect = list(
+    mSFR_1 = 0,
+    mpeak_1 = 10,
+    mperiod_1 = 0.3,
+    mskew_1 = 0,
+    Zfinal_1 = -2,
+    mSFR_2 = 0,
+    mpeak_2 = 1,
+    mperiod_2 = 0.3,
+    mskew_2 = 0,
+    Zfinal_2 = -2,
+    mSFR_3 = 0,
+    mpeak_3 = 1,
+    mperiod_3 = 0.3,
+    mskew_3 = 0,
+    Zfinal_3 = -2
+  ),
+  logged_ProSpect = c(
+    TRUE,                              #         mSFR_1 = 0
+    FALSE,                             #         mpeak_1 = 10
+    TRUE,                              #        mperiod_1 = 0.3
+    FALSE,                             #         mskew_1 = 0
+    TRUE,                              #        Zfinal_1 = -2
+    TRUE,                              #        mSFR_2 = 0
+    FALSE,                             #         mpeak_2 = 1
+    TRUE,                              #        mperiod_2 = 0.3
+    FALSE,                             #         mskew_2 = 0
+    TRUE,                              #        Zfinal_2 = -2
+    TRUE,                              #        mSFR_3 = 0
+    FALSE,                             #         mpeak_3 = 1
+    TRUE,                              #        mperiod_3 = 0.3
+    FALSE,                             #         mskew_3 = 0
+    TRUE                               #        Zfinal_3 = -2
+  ),
+  intervals_ProSpect = list(
+    lo=c(
+      -4,                              #       mSFR_1 = 0
+      0,                               #       mpeak_1 = 10
+      -0.5,                            #          mperiod_1 = 0.3
+      -1,                              #        mskew_1 = 0
+      -4,                              #        Zfinal_1 = -2
+      -4,                              #        mSFR_2 = 0
+      0,                               #       mpeak_2 = 1
+      -0.5,                            #          mperiod_2 = 0.3
+      -1,                              #        mskew_2 = 0
+      -4,                              #        Zfinal_2 = -2
+      -4,                              #        mSFR_3 = 0
+      0,                               #       mpeak_3 = 1
+      -0.5,                            #          mperiod_3 = 0.3
+      -1,                              #        mskew_3 = 0
+      -4                               #        Zfinal_3 = -2
+    ),
+    hi=c(
+      3,                               #       mSFR_1 = 0
+      10,                              #        mpeak_1 = 10
+      1,                               #       mperiod_1 = 0.3
+      1,                               #       mskew_1 = 0
+      -1.3,                            #        Zfinal_1 = -2
+      3,                               #       mSFR_2 = 0
+      10,                              #        mpeak_2 = 1
+      1,                               #       mperiod_2 = 0.3
+      1,                               #       mskew_2 = 0
+      -1.3,                            #        Zfinal_2 = -2
+      3,                               #       mSFR_3 = 0
+      10,                              #        mpeak_3 = 1
+      1,                               #       mperiod_3 = 0.3
+      1,                               #       mskew_3 = 0
+      -1.3                             #        Zfinal_3 = -2
+    )
+  ),
+  data_ProSpect = list(massfunc = massfunc_snorm_trunc,
+                       speclib = BC03lr,
+                       Dale = Dale_NormTot,
+                       filtout = filtout,
+                       z = redshift,
+                       Z = Zfunc_massmap_lin,
+                       agemax = agemax,
+                       #Set no ISM dust in bulge
+                       tau_screen_1 = 0,
+                       tau_birth_1 = 0.63,
+                       #Set to Thorne 2020 medians for disk 1
+                       tau_screen_2 = 0.16,
+                       tau_birth_2 = 0.63,
+                       #Set to Thorne 2020 medians for disk 2
+                       tau_screen_3 = 0.16,
+                       tau_birth_3 = 0.63
+  )
+)
+```
+
+There are two good ways to check the setup is sensible. We can run it through **profitLikeModel**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+profitLikeModel(parm=MF2F_Ncomp3$init, Data=MF2F_Ncomp3, makeplots=TRUE)
+```
+
+And assuming that looks roughly sensible we can try a few iterations with **profuseMultiBandDoFit**:
+
+```{r eval=evalglobal, message=FALSE, warning=FALSE, results=FALSE}
+high_Ncomp3 = profuseMultiBandDoFit(MF2F=MF2F_Ncomp3, Niters=c(10,10))
+```
