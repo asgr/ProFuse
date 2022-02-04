@@ -296,7 +296,7 @@ MF2F_Ncomp2 = profuseMultiBandFound2Fit(
     tau_screen_2 = 0.16,
     tau_birth_2 = 0.63
   )
-  )
+)
 ```
 
 There are two good ways to check the setup is sensible. We can run it through **profitLikeModel**:

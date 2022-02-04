@@ -13,7 +13,7 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
     sky_list = NULL, skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1",
         "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
     Ncomp = 2, cutbox = dim(image), psf_list = NULL, magdiff = 2.5,
-    magzero = NULL, gain = NULL, resamp = NULL, sing_nser = 2,
+    magzero = NULL, gain = NULL, resamp = NULL, doprofit = NULL, sing_nser = 2,
     bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
     disk_nser_fit = FALSE, bulge_circ = TRUE, nser_upper = 5.3, star_rough = TRUE,
     fit_rough = FALSE, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
@@ -75,6 +75,9 @@ Numeric vector; gain (in photo-electrons per ADU) for the corresponding \option{
 }
   \item{resamp}{
 Numeric vector; optional, reampling factors for the corresponding \option{image_list}. If you have warped natively low resolution data (say, FIR) to match higher resolution optical data the resampling factor for the FIR will be larger than 1 (less than 1 is ignored) which modifies the measure sky RMS. In simple terms, by over-sampling lower resolution data and conserving flux you reduce the estimated RMS likelihood (your RMS per new pixel will be a factor \option{resamp} larger, but you have \option{resamp}^2 fewer pixels).
+}
+  \item{doprofit}{
+Numeric vector; optional should ProFit component structures be computed for the corresponding \option{image_list}? If Null or vector component is TRUE then this will calculate LL based on the whole image, if FALSE then the LL is only computed for flux within the relevant \option{segim_list} element. This makes sense when the source is very unresolved (typically UV/MIR/FIR) since there is very little structural information present, but we still might want to use the integrated flux properties of the source to constrain the total \code{ProSpect} SFH/ZH aspect of our model.
 }
   \item{sing_nser}{
 Numeric scalar; optional, start value (or fixed value if \option{sing_nser_fit} = FALSE) of the single Sersic profile index. Only relevant for \option{Ncomp} = 1 fits.

@@ -12,6 +12,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                     magzero = NULL,
                                     gain = NULL,
                                     resamp = NULL,
+                                    doprofit = NULL,
                                     sing_nser = 2,
                                     bulge_nser = 4,
                                     disk_nser = 1,
@@ -228,6 +229,15 @@ profuseMultiBandFound2Fit = function(image_list,
       verbose = FALSE,
       rough = fit_rough
     )
+
+    if(!is.null(doprofit)){
+      MF2F[[i]]$doprofit = doprofit[i]
+
+      if(!doprofit[i]){
+        MF2F[[i]]$object_flux = sum(MF2F[[i]]$image*MF2F[[i]]$region, na.rm=TRUE)
+        MF2F[[i]]$object_fluxerr = sqrt(sum(MF2F[[i]]$sigma^2*MF2F[[i]]$region, na.rm=TRUE))
+      }
+    }
   }
 
   names(MF2F) = names(image_list)
