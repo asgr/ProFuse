@@ -47,8 +47,9 @@ profuseFound2Fit = function(image,
                               SBdilate = 2)$psf #works well for stars
   }
 
-  image[image < quantile(image, 0.01, na.rm=TRUE)*10] = NA
-  image[image > quantile(image, 0.99, na.rm=TRUE)*10] = NA
+  image_med = median(image, na.rm=TRUE)
+  image[image - image_med < quantile(image - image_med, 0.01, na.rm=TRUE)*10] = NA
+  image[image - image_med > quantile(image - image_med, 0.99, na.rm=TRUE)*10] = NA
 
   if(!is.null(loc)){
     cutim = magicaxis::magcutout(image, loc = loc, box = cutbox)

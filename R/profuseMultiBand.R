@@ -42,7 +42,7 @@ profuseMultiBandFound2Fit = function(image_list,
   }
 
   for(i in 1:Nim){
-    if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){ #[i][[1]] looks silly, but it will return NULL when sky_list = NULL for any i (default). [[i]] will error in this case
+    if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){ #[i][[1]] looks silly, but it will return NULL when sky_list = NULL for any i (default). [[i]] will error in this case. This does not seem to be the case as of R v4.1.0, but probably leave to be safe for now.
       message("Image ",i,": running initial ProFound")
       profound = ProFound::profoundProFound(image = image_list[[i]],
                                             sky = sky_list[i][[1]],
@@ -59,7 +59,7 @@ profuseMultiBandFound2Fit = function(image_list,
       }
     }
 
-    if(is.null(psf_list[i][[1]])){
+    if(is.null(psf_list[i][[1]]) & !isFALSE(doprofit[i])){ #last bit looks weird, but means the AllStar phase is skipped when doprofit is FALSE or NULL.
       message("Image ",i,": running AllStarDoFit")
       psf_list[[i]] = profuseAllStarDoFit(image = image_list[[i]],
                                           resamp = resamp[i][[1]],
@@ -72,21 +72,37 @@ profuseMultiBandFound2Fit = function(image_list,
                                          skycut = 2, #works well for stars
                                          SBdilate = 2)$psf #works well for stars
     }
+    if(is.null(psf_list[i][[1]]) & isFALSE(doprofit[i])){
+      psf_list[[i]] = matrix(1,1,1)
+    }
   }
 
   message("Making image stack")
 
-  multi_stack = ProFound::profoundMakeStack(
-    image_list = image_list,
-    skyRMS_list = skyRMS_list,
-    magzero_in = magzero,
-    magzero_out = 0
-  )
+  if(is.null(doprofit)){
+    multi_stack = ProFound::profoundMakeStack(
+      image_list = image_list,
+      skyRMS_list = skyRMS_list,
+      magzero_in = magzero,
+      magzero_out = 0
+    )
+  }else{
+    multi_stack = ProFound::profoundMakeStack(
+      image_list = image_list[doprofit],
+      skyRMS_list = skyRMS_list[doprofit],
+      magzero_in = magzero[doprofit],
+      magzero_out = 0
+    )
+  }
 
   message("Running ProFound on stack")
 
   if(is.null(segim_global) & !is.null(segim_list)){
-    segim_global = profuseSegimGlobal(segim_list)
+    if(is.null(doprofit)){
+      segim_global = profuseSegimGlobal(segim_list)
+    }else{
+      segim_global = profuseSegimGlobal(segim_list[doprofit])
+    }
   }
 
   multi_stack_pro = ProFound::profoundProFound(image=multi_stack$image,
