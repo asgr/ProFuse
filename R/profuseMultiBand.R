@@ -246,14 +246,11 @@ profuseMultiBandFound2Fit = function(image_list,
       rough = fit_rough
     )
 
-    if(!is.null(doprofit)){
-      MF2F[[i]]$doprofit = doprofit[i]
-
-      if(!doprofit[i]){
-        MF2F[[i]]$object_flux = sum(MF2F[[i]]$image*MF2F[[i]]$region, na.rm=TRUE)
-        MF2F[[i]]$object_fluxerr = sqrt(sum(MF2F[[i]]$sigma^2*MF2F[[i]]$region, na.rm=TRUE))
-      }
-    }
+    #if(!is.null(doprofit)){
+    MF2F[[i]]$doprofit = doprofit[i]
+    MF2F[[i]]$object_flux = magAB2Jansky(profoundFlux2Mag(sum(MF2F[[i]]$image*MF2F[[i]]$region, na.rm=TRUE), magzero[i])) #only used for fitting when doprofit = FALSE, but useful outputs anyway
+    MF2F[[i]]$object_fluxerr = magAB2Jansky(profoundFlux2Mag(sqrt(sum(MF2F[[i]]$sigma^2*MF2F[[i]]$region, na.rm=TRUE)), magzero[i])) #only used for fitting when doprofit = FALSE, but useful outputs anyway
+    #}
   }
 
   names(MF2F) = names(image_list)
