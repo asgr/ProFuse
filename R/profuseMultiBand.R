@@ -343,9 +343,9 @@ profuseMultiBandDoFit = function(image_list,
                                 star_rough = TRUE,
                                 fit_rough = FALSE,
                                 seed = 666,
-                                optim_iters = 2,
-                                Niters = c(1000,1000),
-                                NfinalMCMC = Niters[2],
+                                optim_iters = 5,
+                                Niters = c(200,200),
+                                NfinalMCMC = 1000,
                                 ...) {
 
   timestart = proc.time()[3] # start timer

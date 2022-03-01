@@ -26,8 +26,8 @@ profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL,
     parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1",
         "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
     psf_list = NULL, magzero = NULL, psf_dim = c(51, 51), star_rough = TRUE,
-    fit_rough = FALSE, seed = 666, optim_iters = 2, Niters = c(1000,1000),
-    NfinalMCMC = Niters[2], ...)
+    fit_rough = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
+    NfinalMCMC = 1000, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -146,10 +146,10 @@ Logical; optional, should the image be cut down to the tightest fitting box that
 Integer scalar; random seed to start the \code{Highlander} function with.
 }
   \item{optim_iters}{
-Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}.
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.
 }
   \item{Niters}{
-Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}.
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(200,200) works pretty well in practice.
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.

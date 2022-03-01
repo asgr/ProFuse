@@ -17,12 +17,12 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
     bulge_circ = TRUE, nser_upper=5.3, star_rough = TRUE, fit_rough = FALSE,
     psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
     offset = NULL, tightcrop = TRUE, deblend_extra = TRUE, fit_extra = FALSE,
-    pos_delta = 10, ...)
+    pos_delta = 10, autoclip = TRUE, ...)
 
 profuseDoFit(image, sigma = NULL, loc = NULL, F2F = NULL, Ncomp = 2, cutbox = dim(image),
   psf, magdiff = 2.5, magzero = 0, psf_dim = c(51,51), star_rough = TRUE,
-  fit_rough = FALSE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(1000,1000),
-  NfinalMCMC = Niters[2], ...)
+  fit_rough = FALSE, plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
+  NfinalMCMC = 1000, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -135,13 +135,16 @@ Logical; optional, should a before and after modelling plot be created? This is 
 Integer scalar; random seed to start the \code{Highlander} function with.
 }
   \item{optim_iters}{
-Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}.
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.
 }
   \item{Niters}{
-Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}.
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(200,200) works pretty well in practice.
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
+}
+  \item{autoclip}{
+Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.

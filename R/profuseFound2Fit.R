@@ -30,7 +30,8 @@ profuseFound2Fit = function(image,
                            tightcrop = TRUE,
                            deblend_extra = TRUE,
                            fit_extra = FALSE,
-                           pos_delta=10,
+                           pos_delta = 10,
+                           autoclip = TRUE,
                            ...) {
   if(Ncomp == 0.5){psf = NULL}
   if((Ncomp >= 1 & is.null(psf)) | (Ncomp == 0 & is.null(psf))){
@@ -47,9 +48,11 @@ profuseFound2Fit = function(image,
                               SBdilate = 2)$psf #works well for stars
   }
 
-  image_med = median(image, na.rm=TRUE)
-  image[image - image_med < quantile(image - image_med, 0.01, na.rm=TRUE)*10] = NA
-  image[image - image_med > quantile(image - image_med, 0.99, na.rm=TRUE)*10] = NA
+  if(autoclip){
+    image_med = median(image, na.rm=TRUE)
+    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*10] = NA
+    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*10] = NA
+  }
 
   if(!is.null(loc)){
     cutim = magicaxis::magcutout(image, loc = loc, box = cutbox)
@@ -169,6 +172,7 @@ profuseFound2Fit = function(image,
     cutim = cutim[xlo:xhi, ylo:yhi]
     region = region[xlo:xhi, ylo:yhi]
     cutsigma = cutsigma[xlo:xhi, ylo:yhi]
+    cutseg = cutseg[xlo:xhi, ylo:yhi]
 
     if(loc_use){
       xcen = loc[1] - xlo + 1
@@ -561,6 +565,7 @@ profuseFound2Fit = function(image,
     region = region,
     sigma = cutsigma,
     segim = cutseg,
+    mask = is.na(image)*1L,
     psf = psf,
     modellist = modellist,
     tofit = tofit,
@@ -591,9 +596,9 @@ profuseDoFit = function(image,
                        fit_rough = FALSE,
                        plot = FALSE,
                        seed = 666,
-                       optim_iters = 2,
-                       Niters = c(1000,1000),
-                       NfinalMCMC = Niters[2],
+                       optim_iters = 5,
+                       Niters = c(200,200),
+                       NfinalMCMC = 1000,
                        ...) {
 
   timestart = proc.time()[3] # start timer
