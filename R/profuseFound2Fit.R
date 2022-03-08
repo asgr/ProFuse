@@ -161,6 +161,9 @@ profuseFound2Fit = function(image,
   }
 
   region = matrix(mini_profound$segim %in% c(segID_tar, segID_ext), nrow=cutbox[1], ncol=cutbox[2])
+  if(!is.null(mini_profound$mask)){
+    region = region & mini_profound$mask==0L
+  }
   regionlim = which(region, arr.ind=TRUE)
 
   if(tightcrop){
@@ -565,7 +568,7 @@ profuseFound2Fit = function(image,
     region = region,
     sigma = cutsigma,
     segim = cutseg,
-    mask = is.na(image)*1L,
+    mask = is.na(cutim)*1L,
     psf = psf,
     modellist = modellist,
     tofit = tofit,

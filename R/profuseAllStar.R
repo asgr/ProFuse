@@ -8,7 +8,7 @@ profuseAllStarFound2Fit = function(image,
                            star_con = 2,
                            star_con_fit = TRUE,
                            star_circ = TRUE,
-                           rough = FALSE,
+                           rough = TRUE,
                            star_dom_mag = NULL,
                            Nstar = 4,
                            ...) {
@@ -205,9 +205,12 @@ profuseAllStarDoFit = function(image,
                        locs = NULL,
                        magzero = 0,
                        psf_dim = c(51,51),
-                       rough = FALSE,
+                       rough = TRUE,
                        plot = FALSE,
                        seed = 666,
+                       optim_iters = 5,
+                       Niters = c(200,200),
+                       NfinalMCMC = 1000,
                        ...) {
 
   timestart = proc.time()[3] # start timer
@@ -249,7 +252,10 @@ profuseAllStarDoFit = function(image,
     lower = lowers,
     upper = uppers,
     applyintervals = FALSE,
-    applyconstraints = FALSE
+    applyconstraints = FALSE,
+    optim_iters = optim_iters,
+    Niters = Niters,
+    NfinalMCMC = NfinalMCMC
   )
   names(highfit$parm) = names(Data$init)
 

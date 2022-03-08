@@ -11,10 +11,11 @@ Functions to identify stars from \code{ProFound} and fit them with \code{ProFit}
 \usage{
 profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, magzero = 0,
   resamp = NULL, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
-  rough = FALSE, star_dom_mag = NULL, Nstar = 4, ...)
+  rough = TRUE, star_dom_mag = NULL, Nstar = 4, ...)
 
 profuseAllStarDoFit(image, sigma = NULL, locs = NULL, magzero = 0, psf_dim = c(51,51),
-  rough = FALSE, plot = FALSE, seed = 666, ...)
+  rough = TRUE, plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
+  NfinalMCMC = 1000, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -51,17 +52,25 @@ Integer vector; optional, the dimensions of the output PSF generated when fittin
   \item{rough}{
 Logical; optional, should ProFit be run using an approximate fit? This is less accurate, and potentially much less for compact sources, but it also runs much faster. Potentially if the target object is very extended then this will be accurate enough and speed up fitting by a factor of a few usually. It is also useful for quick testing. For publishable results this should usually be left as the default of FALSE. For \code{AllStar} setting this to FALSE is perhaps a good option if you do no care about the model parameters themselves (e.g. FWHM) and just want a decent PSF image.
 }
-  \item{plot}{
-Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
-}
-  \item{seed}{
-Integer scalar; random seed to start the \code{Highlander} function with.
-}
   \item{star_dom_mag}{
 Numeric scalar; optional, specify at what magnitude (and brighter) stars start to dominate source counts. This helps the code to guess which objects are stars if \option{locs} is not provided. If not provided then it will just use the median magitude of all sources (which is rarely correct, but at least it sits in the domain of the data). Sensible values are usually between mag 20-22 (for AB mag and optical bands).
 }
   \item{Nstar}{
 Integer scalar; optional, maximum number of fitting stars to generate in \code{profitAllStarFound2Fit}, and therefore to fit in \code{profitAllStarDoFit}.
+}
+  \item{plot}{
+Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
+}
+  \item{seed}{
+Integer scalar; random seed to start the \code{Highlander} function with.
+}  \item{optim_iters}{
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.
+}
+  \item{Niters}{
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(200,200) works pretty well in practice.
+}
+  \item{NfinalMCMC}{
+Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.
