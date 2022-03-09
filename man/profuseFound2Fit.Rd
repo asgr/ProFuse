@@ -19,8 +19,8 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, mask = NULL, Nco
     offset = NULL, tightcrop = TRUE, deblend_extra = FALSE, fit_extra = FALSE,
     pos_delta = 10, autoclip = TRUE, ...)
 
-profuseDoFit(image, F2F = NULL, Ncomp = 2, magzero = 0, psf_dim = c(51,51), plot = FALSE,
-  seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000, ...)
+profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = 0, psf_dim = c(51,51),
+  plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

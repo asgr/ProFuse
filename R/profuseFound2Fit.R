@@ -82,6 +82,16 @@ profuseFound2Fit = function(image,
     cutseg = NULL
   }
 
+  if(is.null(mask)){
+    cutmask = is.na(cutim)
+  }else if(dim(mask)[1] == dim(cutim)[1] & dim(mask)[2] == dim(cutim)[2]){
+    cutmask = mask
+  }else if (dim(mask)[1] == dim(image)[1] & dim(mask)[2] == dim(image)[2] & !is.null(loc)) {
+    cutmask = magicaxis::magcutout(mask, loc = loc, box = cutbox)$image
+  }else{
+    cutmask = is.na(cutim)
+  }
+
   loc = loc_cut
 
   message('    Running ProFound')
@@ -90,7 +100,7 @@ profuseFound2Fit = function(image,
   if(is.null(cutseg)){
     mini_profound = ProFound::profoundProFound(
       image = cutim,
-      mask = mask,
+      mask = cutmask,
       sky = 0,
       redosky = FALSE,
       nearstats = TRUE,
@@ -104,7 +114,7 @@ profuseFound2Fit = function(image,
     mini_profound = ProFound::profoundProFound(
       image = cutim,
       segim = cutseg,
-      mask = mask,
+      mask = cutmask,
       sky = 0,
       redosky = FALSE,
       nearstats = TRUE,
@@ -571,7 +581,7 @@ profuseFound2Fit = function(image,
     region = region,
     sigma = cutsigma,
     segim = cutseg,
-    mask = is.na(cutim)*1L,
+    mask = cutmask,
     psf = psf,
     modellist = modellist,
     tofit = tofit,
@@ -591,6 +601,7 @@ profuseFound2Fit = function(image,
 profuseDoFit = function(image,
                        F2F = NULL,
                        Ncomp = 2,
+                       psf = NULL,
                        magzero = 0,
                        psf_dim = c(51,51),
                        plot = FALSE,
@@ -608,6 +619,7 @@ profuseDoFit = function(image,
     F2F = profuseFound2Fit(
       image = image,
       Ncomp = Ncomp,
+      psf = psf,
       magzero = magzero,
       ...
     )
