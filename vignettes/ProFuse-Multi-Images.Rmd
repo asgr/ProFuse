@@ -132,7 +132,7 @@ Datalist[[1]]$init
 Datalist[[2]]$init
 ```
 
-We now need to make a new *init* structure that adds on an additional re term for the second image disk (re2b) and a new *parmuse* structure that tells **ProFit** where to look for parameters when fittin each image.
+We now need to make a new *init* structure that adds on an additional re term for the second image disk (re2b) and a new *parmuse* structure that tells **ProFit** where to look for parameters when fitting each image.
 
 ```{r eval=evalglobal}
 Datalist2 = c(list(F2F1$Data), list(F2F2$Data)) #Note we are still using the offset added to F2F2$Data

@@ -9,7 +9,7 @@ ProFound to ProFit Profile Fitting
 Functions to easily take users from image pixel data all the way to fully fitted profiles.
 }
 \usage{
-profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
+profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, mask = NULL, Ncomp = 2,
     cutbox = dim(image), psf = NULL, magdiff = 2.5, magzero = 0,
     gain = NULL, resamp = NULL, loc_use = FALSE, loc_fit = TRUE,
     mag_fit = TRUE, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
@@ -19,15 +19,13 @@ profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, Ncomp = 2,
     offset = NULL, tightcrop = TRUE, deblend_extra = FALSE, fit_extra = FALSE,
     pos_delta = 10, autoclip = TRUE, ...)
 
-profuseDoFit(image, sigma = NULL, loc = NULL, F2F = NULL, Ncomp = 2, cutbox = dim(image),
-  psf, magdiff = 2.5, magzero = 0, psf_dim = c(51,51), star_rough = TRUE,
-  fit_rough = FALSE, plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
-  NfinalMCMC = 1000, ...)
+profuseDoFit(image, F2F = NULL, Ncomp = 2, magzero = 0, psf_dim = c(51,51), plot = FALSE,
+  seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{image}{
-Numeric matrix; required, the galaxy image we want to fit a galaxy of PSF/star model to. For convenience this can also be an Rfits_pointer object for very large on disk images. Critically, this input \option{image} needs to be well background subtracted (this is not done again internally).
+Numeric matrix; required for \code{profuseFound2Fit} and for \code{profuseDoFit} if \option{F2F} is not provided. The galaxy image we want to fit a galaxy of PSF/star model to. For convenience this can also be an Rfits_pointer object for very large on disk images. Critically, this input \option{image} needs to be well background subtracted (this is not done again internally).
 }
   \item{sigma}{
 Numeric matrix; optional, the sigma map of the \option{image} data we want to fit a model to. If not provided this will be estimated by running \code{profoundProFound} (to find the sky and skyRMS), \code{profoundGainEst} (to find the gain) and \code{profoundMakeSigma} to make a decent effort at creating an appropriate sigma map. Users should usually try to provide this themselves for critical fitting, but the automatic sigma map is usually good enough for testing purposes. For convenience this can also be an Rfits_pointer object for very large on disk sigma maps.
@@ -40,6 +38,9 @@ List; output of \code{profuseFound2Fit}. If this is provided then the \code{prof
 }
   \item{segim}{
 Integer matrix; optional, users can pass in their own segmentation maps, which should be pixel matched to the input \option{image}. This will be used instead of the internal \code{ProFound} run, although the segmentation statistics will still be recomputed.
+}
+ \item{mask}{
+Boolean matrix or integer scalar (1,0); optional, parts of the image to mask out (i.e. ignore). If a matrix is provided, this matrix *must* be the same dimensions as \option{image} where 1 means mask out and 0 means use for analysis. If a scalar is provided it indicates the exact \option{image} values that should be treated as masked (e.g. by setting masked pixels to 0 or -999). The latter achieves the same effect as setting masked \option{image} pixels to NA, but allows for the fact not all programs can produce \code{R} legal NA values.
 }
   \item{Ncomp}{
 Integer scalar; optional, number of components to fit to galaxy. Options for galaxies are "1" (single Sersic profile); "1.5" (disk Sersic profile with a central PSF to model the bulge); "2" (double Sersic profile, the default); and "3" (triple Sersic profile with one bulge and two [thin/thick] disks). In these cases an input \option{psf} should be supplied. To fit a star with a Moffat profile set Ncomp to "0.5". In this case no input \option{psf} should be supplied. To fit a star with a provided PSF set Ncomp to "0".

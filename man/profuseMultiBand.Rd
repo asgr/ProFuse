@@ -21,18 +21,15 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
     parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
     intervals_ProSpect = NULL, ...)
 
-profuseMultiBandDoFit(image_list, segim_list = NULL, segim_global = NULL,
-    sky_list = NULL, skyRMS_list = NULL, loc = NULL, MF2F = NULL,
-    parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1",
-        "sersic.ang2", "sersic.axrat2"), Ncomp = 2, cutbox = dim(image),
-    psf_list = NULL, magzero = NULL, psf_dim = c(51, 51), star_rough = TRUE,
-    fit_rough = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
-    NfinalMCMC = 1000, ...)
+profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
+    "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
+    magzero = NULL, seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000,
+    ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{image_list}{
-List; required, a list a numeric matrices (one image per target band). This list should exactly match the length of \option{segim_list}, \option{sky_list}, \option{skyRMS_list}, \option{psf_list}, \option{magzero} if these are supplied.
+List; required for \code{profuseMultiBandFound2Fit} and for \code{profuseMultiBandDoFit} if \option{MF2F} is not provided. A list a numeric matrices (one image per target band). This list should exactly match the length of \option{segim_list}, \option{sky_list}, \option{skyRMS_list}, \option{psf_list}, \option{magzero} if these are supplied.
 }
   \item{segim_list}{
 List; optional, a list of integer matrix segmentation maps (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the stacked \option{image_list} segmentation map and use this instead.
