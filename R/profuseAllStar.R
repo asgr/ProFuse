@@ -200,7 +200,7 @@ profuseAllStarFound2Fit = function(image,
     rough = rough
   )
   Data$Nmod = Nstar
-  return(invisible(list(profound = mini_profound, Data = Data)))
+  return(invisible(list(profound = mini_profound, Data = Data, star_segID=mini_profound$segstats[loc_tar, 'segID'])))
 }
 
 profuseAllStarDoFit = function(image,
@@ -269,6 +269,7 @@ profuseAllStarDoFit = function(image,
 
   highfit$profound = found2fit$profound
   highfit$Data = Data
+  highfit$star_segID = found2fit$star_segID
   highfit$initmodel = profitRemakeModellist(Data$init, Data = Data)
   highfit$finalmodel = profitRemakeModellist(highfit$parm, Data = Data)
 

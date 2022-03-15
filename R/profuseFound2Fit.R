@@ -189,6 +189,7 @@ profuseFound2Fit = function(image,
     region = region[xlo:xhi, ylo:yhi]
     cutsigma = cutsigma[xlo:xhi, ylo:yhi]
     cutseg = cutseg[xlo:xhi, ylo:yhi]
+    cutmask = cutmask[xlo:xhi, ylo:yhi]
 
     if(loc_use){
       xcen = loc[1] - xlo + 1

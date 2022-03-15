@@ -86,6 +86,7 @@ The output of \code{profitAllStarFound2Fit} is:
 
 \item{profound}{Output from the initial \code{profoundProFound} run. See \code{profoundProFound}.}
 \item{Data}{The input Data structure created by \code{\link{profitSetupData}}.}
+\item{star_segID}{The segID of the selected stars, which can be referred back to the \option{profound} output.}
 
 The output of \code{profitDoFit}, \code{profitAllStarDoFit} and \code{profitMultiBandDoFit} is subset of:
 
