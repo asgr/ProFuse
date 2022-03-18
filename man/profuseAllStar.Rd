@@ -9,9 +9,9 @@ Automated Star Fitting
 Functions to identify stars from \code{ProFound} and fit them with \code{ProFit} using \code{Highlander}.
 }
 \usage{
-profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, magzero = 0,
-  resamp = NULL, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
-  rough = TRUE, star_dom_mag = NULL, Nstar = 4, ...)
+profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, mask = NULL,
+  magzero = 0, resamp = NULL, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
+  star_circ = TRUE, rough = TRUE, star_dom_mag = NULL, Nstar = 4, ...)
 
 profuseAllStarDoFit(image, sigma = NULL, locs = NULL, magzero = 0, psf_dim = c(51,51),
   rough = TRUE, plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
@@ -27,6 +27,9 @@ Numeric matrix; optional, the sigma map of the \option{image} data we want to fi
 }
   \item{segim}{
 Integer matrix; optional, users can pass in their own segmentation maps, which should be pixel matched to the input \option{image}. This will be used instead of the internal \code{ProFound} run, although the segmentation statistics will still be recomputed.
+}
+ \item{mask}{
+Boolean matrix or integer scalar (1,0); optional, parts of the image to mask out (i.e. ignore). If a matrix is provided, this matrix *must* be the same dimensions as \option{image} where 1 means mask out and 0 means use for analysis. If a scalar is provided it indicates the exact \option{image} values that should be treated as masked (e.g. by setting masked pixels to 0 or -999). The latter achieves the same effect as setting masked \option{image} pixels to NA, but allows for the fact not all programs can produce \code{R} legal NA values.
 }
   \item{locs}{
 Numeric matrix; optional, the [X,Y] locations of target stars on the original \option{image} for \code{AllStar} fitting to create out PSF model. The idea is we pass in a list of multiple potential stars, and internally this is limited to just those star segments that do not touch another source or hit the \option{image} border. If this is not provided then \code{profitAllStarFound2Fit} will attempt to guess which objects might be good stars for modelling (but this should not be relied on generally).

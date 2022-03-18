@@ -3,10 +3,10 @@ profuseMultiBandFound2Fit = function(image_list,
                                      segim_global = NULL,
                                     sky_list = NULL,
                                     skyRMS_list = NULL,
-                                    loc = NULL,
                                     parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
                                     Ncomp = 2,
-                                    cutbox = dim(image),
+                                    loc = NULL,
+                                    cutbox = NULL,
                                     psf_list = NULL,
                                     magdiff = 2.5,
                                     magzero = NULL,
@@ -39,6 +39,10 @@ profuseMultiBandFound2Fit = function(image_list,
 
   if(is.null(magzero)){
     magzero = rep(0, Nim)
+  }
+
+  if(length(magzero) == 1){
+    magzero = rep(magzero, Nim)
   }
 
   for(i in 1:Nim){
@@ -117,9 +121,10 @@ profuseMultiBandFound2Fit = function(image_list,
 
   F2Fstack = profuseFound2Fit(image = multi_stack$image,
                              sigma = multi_stack$skyRMS, #not quite a sigma map, but doesn't matter for the stack F2F
-                             loc = loc,
                              segim = multi_stack_pro$segim,
                              Ncomp = Ncomp,
+                             loc = loc,
+                             cutbox = cutbox,
                              psf = matrix(1,1,1), #Doesn't matter what we pass in here
                              magzero = 0,
                              mag_fit = is.null(parm_ProSpect),

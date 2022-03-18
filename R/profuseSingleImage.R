@@ -1,10 +1,10 @@
 profuseFound2Fit = function(image,
                            sigma = NULL,
-                           loc = NULL,
                            segim = NULL,
                            mask = NULL,
                            Ncomp = 2,
-                           cutbox = dim(image),
+                           loc = NULL,
+                           cutbox = NULL,
                            psf = NULL,
                            magdiff = 2.5,
                            magzero = 0,
@@ -55,44 +55,60 @@ profuseFound2Fit = function(image,
     image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*10] = NA
   }
 
-  if(!is.null(loc)){
-    cutim = magicaxis::magcutout(image, loc = loc, box = cutbox)
+  if(!is.null(loc) & !is.null(cutbox)){ # this means we are wanting to cutout around the target object and centre it
+    cutim = magicaxis::magcutout(image, loc=loc, box=cutbox)
     loc_cut = cutim$loc
     cutim = cutim$image
+
+    if(!is.null(sigma)){#if we have sigma, cut it out
+      cutsigma = magicaxis::magcutout(sigma, loc = loc, box = cutbox)$image
+    }
+
+    if(!is.null(segim)){#if we have segim, cut it out
+      cutseg = magicaxis::magcutout(segim, loc = loc, box = cutbox)$image
+    }
+
+    if(!is.null(mask)){#if we have mask, cut it out
+      cutmask = magicaxis::magcutout(mask, loc = loc, box = cutbox)$image
+    }else{
+      cutmask = is.na(cutim)
+    }
   }else{
-    loc_cut = dim(image) / 2
     cutim = image
-
-  }
-
-  if (!is.null(sigma) & !is.null(loc)) {
-    cutsigma = magicaxis::magcutout(sigma, loc = loc, box = cutbox)$image
-  } else{
-    cutsigma = NULL
-  }
-
-  if(is.null(segim)){
-    cutseg = NULL
-  }else if(dim(segim)[1] == dim(cutim)[1] & dim(segim)[2] == dim(cutim)[2]){
+    cutsigma = sigma
     cutseg = segim
-  }else if (dim(segim)[1] == dim(image)[1] & dim(segim)[2] == dim(image)[2] & !is.null(loc)) {
-    cutseg = magicaxis::magcutout(segim, loc = loc, box = cutbox)$image
-  }else{
-    message('No input segim that matches the input image- will create one using ProFound!')
-    cutseg = NULL
+    if(!is.null(mask)){
+      cutmask = mask
+    }else{
+      cutmask = is.na(cutim)
+    }
+    if(!is.null(loc)){
+      loc_cut = loc
+    }else{
+      loc_cut = dim(cutim) / 2
+    }
   }
 
-  if(is.null(mask)){
-    cutmask = is.na(cutim)
-  }else if(dim(mask)[1] == dim(cutim)[1] & dim(mask)[2] == dim(cutim)[2]){
-    cutmask = mask
-  }else if (dim(mask)[1] == dim(image)[1] & dim(mask)[2] == dim(image)[2] & !is.null(loc)) {
-    cutmask = magicaxis::magcutout(mask, loc = loc, box = cutbox)$image
-  }else{
-    cutmask = is.na(cutim)
-  }
+  # if(is.null(segim)){
+  #   cutseg = NULL
+  # }else if(dim(segim)[1] == dim(cutim)[1] & dim(segim)[2] == dim(cutim)[2]){
+  #   cutseg = segim
+  # }else if (dim(segim)[1] == dim(image)[1] & dim(segim)[2] == dim(image)[2] & docutouts) {
+  #   cutseg = magicaxis::magcutout(segim, loc = loc, box = cutbox)$image
+  # }else{
+  #   message('No input segim that matches the input image- will create one using ProFound!')
+  #   cutseg = NULL
+  # }
 
-  loc = loc_cut
+  # if(is.null(mask)){
+  #   cutmask = is.na(cutim)
+  # }else if(dim(mask)[1] == dim(cutim)[1] & dim(mask)[2] == dim(cutim)[2]){
+  #   cutmask = mask
+  # }else if (dim(mask)[1] == dim(image)[1] & dim(mask)[2] == dim(image)[2] & !is.null(loc)) {
+  #   cutmask = magicaxis::magcutout(mask, loc = loc, box = cutbox)$image
+  # }else{
+  #   cutmask = is.na(cutim)
+  # }
 
   message('    Running ProFound')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The ProFound package is required to run this function!')}
@@ -150,7 +166,7 @@ profuseFound2Fit = function(image,
     cutim = ProFound::profoundFluxDeblend(mini_profound, image_reweight=TRUE)$image
   }
 
-  segID_tar = mini_profound$segim[cutbox[1] / 2, cutbox[2] / 2]
+  segID_tar = mini_profound$segim[ceiling(loc_cut[1]), ceiling(loc_cut[2])]
   if (segID_tar == 0) {
     message('Target appears to be sky! Consider using different ProFound parameters.')
     return(NULL)
@@ -173,7 +189,7 @@ profuseFound2Fit = function(image,
     N_ext = 0
   }
 
-  region = matrix(mini_profound$segim %in% c(segID_tar, segID_ext), nrow=cutbox[1], ncol=cutbox[2])
+  region = matrix(mini_profound$segim %in% c(segID_tar, segID_ext), nrow=dim(mini_profound$segim)[1], ncol=dim(mini_profound$segim)[2])
   if(!is.null(mini_profound$mask)){
     region = region & mini_profound$mask==0L
   }

@@ -3,14 +3,14 @@
 \alias{profuseDoFit}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-ProFound to ProFit Profile Fitting
+ProFound to ProFit Profile Fitting for Single Images
 }
 \description{
-Functions to easily take users from image pixel data all the way to fully fitted profiles.
+Functions to easily take users from single image pixel data all the way to fully fitted profiles.
 }
 \usage{
-profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, mask = NULL, Ncomp = 2,
-    cutbox = dim(image), psf = NULL, magdiff = 2.5, magzero = 0,
+profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
+    loc = NULL, cutbox = NULL, psf = NULL, magdiff = 2.5, magzero = 0,
     gain = NULL, resamp = NULL, loc_use = FALSE, loc_fit = TRUE,
     mag_fit = TRUE, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
     sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
@@ -30,9 +30,6 @@ Numeric matrix; required for \code{profuseFound2Fit} and for \code{profuseDoFit}
   \item{sigma}{
 Numeric matrix; optional, the sigma map of the \option{image} data we want to fit a model to. If not provided this will be estimated by running \code{profoundProFound} (to find the sky and skyRMS), \code{profoundGainEst} (to find the gain) and \code{profoundMakeSigma} to make a decent effort at creating an appropriate sigma map. Users should usually try to provide this themselves for critical fitting, but the automatic sigma map is usually good enough for testing purposes. For convenience this can also be an Rfits_pointer object for very large on disk sigma maps.
 }
-  \item{loc}{
-Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
-}
   \item{F2F}{
 List; output of \code{profuseFound2Fit}. If this is provided then the \code{profuseFound2Fit} step of \code{profuseDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_F2F}} on the \option{F2F} object if you are using across different session to regenerate the PSF convolution pointer.
 }
@@ -44,6 +41,9 @@ Boolean matrix or integer scalar (1,0); optional, parts of the image to mask out
 }
   \item{Ncomp}{
 Integer scalar; optional, number of components to fit to galaxy. Options for galaxies are "1" (single Sersic profile); "1.5" (disk Sersic profile with a central PSF to model the bulge); "2" (double Sersic profile, the default); and "3" (triple Sersic profile with one bulge and two [thin/thick] disks). In these cases an input \option{psf} should be supplied. To fit a star with a Moffat profile set Ncomp to "0.5". In this case no input \option{psf} should be supplied. To fit a star with a provided PSF set Ncomp to "0".
+}
+  \item{loc}{
+Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
 }
   \item{cutbox}{
 Numeric vector; optional, the dimensions of the box to cut out from \option{image} centred on \option{loc}. This is ignored if \option{loc} is NULL (default). This can be useful if the target \option{image} is very large since a part of this process is to run \code{profoundProFound}, where we only really care about the solution near our object of interest.
@@ -191,6 +191,9 @@ The output of \code{profitDoFit}, \code{profitAllStarDoFit} and \code{profitMult
 \item{psf}{The model Moffat image of the PSF estimated from fitting a target star with \option{Ncomp} = 0.5 (only present in this scenario) or multiple stars when using \code{profitAllStarDoFIt}. This will be created with dimensions \option{psf_dim}. The sum of the image is forced to exactly equal 1, even if the Moffat profile extends outside of the image domain. This at least ensures flux conservation during any convolution routines.}
 \item{psf_modellist}{The model list for the PSF created in \option{psf}.}
 \item{psf_fluxcheck}{The sum of the original PSF image flux. If far from 1 (say less than 0.95) then it implies the \option{psf_dim} is too small. If very close to 1 (say less than 0.999) then \option{psf_dim} is probably larger than it needs to be.}
+}
+\references{
+None yet (paper submitted).
 }
 \author{
 Aaron Robotham
