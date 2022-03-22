@@ -121,6 +121,30 @@ profitLikeModel(HighFit$parm, Data=Datalist, makeplots=TRUE)
 
 A similar methodology will work on any number of images, as long as they fit within memory. They should strictly all be the same band and pixel scale however, since currently (as of Jan 2021) **ProFit** does not allow the main model parameters to vary between images (other than the [X,Y] offset as shown above). Longer term the plan is to allow such functionality.
 
+## And Now the Lazy Way...
+
+Now we have done things the harder semi-manual way, you will be relieved to hear we can do pretty much all of the above in one single function call now:
+
+```{r eval=evalglobal}
+F2F = profuseMultiImageFound2Fit(image_list = list(im1, im2), loc=c(450,500), cutbox=600,
+        offset_list = list(c(0,0), c(-23.112,-9.697)), magzero = 30,
+        psf_list=list(F2F[[1]]$psf, F2F[[2]]$psf), roughpedestal=T, tolerance=10)
+```
+
+The caveat is we lose some of the finer control possible setting things up more explicitly, but **profuseMultiImageFound2Fit** covers most use-cases in practice.
+
+```{r eval=evalglobal}
+profitLikeModel(F2F[[1]]$init, Data=F2F, makeplots=TRUE)
+```
+
+```{r eval=evalglobal}
+easyfit = profuseMultiImageDoFit(F2F=F2F)
+```
+
+```{r eval=evalglobal}
+profitLikeModel(easyfit$parm, Data=F2F, makeplots=TRUE)
+```
+
 ## Free, Fixed, and Follow Fits
 
 It is also possible, but more complicated, to fit some but not all parameters. For this mode the users will need to be keenly aware of which parameters are which within the parm stuctures of *Data* since they will need to construct their own, and tag which parts should correspond to the relevant model list. If that sounds complicated, then its because it is! With great flexibility comes great complexity...
@@ -174,26 +198,6 @@ Now we can take a look at the fit parameters. Note that even though they were fr
 
 ```{r eval=evalglobal}
 HighFit2$parm
-```
-
-## And Now the Lazy Way...
-
-Now we have done things the harder semi-manual way, you will be relieved to hear we can do pretty much all of the above in one single function call now:
-
-```{r eval=evalglobal}
-F2F = profuseMultiImageFound2Fit(image_list = list(im1, im2), loc=c(450,500), cutbox=300,
-        offset_list = list(c(0,0), c(-23.112,-9.697)), magzero = 30,
-        psf_list=list(F2F[[1]]$psf, F2F[[2]]$psf), roughpedestal=T, tolerance=10)
-```
-
-The caveat is we lose some of the finer control possible setting things up more explicitly, but **profuseMultiImageFound2Fit** covers most use-cases in practice.
-
-```{r eval=evalglobal}
-profitLikeModel(F2F[[1]]$init, Data=F2F, makeplots=TRUE)
-```
-
-```{r eval=evalglobal}
-easyfit = profuseMultiImageDoFit(F2F=F2F)
 ```
 
 ## Fully Automatic Multi-band Fitting

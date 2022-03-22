@@ -212,22 +212,39 @@ profuseFound2Fit = function(image,
     cutseg = cutseg[xlo:xhi, ylo:yhi]
     cutmask = cutmask[xlo:xhi, ylo:yhi]
 
-    if(loc_use){
-      xcen = loc[1] - xlo + 1
-      ycen = loc[2] - ylo + 1
+    if(is.null(offset)){
+      if(loc_use){
+        xcen = loc[1] - xlo + 1L
+        ycen = loc[2] - ylo + 1L
+      }else{
+        xcen = mini_profound$segstats[loc_tar, 'xmax'] - xlo + 1L
+        ycen = mini_profound$segstats[loc_tar, 'ymax'] - ylo + 1L
+      }
       xcen_int = xcen + c(-pos_delta,pos_delta)
       ycen_int = ycen + c(-pos_delta,pos_delta)
     }else{
-      xcen = mini_profound$segstats[loc_tar, 'xmax'] - xlo + 1
-      ycen = mini_profound$segstats[loc_tar, 'ymax'] - ylo + 1
-      xcen_int = xcen + c(-pos_delta,pos_delta)
-      ycen_int = ycen + c(-pos_delta,pos_delta)
+      offset[1] = offset[1] - xlo + 1L
+      offset[2] = offset[2] - ylo + 1L
+      if(loc_use){
+        xcen = loc[1]
+        ycen = loc[2]
+      }else{
+        xcen = mini_profound$segstats[loc_tar, 'xmax']
+        ycen = mini_profound$segstats[loc_tar, 'ymax']
+      }
+      xcen_int = xcen + c(-pos_delta,pos_delta) + offset[1]
+      ycen_int = ycen + c(-pos_delta,pos_delta) + offset[2]
     }
   }else{
     xlo = 1L
     ylo = 1L
-    xcen = mini_profound$segstats[loc_tar, 'xmax']
-    ycen = mini_profound$segstats[loc_tar, 'ymax']
+    if(loc_use){
+      xcen = loc[1]
+      ycen = loc[2]
+    }else{
+      xcen = mini_profound$segstats[loc_tar, 'xmax']
+      ycen = mini_profound$segstats[loc_tar, 'ymax']
+    }
     xcen_int = xcen + c(-pos_delta,pos_delta)
     ycen_int = ycen + c(-pos_delta,pos_delta)
   }
