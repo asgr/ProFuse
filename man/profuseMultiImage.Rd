@@ -1,5 +1,7 @@
 \name{profuseMultiImageFound2Fit}
+\alias{profuseMultiImage}
 \alias{profuseMultiImageFound2Fit}
+\alias{profuseMultiImageDoFit}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 ProFound to ProFit Profile Fitting for Multiple Images
@@ -11,11 +13,17 @@ Functions to easily take users from multiple image pixel data all the way to ful
 profuseMultiImageFound2Fit(image_list, segim_list = NULL, mask_list = NULL,
   Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, magzero = NULL, gain = NULL,
   resamp = NULL, offset_list = NULL, ...)
+profuseMultiImageDoFit(image_list, F2F = NULL, Ncomp = 2, psf_list = NULL, magzero = NULL,
+    psf_dim = c(51, 51), plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200, 200),
+    NfinalMCMC = 1000, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{image_list}{
 List; required, images to pass into \code{\link{profuseFound2Fit}} \option{image}.
+}
+  \item{F2F}{
+List; output of \code{profuseMultiImageFound2Fit}. If this is provided then the \code{profuseMultiImageFound2Fit} step of \code{profuseMultiImageDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_MF2F}} on the \option{F2F} object if you are using across different session to regenerate the PSF convolution pointer.
 }
   \item{segim_list}{
 List; required, segims to pass into \code{\link{profuseFound2Fit}} \option{segim}.
@@ -46,6 +54,24 @@ Numeric scalar; optional, resampling factor to pass into \code{\link{profuseFoun
 }
   \item{offset_list}{
 List; optional, offsets to pass into \code{\link{profuseFound2Fit}} \option{psf}.
+}
+  \item{psf_dim}{
+Integer vector; optional, the dimensions of the output PSF generated when fitting a star with \option{Ncomp} = 0.5. The PSF will be centrally located in the image. The dimensions will be forced to be odd (adding 1 if required) to ensure the PSF mode is at the centre of the middle pixel.
+}
+  \item{plot}{
+Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
+}
+  \item{seed}{
+Integer scalar; random seed to start the \code{Highlander} function with.
+}
+  \item{optim_iters}{
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.
+}
+  \item{Niters}{
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(200,200) works pretty well in practice.
+}
+  \item{NfinalMCMC}{
+Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
 }
   \item{\dots}{
 Other arguments to pass into \code{\link{profuseFound2Fit}}.

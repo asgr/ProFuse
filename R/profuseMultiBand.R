@@ -329,7 +329,9 @@ profuseMultiBandFound2Fit = function(image_list,
   MF2F$logged_ProSpect = logged_ProSpect
   MF2F$intervals_ProSpect = intervals_ProSpect
 
-  return(MF2F)
+  class(MF2F) = c(class(MF2F), 'MF2F')
+
+  return(invisible(MF2F))
 }
 
 profuseMultiBandDoFit = function(image_list,

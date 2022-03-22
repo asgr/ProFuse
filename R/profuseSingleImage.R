@@ -33,6 +33,7 @@ profuseFound2Fit = function(image,
                            fit_extra = FALSE,
                            pos_delta = 10,
                            autoclip = TRUE,
+                           roughpedestal = TRUE,
                            ...) {
   if(Ncomp == 0.5){psf = NULL}
   if((Ncomp >= 1 & is.null(psf)) | (Ncomp == 0 & is.null(psf))){
@@ -51,8 +52,8 @@ profuseFound2Fit = function(image,
 
   if(autoclip){
     image_med = median(image, na.rm=TRUE)
-    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*10] = NA
-    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*10] = NA
+    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*20] = NA
+    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*20] = NA
   }
 
   if(!is.null(loc) & !is.null(cutbox)){ # this means we are wanting to cutout around the target object and centre it
@@ -62,10 +63,14 @@ profuseFound2Fit = function(image,
 
     if(!is.null(sigma)){#if we have sigma, cut it out
       cutsigma = magicaxis::magcutout(sigma, loc = loc, box = cutbox)$image
+    }else{
+      cutsigma = NULL
     }
 
     if(!is.null(segim)){#if we have segim, cut it out
       cutseg = magicaxis::magcutout(segim, loc = loc, box = cutbox)$image
+    }else{
+      cutseg = NULL
     }
 
     if(!is.null(mask)){#if we have mask, cut it out
@@ -123,6 +128,7 @@ profuseFound2Fit = function(image,
       groupby = 'segim',
       magzero = magzero,
       verbose = FALSE,
+      roughpedestal = roughpedestal,
       ...
     )
     cutseg = mini_profound$segim
@@ -138,6 +144,7 @@ profuseFound2Fit = function(image,
       magzero = magzero,
       verbose = FALSE,
       iters = 0,
+      roughpedestal = roughpedestal,
       ...
     )
   }
@@ -612,14 +619,18 @@ profuseFound2Fit = function(image,
     rough = fit_rough
   )
   Data$Nmod = Ncomp + N_ext
-  return(invisible(list(profound = mini_profound, Data = Data)))
+
+  F2F_single = list(profound = mini_profound, Data = Data)
+  class(F2F_single) = c(class(F2F_single), 'F2F_single')
+
+  return(invisible(F2F_single))
 }
 
 profuseDoFit = function(image,
                        F2F = NULL,
                        Ncomp = 2,
                        psf = NULL,
-                       magzero = 0,
+                       magzero = NULL,
                        psf_dim = c(51,51),
                        plot = FALSE,
                        seed = 666,

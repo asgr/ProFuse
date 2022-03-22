@@ -17,9 +17,9 @@ profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
     bulge_circ = TRUE, nser_upper=5.3, star_rough = TRUE, fit_rough = FALSE,
     psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
     offset = NULL, tightcrop = TRUE, deblend_extra = FALSE, fit_extra = FALSE,
-    pos_delta = 10, autoclip = TRUE, ...)
+    pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
 
-profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = 0, psf_dim = c(51,51),
+profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = NULL, psf_dim = c(51,51),
   plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -27,11 +27,11 @@ profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = 0, psf_dim = c(
   \item{image}{
 Numeric matrix; required for \code{profuseFound2Fit} and for \code{profuseDoFit} if \option{F2F} is not provided. The galaxy image we want to fit a galaxy of PSF/star model to. For convenience this can also be an Rfits_pointer object for very large on disk images. Critically, this input \option{image} needs to be well background subtracted (this is not done again internally).
 }
-  \item{sigma}{
-Numeric matrix; optional, the sigma map of the \option{image} data we want to fit a model to. If not provided this will be estimated by running \code{profoundProFound} (to find the sky and skyRMS), \code{profoundGainEst} (to find the gain) and \code{profoundMakeSigma} to make a decent effort at creating an appropriate sigma map. Users should usually try to provide this themselves for critical fitting, but the automatic sigma map is usually good enough for testing purposes. For convenience this can also be an Rfits_pointer object for very large on disk sigma maps.
-}
   \item{F2F}{
 List; output of \code{profuseFound2Fit}. If this is provided then the \code{profuseFound2Fit} step of \code{profuseDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_F2F}} on the \option{F2F} object if you are using across different session to regenerate the PSF convolution pointer.
+}
+  \item{sigma}{
+Numeric matrix; optional, the sigma map of the \option{image} data we want to fit a model to. If not provided this will be estimated by running \code{profoundProFound} (to find the sky and skyRMS), \code{profoundGainEst} (to find the gain) and \code{profoundMakeSigma} to make a decent effort at creating an appropriate sigma map. Users should usually try to provide this themselves for critical fitting, but the automatic sigma map is usually good enough for testing purposes. For convenience this can also be an Rfits_pointer object for very large on disk sigma maps.
 }
   \item{segim}{
 Integer matrix; optional, users can pass in their own segmentation maps, which should be pixel matched to the input \option{image}. This will be used instead of the internal \code{ProFound} run, although the segmentation statistics will still be recomputed.
@@ -128,6 +128,9 @@ Logical; optional, should extra objects near to the primary target also be fitte
 }
   \item{pos_delta}{
 Numeric scalar; allowed range of [x,y] centring compared to the initial guess. The default of 10 works well for most cases, but very large galaxies with complex structure might need this set higher to better allow the true centre to be recovered.
+}
+  \item{roughpedestal}{
+Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
 }
   \item{plot}{
 Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.

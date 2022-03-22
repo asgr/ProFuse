@@ -71,9 +71,9 @@ To get most of the way to the correct Datalist structure we need we can use **pr
 
 ```{r eval=evalglobal}
 F2F1 = profuseFound2Fit(im1, loc=c(450,500), psf=PSF1$psf, cutbox=c(300,300), Ncomp=2,
-                       magzero=30, SBdilate=2, tightcrop=FALSE)
+                       magzero=30, SBdilate=2, tightcrop=FALSE, tolerance=10)
 F2F2 = profuseFound2Fit(im2, loc=c(450,500), psf=PSF2$psf, cutbox=c(300,300), Ncomp=2,
-                       magzero=30, SBdilate=2, tightcrop=FALSE)
+                       magzero=30, SBdilate=2, tightcrop=FALSE, tolerance=10)
 ```
 
 The main adjustment we need to make it to tell **ProFit** what the offset is between the frames and put this into the *Data* object contained. From the original WCSs the offset from *im1* to *im2* is know to be [-23.112,-9.697] pixels:
@@ -174,6 +174,26 @@ Now we can take a look at the fit parameters. Note that even though they were fr
 
 ```{r eval=evalglobal}
 HighFit2$parm
+```
+
+## And Now the Lazy Way...
+
+Now we have done things the harder semi-manual way, you will be relieved to hear we can do pretty much all of the above in one single function call now:
+
+```{r eval=evalglobal}
+F2F = profuseMultiImageFound2Fit(image_list = list(im1, im2), loc=c(450,500), cutbox=300,
+        offset_list = list(c(0,0), c(-23.112,-9.697)), magzero = 30,
+        psf_list=list(F2F[[1]]$psf, F2F[[2]]$psf), roughpedestal=T, tolerance=10)
+```
+
+The caveat is we lose some of the finer control possible setting things up more explicitly, but **profuseMultiImageFound2Fit** covers most use-cases in practice.
+
+```{r eval=evalglobal}
+profitLikeModel(F2F[[1]]$init, Data=F2F, makeplots=TRUE)
+```
+
+```{r eval=evalglobal}
+easyfit = profuseMultiImageDoFit(F2F=F2F)
 ```
 
 ## Fully Automatic Multi-band Fitting
