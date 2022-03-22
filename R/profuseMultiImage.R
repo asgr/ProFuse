@@ -9,6 +9,7 @@ profuseMultiImageFound2Fit = function(
     magzero = NULL,
     gain = NULL,
     resamp = NULL,
+    tightcrop = TRUE,
     offset_list = NULL,
     ...
 ){
@@ -79,7 +80,7 @@ profuseMultiImageFound2Fit = function(
                            magzero = magzero[[i]],
                            gain = gain[[i]],
                            resamp = resamp[[i]],
-                           tightcrop = FALSE,
+                           tightcrop = tightcrop,
                            offset = offset_list[[i]],
                            ...
     )$Data

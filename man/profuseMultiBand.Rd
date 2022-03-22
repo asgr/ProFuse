@@ -19,7 +19,7 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
     fit_rough = FALSE, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
     star_circ = TRUE, tightcrop = TRUE, wave = NULL, smooth.parm = NULL,
     parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
-    intervals_ProSpect = NULL, ...)
+    intervals_ProSpect = NULL, autoclip = TRUE, roughpedestal = TRUE, ...)
 
 profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
     "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
@@ -118,6 +118,9 @@ Logical; optional, should the Moffat profile concentration index be optimised du
   \item{star_circ}{
 Logical; optional, should the star be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
 }
+  \item{tightcrop}{
+Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
+}
   \item{wave}{
 Numeric vector; optional. This is only relevant if you are providing smoothing functions via \option{smooth.parm}. If provided it should be the wavelength of each image in \option{image_list}, where \option{image_list} then needs to be in ascending (blue to red) wavelength order.
 }
@@ -136,8 +139,11 @@ Logical vector; optional; match length of \option{parm_ProSpect}, and elements s
   \item{intervals_ProSpect}{
 List, optional; has elements \option{lo} and \option{hi} which if provided must be the same length as \option{parm_ProSpect}. These specify the lower and upper limits in the same linear/log space as \option{parm_ProSpect}, i.e. set \option{lo} to -1 if you do not want to logged unit to go below 0.1.
 }
-  \item{tightcrop}{
-Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
+ \item{autoclip}{
+Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
+}
+  \item{roughpedestal}{
+Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.

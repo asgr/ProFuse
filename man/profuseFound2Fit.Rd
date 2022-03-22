@@ -129,6 +129,9 @@ Logical; optional, should extra objects near to the primary target also be fitte
   \item{pos_delta}{
 Numeric scalar; allowed range of [x,y] centring compared to the initial guess. The default of 10 works well for most cases, but very large galaxies with complex structure might need this set higher to better allow the true centre to be recovered.
 }
+  \item{autoclip}{
+Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
+}
   \item{roughpedestal}{
 Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
 }
@@ -146,9 +149,6 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
-}
-  \item{autoclip}{
-Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.

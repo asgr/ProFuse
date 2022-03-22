@@ -11,11 +11,12 @@ Functions to identify stars from \code{ProFound} and fit them with \code{ProFit}
 \usage{
 profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, mask = NULL,
   magzero = 0, resamp = NULL, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
-  star_circ = TRUE, rough = TRUE, star_dom_mag = NULL, Nstar = 4, ...)
+  star_circ = TRUE, rough = TRUE, star_dom_mag = NULL, Nstar = 4, autoclip = TRUE,
+  roughpedestal = TRUE, ...)
 
 profuseAllStarDoFit(image, sigma = NULL, locs = NULL, magzero = 0, psf_dim = c(51,51),
-  rough = TRUE, plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
-  NfinalMCMC = 1000, ...)
+  rough = TRUE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(100,100),
+  NfinalMCMC = 100, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -61,16 +62,23 @@ Numeric scalar; optional, specify at what magnitude (and brighter) stars start t
   \item{Nstar}{
 Integer scalar; optional, maximum number of fitting stars to generate in \code{profitAllStarFound2Fit}, and therefore to fit in \code{profitAllStarDoFit}.
 }
+  \item{autoclip}{
+Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
+}
+  \item{roughpedestal}{
+Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
+}
   \item{plot}{
 Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
-}  \item{optim_iters}{
-Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.
+}
+  \item{optim_iters}{
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 2 works pretty well in practice for stars.
 }
   \item{Niters}{
-Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(200,200) works pretty well in practice.
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(100,100) works pretty well in practice for stars.
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.

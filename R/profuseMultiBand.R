@@ -34,6 +34,8 @@ profuseMultiBandFound2Fit = function(image_list,
                                     data_ProSpect = NULL, #perhaps need a way to specify extra data going to bulge/disk. Naming or list?
                                     logged_ProSpect = NULL,
                                     intervals_ProSpect = NULL,
+                                    autoclip = TRUE,
+                                    roughpedestal = TRUE,
                                     ...){
   Nim = length(image_list)
 
@@ -46,12 +48,20 @@ profuseMultiBandFound2Fit = function(image_list,
   }
 
   for(i in 1:Nim){
+    if(autoclip){
+      image_med = median(image_list[[i]], na.rm=TRUE)
+      image_list[[i]][image_list[[i]] - image_med < quantile(image_list[[i]] - image_med, 0.001, na.rm=TRUE)*100] = NA
+      image_list[[i]][image_list[[i]] - image_med > quantile(image_list[[i]] - image_med, 0.999, na.rm=TRUE)*100] = NA
+    }
+
     if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){ #[i][[1]] looks silly, but it will return NULL when sky_list = NULL for any i (default). [[i]] will error in this case. This does not seem to be the case as of R v4.1.0, but probably leave to be safe for now.
       message("Image ",i,": running initial ProFound")
       profound = ProFound::profoundProFound(image = image_list[[i]],
+                                            segim = segim_list[[i]],
                                             sky = sky_list[i][[1]],
                                             skyRMS = skyRMS_list[i][[1]],
                                             magzero = magzero[i],
+                                            roughpedestal = roughpedestal,
                                             ...)
       if(is.null(sky_list[i])){
         image_list[[i]] = image_list[[i]] - profound$sky
@@ -73,6 +83,8 @@ profuseMultiBandFound2Fit = function(image_list,
                                          star_circ = star_circ,
                                          magzero = magzero[i],
                                          rough = star_rough,
+                                         autoclip = FALSE,
+                                         roughpedestal = roughpedestal,
                                          skycut = 2, #works well for stars
                                          SBdilate = 2)$psf #works well for stars
     }
@@ -137,7 +149,9 @@ profuseMultiBandFound2Fit = function(image_list,
                              bulge_circ =  bulge_circ,
                              nser_upper = nser_upper,
                              tightcrop = FALSE,
-                             fit_extra = FALSE
+                             fit_extra = FALSE,
+                             autoclip = FALSE,
+                             roughpedestal = roughpedestal
   )
 
   if(tightcrop){

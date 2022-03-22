@@ -35,6 +35,12 @@ profuseFound2Fit = function(image,
                            autoclip = TRUE,
                            roughpedestal = TRUE,
                            ...) {
+  if(autoclip){
+    image_med = median(image, na.rm=TRUE)
+    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*100] = NA
+    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*100] = NA
+  }
+
   if(Ncomp == 0.5){psf = NULL}
   if((Ncomp >= 1 & is.null(psf)) | (Ncomp == 0 & is.null(psf))){
     message('Need PSF for Ncomp >= 1 or Ncomp == 0. Running AllStarDoFit!')
@@ -46,14 +52,9 @@ profuseFound2Fit = function(image,
                               star_circ = star_circ,
                               magzero = magzero,
                               rough = star_rough,
+                              autoclip = FALSE,
                               skycut = 2, #works well for stars
                               SBdilate = 2)$psf #works well for stars
-  }
-
-  if(autoclip){
-    image_med = median(image, na.rm=TRUE)
-    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*20] = NA
-    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*20] = NA
   }
 
   if(!is.null(loc) & !is.null(cutbox)){ # this means we are wanting to cutout around the target object and centre it
@@ -137,14 +138,11 @@ profuseFound2Fit = function(image,
       image = cutim,
       segim = cutseg,
       mask = cutmask,
-      sky = 0,
-      redosky = FALSE,
       nearstats = TRUE,
       groupby = 'segim',
       magzero = magzero,
       verbose = FALSE,
-      iters = 0,
-      roughpedestal = roughpedestal,
+      static_photom = TRUE,
       ...
     )
   }

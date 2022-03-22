@@ -12,7 +12,7 @@ Functions to easily take users from multiple image pixel data all the way to ful
 \usage{
 profuseMultiImageFound2Fit(image_list, segim_list = NULL, mask_list = NULL,
   Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, magzero = NULL, gain = NULL,
-  resamp = NULL, offset_list = NULL, ...)
+  resamp = NULL, tightcrop = TRUE, offset_list = NULL, ...)
 profuseMultiImageDoFit(image_list, F2F = NULL, Ncomp = 2, psf_list = NULL, magzero = NULL,
     psf_dim = c(51, 51), plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200, 200),
     NfinalMCMC = 1000, ...)
@@ -51,6 +51,9 @@ Numeric vector; optional, gains to pass into \code{\link{profuseFound2Fit}} \opt
 }
   \item{resamp}{
 Numeric scalar; optional, resampling factor to pass into \code{\link{profuseFound2Fit}} \option{resamp}.
+}
+  \item{tightcrop}{
+Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
 }
   \item{offset_list}{
 List; optional, offsets to pass into \code{\link{profuseFound2Fit}} \option{psf}.
