@@ -139,10 +139,23 @@ profuseMultiImageDoFit = function(image_list,
 
   lowers = unlist(Data$intervals)[c(T, F)]
   lowers[unlist(Data$tolog) == T] = log10(lowers[unlist(Data$tolog) == T])
-  lowers = lowers[which(unlist(Data$tofit))]
+  lowers = as.numeric(lowers[which(unlist(Data$tofit))])
   uppers = unlist(Data$intervals)[c(F, T)]
   uppers[unlist(Data$tolog) == T] = log10(uppers[unlist(Data$tolog) == T])
-  uppers = uppers[which(unlist(Data$tofit))]
+  uppers = as.numeric(uppers[which(unlist(Data$tofit))])
+
+  if(!is.null(Data$offset)){
+    xcen_loc = grep('xcen',Data$parm.names)
+    ycen_loc = grep('ycen',Data$parm.names)
+    if(length(xcen_loc) > 0){
+      lowers[xcen_loc] = lowers[xcen_loc] - Data$offset[1]
+      uppers[xcen_loc] = uppers[xcen_loc] - Data$offset[1]
+    }
+    if(length(ycen_loc) > 0){
+      lowers[ycen_loc] = lowers[ycen_loc] - Data$offset[2]
+      uppers[ycen_loc] = uppers[ycen_loc] - Data$offset[2]
+    }
+  }
 
   message('Running Highlander')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
