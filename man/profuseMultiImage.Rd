@@ -15,7 +15,7 @@ profuseMultiImageFound2Fit(image_list, segim_list = NULL, mask_list = NULL,
   resamp = NULL, tightcrop = TRUE, offset_list = NULL, ...)
 profuseMultiImageDoFit(image_list, F2F = NULL, Ncomp = 2, psf_list = NULL, magzero = NULL,
     psf_dim = c(51, 51), plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200, 200),
-    NfinalMCMC = 1000, ...)
+    NfinalMCMC = 1000, keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -75,6 +75,9 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
+}
+  \item{keepall}{
+Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.
 }
   \item{\dots}{
 Other arguments to pass into \code{\link{profuseFound2Fit}}.

@@ -219,6 +219,7 @@ profuseAllStarDoFit = function(image,
                        optim_iters = 2,
                        Niters = c(100,100),
                        NfinalMCMC = 100,
+                       keepall = FALSE,
                        ...) {
 
   timestart = proc.time()[3] # start timer
@@ -263,7 +264,8 @@ profuseAllStarDoFit = function(image,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
     Niters = Niters,
-    NfinalMCMC = NfinalMCMC
+    NfinalMCMC = NfinalMCMC,
+    keepall = keepall
   )
   names(highfit$parm) = names(Data$init)
 

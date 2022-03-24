@@ -357,6 +357,7 @@ profuseMultiBandDoFit = function(image_list,
                                 optim_iters = 5,
                                 Niters = c(200,200),
                                 NfinalMCMC = 1000,
+                                keepall = FALSE,
                                 ...) {
 
   timestart = proc.time()[3] # start timer
@@ -411,7 +412,8 @@ profuseMultiBandDoFit = function(image_list,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
-    parm.names = MF2F$parm.names
+    parm.names = MF2F$parm.names,
+    keepall = FALSE
   )
 
   highfit$MF2F = MF2F

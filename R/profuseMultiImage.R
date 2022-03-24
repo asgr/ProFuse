@@ -110,6 +110,7 @@ profuseMultiImageDoFit = function(image_list,
                         optim_iters = 5,
                         Niters = c(200,200),
                         NfinalMCMC = 1000,
+                        keepall = FALSE,
                         ...) {
 
   timestart = proc.time()[3] # start timer
@@ -171,7 +172,8 @@ profuseMultiImageDoFit = function(image_list,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
-    parm.names = Data$parm.names
+    parm.names = Data$parm.names,
+    keepall = keepall
   )
   names(highfit$parm) = names(Data$init)
 

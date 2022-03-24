@@ -16,7 +16,7 @@ profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, mask = N
 
 profuseAllStarDoFit(image, sigma = NULL, locs = NULL, magzero = 0, psf_dim = c(51,51),
   rough = TRUE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(100,100),
-  NfinalMCMC = 100, ...)
+  NfinalMCMC = 100, keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -82,6 +82,9 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
+}
+  \item{keepall}{
+Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.
