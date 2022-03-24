@@ -133,7 +133,7 @@ profuseMultiImageDoFit = function(image_list,
 
   if (plot) {
     profitLikeModel(parm = Data$init,
-                    Data = Data,
+                    Data = F2F,
                     makeplots = TRUE)
     legend('topright', legend = 'Start')
   }
@@ -162,7 +162,7 @@ profuseMultiImageDoFit = function(image_list,
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
   highfit = Highlander::Highlander(
     parm = Data$init,
-    Data = Data,
+    Data = F2F,
     likefunc = profitLikeModel,
     seed = seed,
     lower = lowers,
@@ -178,12 +178,11 @@ profuseMultiImageDoFit = function(image_list,
   names(highfit$parm) = names(Data$init)
 
   if (plot) {
-    profitLikeModel(highfit$parm, Data=Data, makeplots = TRUE)
+    profitLikeModel(highfit$parm, Data=F2F, makeplots = TRUE)
     legend('topright', legend = 'After')
   }
 
-  highfit$profound = F2F$profound
-  highfit$Data = Data
+  highfit$Data = F2F
   highfit$initmodel = profitRemakeModellist(Data$init, Data = Data)
   highfit$finalmodel = profitRemakeModellist(highfit$parm, Data = Data)
 

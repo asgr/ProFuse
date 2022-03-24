@@ -433,7 +433,6 @@ profuseMultiBandDoFit = function(image_list,
 
   highfit$time = (proc.time()[3]-timestart)/60
   highfit$date = date()
-  #highfit$call = call
   highfit$ProFit.version = packageVersion('ProFit')
   highfit$ProFound.version = packageVersion('ProFound')
   highfit$Highlander.version = packageVersion('Highlander')
