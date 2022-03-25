@@ -315,7 +315,9 @@ profuseMultiBandFound2Fit = function(image_list,
   }
 
   if(is.null(data_ProSpect$LumDist_Mpc)){
-    data_ProSpect$LumDist_Mpc = cosdistLumDist(data_ProSpect$z, H0 = 67.8, OmegaM = 0.308)
+    if(!is.null(data_ProSpect$z)){
+      data_ProSpect$LumDist_Mpc = cosdistLumDist(data_ProSpect$z, H0 = 67.8, OmegaM = 0.308)
+    }
   }
 
   if(is.null(data_ProSpect$magemax)){
@@ -376,27 +378,36 @@ profuseMultiBandDoFit = function(image_list,
     MF2F = profuseRegenPSF_MF2F(MF2F)
   }
 
-  lower_profit = {}
-  upper_profit = {}
-  logged_profit = {}
+  if(is.null(MF2F$smooth.parm)){
+    #This implies we are in ProSpect fitting mode (this is how we use it now)
+    lower_profit = {}
+    upper_profit = {}
+    logged_profit = {}
 
-  for(i in 1:length(MF2F[[1]]$intervals)){ #loop over profiles
-    for(j in 1:length(MF2F[[1]]$intervals[[i]])){ #loop over parameters
-      for(k in 1:length(MF2F[[1]]$intervals[[i]][[1]])){ #loop over components
-        if(isTRUE(MF2F[[1]]$tofit[[i]][[j]][[k]])){
-          lower_profit = c(lower_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][1])
-          upper_profit = c(upper_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][2])
-          logged_profit = c(logged_profit, MF2F[[1]]$tolog[[i]][[j]][[k]])
+    for(i in 1:length(MF2F[[1]]$intervals)){ #loop over profiles
+      for(j in 1:length(MF2F[[1]]$intervals[[i]])){ #loop over parameters
+        for(k in 1:length(MF2F[[1]]$intervals[[i]][[1]])){ #loop over components
+          if(isTRUE(MF2F[[1]]$tofit[[i]][[j]][[k]])){
+            lower_profit = c(lower_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][1])
+            upper_profit = c(upper_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][2])
+            logged_profit = c(logged_profit, MF2F[[1]]$tolog[[i]][[j]][[k]])
+          }
         }
       }
     }
+
+    lower_profit[logged_profit] = log10(lower_profit[logged_profit])
+    upper_profit[logged_profit] = log10(upper_profit[logged_profit])
+
+    lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
+    upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
+
+  }else{
+    #This implies we are in smooth.spline fitting mode, i.e. not using ProSpect (we don't use this)
+    #Currently I have just set these to NULL to keep things working. These should really inherit sensible limits, but we aren't really using this functionality anyway.
+    lower = NULL
+    upper = NULL
   }
-
-  lower_profit[logged_profit] = log10(lower_profit[logged_profit])
-  upper_profit[logged_profit] = log10(upper_profit[logged_profit])
-
-  lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
-  upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
 
   message('Running Highander on multi-band data')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
