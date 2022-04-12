@@ -219,16 +219,16 @@ library(ProFit)
 image = Rfits_read_image(system.file("extdata", 'VIKING/mystery_VIKING_Z.fits',
   package="ProFound"))$imDat
 
-lazy = profuseDoFit(image=image, magzero=30)
+lazy = profuseDoFit(image=image, magzero=30, optim_iters=2, NfinalMCMC=200)
+
+#We can have a look at the results in a similar manner to usual:
+
+profitLikeModel(lazy$parm, Data=lazy$Data, makeplots=TRUE, plotchisq=TRUE)
 
 #That was easy!
 
 #There are complex types of fits that you might need to do more manually with ProFit,
 #but the above appears to cover 99\% of fitting situations in practice.
-
-#We can have a look at the results in a similar manner to usual:
-
-profitLikeModel(lazy$parm, Data=lazy$Data, makeplots=TRUE, plotchisq=TRUE)
 
 #Doing things more manually you can also specify your own PSF (if you know it):
 
