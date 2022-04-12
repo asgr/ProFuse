@@ -12,13 +12,18 @@ profuseAllStarFound2Fit = function(image,
                            rough = TRUE,
                            star_dom_mag = NULL,
                            Nstar = 4,
+                           autoclip = TRUE,
+                           roughpedestal = TRUE,
                            ...) {
 
   message('    Running ProFound')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The ProFound package is required to run this function!')}
 
-  image[image < quantile(image, 0.01, na.rm=TRUE)*10] = NA
-  image[image > quantile(image, 0.99, na.rm=TRUE)*10] = NA
+  if(autoclip){
+    image_med = median(image, na.rm=TRUE)
+    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*100] = NA
+    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*100] = NA
+  }
 
   if(is.null(segim)){
     mini_profound = ProFound::profoundProFound(
@@ -29,6 +34,8 @@ profuseAllStarFound2Fit = function(image,
       magzero = magzero,
       verbose = FALSE,
       boundstats = TRUE,
+      static_photom = TRUE,
+      roughpedestal = FALSE,
       ...
     )
     segim = mini_profound$segim
@@ -37,12 +44,10 @@ profuseAllStarFound2Fit = function(image,
       image = image,
       segim = segim,
       mask = mask,
-      sky = 0,
-      redosky = FALSE,
       magzero = magzero,
       verbose = FALSE,
       boundstats = TRUE,
-      iters = 0,
+      static_photom = TRUE,
       ...
     )
   }
@@ -211,9 +216,10 @@ profuseAllStarDoFit = function(image,
                        rough = TRUE,
                        plot = FALSE,
                        seed = 666,
-                       optim_iters = 5,
-                       Niters = c(200,200),
-                       NfinalMCMC = 1000,
+                       optim_iters = 2,
+                       Niters = c(100,100),
+                       NfinalMCMC = 100,
+                       keepall = FALSE,
                        ...) {
 
   timestart = proc.time()[3] # start timer
@@ -258,7 +264,8 @@ profuseAllStarDoFit = function(image,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
     Niters = Niters,
-    NfinalMCMC = NfinalMCMC
+    NfinalMCMC = NfinalMCMC,
+    keepall = keepall
   )
   names(highfit$parm) = names(Data$init)
 

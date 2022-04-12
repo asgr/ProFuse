@@ -9,13 +9,14 @@ Automated Star Fitting
 Functions to identify stars from \code{ProFound} and fit them with \code{ProFit} using \code{Highlander}.
 }
 \usage{
-profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, magzero = 0,
-  resamp = NULL, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
-  rough = TRUE, star_dom_mag = NULL, Nstar = 4, ...)
+profuseAllStarFound2Fit(image, sigma = NULL, locs = NULL, segim = NULL, mask = NULL,
+  magzero = 0, resamp = NULL, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
+  star_circ = TRUE, rough = TRUE, star_dom_mag = NULL, Nstar = 4, autoclip = TRUE,
+  roughpedestal = TRUE, ...)
 
 profuseAllStarDoFit(image, sigma = NULL, locs = NULL, magzero = 0, psf_dim = c(51,51),
-  rough = TRUE, plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200),
-  NfinalMCMC = 1000, ...)
+  rough = TRUE, plot = FALSE, seed = 666, optim_iters = 2, Niters = c(100,100),
+  NfinalMCMC = 100, keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -27,6 +28,9 @@ Numeric matrix; optional, the sigma map of the \option{image} data we want to fi
 }
   \item{segim}{
 Integer matrix; optional, users can pass in their own segmentation maps, which should be pixel matched to the input \option{image}. This will be used instead of the internal \code{ProFound} run, although the segmentation statistics will still be recomputed.
+}
+ \item{mask}{
+Boolean matrix or integer scalar (1,0); optional, parts of the image to mask out (i.e. ignore). If a matrix is provided, this matrix *must* be the same dimensions as \option{image} where 1 means mask out and 0 means use for analysis. If a scalar is provided it indicates the exact \option{image} values that should be treated as masked (e.g. by setting masked pixels to 0 or -999). The latter achieves the same effect as setting masked \option{image} pixels to NA, but allows for the fact not all programs can produce \code{R} legal NA values.
 }
   \item{locs}{
 Numeric matrix; optional, the [X,Y] locations of target stars on the original \option{image} for \code{AllStar} fitting to create out PSF model. The idea is we pass in a list of multiple potential stars, and internally this is limited to just those star segments that do not touch another source or hit the \option{image} border. If this is not provided then \code{profitAllStarFound2Fit} will attempt to guess which objects might be good stars for modelling (but this should not be relied on generally).
@@ -58,19 +62,29 @@ Numeric scalar; optional, specify at what magnitude (and brighter) stars start t
   \item{Nstar}{
 Integer scalar; optional, maximum number of fitting stars to generate in \code{profitAllStarFound2Fit}, and therefore to fit in \code{profitAllStarDoFit}.
 }
+  \item{autoclip}{
+Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
+}
+  \item{roughpedestal}{
+Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
+}
   \item{plot}{
 Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
-}  \item{optim_iters}{
-Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.
+}
+  \item{optim_iters}{
+Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 2 works pretty well in practice for stars.
 }
   \item{Niters}{
-Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(200,200) works pretty well in practice.
+Integer vector; number of iterations per CMA and LD respectively (must be length 2). See \code{\link{Highlander}}. The default of c(100,100) works pretty well in practice for stars.
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
+}
+  \item{keepall}{
+Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.

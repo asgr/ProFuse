@@ -10,21 +10,21 @@ Functions to easily take users from multi-band image pixel data all the way to f
 }
 \usage{
 profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
-    sky_list = NULL, skyRMS_list = NULL, loc = NULL, parm_global = c("sersic.xcen1",
+    sky_list = NULL, skyRMS_list = NULL, parm_global = c("sersic.xcen1",
         "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
-    Ncomp = 2, cutbox = dim(image), psf_list = NULL, magdiff = 2.5,
+    Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, magdiff = 2.5,
     magzero = NULL, gain = NULL, resamp = NULL, doprofit = NULL, sing_nser = 2,
     bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
     disk_nser_fit = FALSE, bulge_circ = TRUE, nser_upper = 5.3, star_rough = TRUE,
     fit_rough = FALSE, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
     star_circ = TRUE, tightcrop = TRUE, wave = NULL, smooth.parm = NULL,
     parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
-    intervals_ProSpect = NULL, ...)
+    intervals_ProSpect = NULL, autoclip = TRUE, roughpedestal = TRUE, ...)
 
 profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
     "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
     magzero = NULL, seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000,
-    ...)
+    keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -43,14 +43,14 @@ List; optional, a list of numeric matrix sky images (one per target band). This 
   \item{skyRMS_list}{
 List; optional, a list of numeric matrix sky RMS images (one per target band). This list should exactly match the length of \option{image_list}. If not present \code{profoundProFound} will be run to estimate the per band sky RMS.
 }
-  \item{loc}{
-Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
-}
   \item{MF2F}{
 List; output of \code{profuseMultiBandFound2Fit}. If this is provided then the \code{profuseMultiBandFound2Fit} step of \code{profuseMultiBandDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_MF2F}} on the \option{MF2F} object if you are using across different session to regenerate the PSF convolution pointers.
 }
   \item{Ncomp}{
 Integer scalar; optional, number of components to fit to galaxy. Options for galaxies are "1" (single Sersic profile); "1.5" (disk Sersic profile with a central PSF to model the bulge); "2" (double Sersic profile, the default); and "3" (triple Sersic profile with one bulge and two [thin/thick] disks). In these cases an input \option{psf} should be supplied. To fit a star with a Moffat profile set Ncomp to "0.5". In this case no input \option{psf} should be supplied. To fit a star with a provided PSF set Ncomp to "0".
+}
+  \item{loc}{
+Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
 }
   \item{cutbox}{
 Numeric vector; optional, the dimensions of the box to cut out from \option{image} centred on \option{loc}. This is ignored if \option{loc} is NULL (default). This can be useful if the target \option{image} is very large since a part of this process is to run \code{profoundProFound}, where we only really care about the solution near our object of interest.
@@ -118,6 +118,9 @@ Logical; optional, should the Moffat profile concentration index be optimised du
   \item{star_circ}{
 Logical; optional, should the star be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
 }
+  \item{tightcrop}{
+Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
+}
   \item{wave}{
 Numeric vector; optional. This is only relevant if you are providing smoothing functions via \option{smooth.parm}. If provided it should be the wavelength of each image in \option{image_list}, where \option{image_list} then needs to be in ascending (blue to red) wavelength order.
 }
@@ -136,8 +139,11 @@ Logical vector; optional; match length of \option{parm_ProSpect}, and elements s
   \item{intervals_ProSpect}{
 List, optional; has elements \option{lo} and \option{hi} which if provided must be the same length as \option{parm_ProSpect}. These specify the lower and upper limits in the same linear/log space as \option{parm_ProSpect}, i.e. set \option{lo} to -1 if you do not want to logged unit to go below 0.1.
 }
-  \item{tightcrop}{
-Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
+ \item{autoclip}{
+Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
+}
+  \item{roughpedestal}{
+Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
@@ -150,6 +156,9 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
+}
+  \item{keepall}{
+Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.
@@ -193,6 +202,9 @@ The output of \code{profitDoFit}, \code{profitAllStarDoFit} and \code{profitMult
 \item{psf}{The model Moffat image of the PSF estimated from fitting a target star with \option{Ncomp} = 0.5 (only present in this scenario) or multiple stars when using \code{profitAllStarDoFIt}. This will be created with dimensions \option{psf_dim}. The sum of the image is forced to exactly equal 1, even if the Moffat profile extends outside of the image domain. This at least ensures flux conservation during any convolution routines.}
 \item{psf_modellist}{The model list for the PSF created in \option{psf}.}
 \item{psf_fluxcheck}{The sum of the original PSF image flux. If far from 1 (say less than 0.95) then it implies the \option{psf_dim} is too small. If very close to 1 (say less than 0.999) then \option{psf_dim} is probably larger than it needs to be.}
+}
+\references{
+None yet (paper submitted).
 }
 \author{
 Aaron Robotham

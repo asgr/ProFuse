@@ -1,10 +1,10 @@
 profuseFound2Fit = function(image,
                            sigma = NULL,
-                           loc = NULL,
                            segim = NULL,
                            mask = NULL,
                            Ncomp = 2,
-                           cutbox = dim(image),
+                           loc = NULL,
+                           cutbox = NULL,
                            psf = NULL,
                            magdiff = 2.5,
                            magzero = 0,
@@ -33,7 +33,14 @@ profuseFound2Fit = function(image,
                            fit_extra = FALSE,
                            pos_delta = 10,
                            autoclip = TRUE,
+                           roughpedestal = TRUE,
                            ...) {
+  if(autoclip){
+    image_med = median(image, na.rm=TRUE)
+    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*100] = NA
+    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*100] = NA
+  }
+
   if(Ncomp == 0.5){psf = NULL}
   if((Ncomp >= 1 & is.null(psf)) | (Ncomp == 0 & is.null(psf))){
     message('Need PSF for Ncomp >= 1 or Ncomp == 0. Running AllStarDoFit!')
@@ -45,54 +52,69 @@ profuseFound2Fit = function(image,
                               star_circ = star_circ,
                               magzero = magzero,
                               rough = star_rough,
+                              autoclip = FALSE,
                               skycut = 2, #works well for stars
                               SBdilate = 2)$psf #works well for stars
   }
 
-  if(autoclip){
-    image_med = median(image, na.rm=TRUE)
-    image[image - image_med < quantile(image - image_med, 0.001, na.rm=TRUE)*10] = NA
-    image[image - image_med > quantile(image - image_med, 0.999, na.rm=TRUE)*10] = NA
-  }
-
-  if(!is.null(loc)){
-    cutim = magicaxis::magcutout(image, loc = loc, box = cutbox)
+  if(!is.null(loc) & !is.null(cutbox)){ # this means we are wanting to cutout around the target object and centre it
+    cutim = magicaxis::magcutout(image, loc=loc, box=cutbox)
     loc_cut = cutim$loc
     cutim = cutim$image
+
+    if(!is.null(sigma)){#if we have sigma, cut it out
+      cutsigma = magicaxis::magcutout(sigma, loc = loc, box = cutbox)$image
+    }else{
+      cutsigma = NULL
+    }
+
+    if(!is.null(segim)){#if we have segim, cut it out
+      cutseg = magicaxis::magcutout(segim, loc = loc, box = cutbox)$image
+    }else{
+      cutseg = NULL
+    }
+
+    if(!is.null(mask)){#if we have mask, cut it out
+      cutmask = magicaxis::magcutout(mask, loc = loc, box = cutbox)$image
+    }else{
+      cutmask = is.na(cutim)
+    }
   }else{
-    loc_cut = dim(image) / 2
     cutim = image
-
-  }
-
-  if (!is.null(sigma) & !is.null(loc)) {
-    cutsigma = magicaxis::magcutout(sigma, loc = loc, box = cutbox)$image
-  } else{
-    cutsigma = NULL
-  }
-
-  if(is.null(segim)){
-    cutseg = NULL
-  }else if(dim(segim)[1] == dim(cutim)[1] & dim(segim)[2] == dim(cutim)[2]){
+    cutsigma = sigma
     cutseg = segim
-  }else if (dim(segim)[1] == dim(image)[1] & dim(segim)[2] == dim(image)[2] & !is.null(loc)) {
-    cutseg = magicaxis::magcutout(segim, loc = loc, box = cutbox)$image
-  }else{
-    message('No input segim that matches the input image- will create one using ProFound!')
-    cutseg = NULL
+    if(!is.null(mask)){
+      cutmask = mask
+    }else{
+      cutmask = is.na(cutim)
+    }
+    if(!is.null(loc)){
+      loc_cut = loc
+    }else{
+      loc_cut = dim(cutim) / 2
+    }
   }
 
-  if(is.null(mask)){
-    cutmask = is.na(cutim)
-  }else if(dim(mask)[1] == dim(cutim)[1] & dim(mask)[2] == dim(cutim)[2]){
-    cutmask = mask
-  }else if (dim(mask)[1] == dim(image)[1] & dim(mask)[2] == dim(image)[2] & !is.null(loc)) {
-    cutmask = magicaxis::magcutout(mask, loc = loc, box = cutbox)$image
-  }else{
-    cutmask = is.na(cutim)
-  }
+  # if(is.null(segim)){
+  #   cutseg = NULL
+  # }else if(dim(segim)[1] == dim(cutim)[1] & dim(segim)[2] == dim(cutim)[2]){
+  #   cutseg = segim
+  # }else if (dim(segim)[1] == dim(image)[1] & dim(segim)[2] == dim(image)[2] & docutouts) {
+  #   cutseg = magicaxis::magcutout(segim, loc = loc, box = cutbox)$image
+  # }else{
+  #   message('No input segim that matches the input image- will create one using ProFound!')
+  #   cutseg = NULL
+  # }
 
-  loc = loc_cut
+  # if(is.null(mask)){
+  #   cutmask = is.na(cutim)
+  # }else if(dim(mask)[1] == dim(cutim)[1] & dim(mask)[2] == dim(cutim)[2]){
+  #   cutmask = mask
+  # }else if (dim(mask)[1] == dim(image)[1] & dim(mask)[2] == dim(image)[2] & !is.null(loc)) {
+  #   cutmask = magicaxis::magcutout(mask, loc = loc, box = cutbox)$image
+  # }else{
+  #   cutmask = is.na(cutim)
+  # }
 
   message('    Running ProFound')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The ProFound package is required to run this function!')}
@@ -107,6 +129,7 @@ profuseFound2Fit = function(image,
       groupby = 'segim',
       magzero = magzero,
       verbose = FALSE,
+      roughpedestal = roughpedestal,
       ...
     )
     cutseg = mini_profound$segim
@@ -115,13 +138,11 @@ profuseFound2Fit = function(image,
       image = cutim,
       segim = cutseg,
       mask = cutmask,
-      sky = 0,
-      redosky = FALSE,
       nearstats = TRUE,
       groupby = 'segim',
       magzero = magzero,
       verbose = FALSE,
-      iters = 0,
+      static_photom = TRUE,
       ...
     )
   }
@@ -150,7 +171,7 @@ profuseFound2Fit = function(image,
     cutim = ProFound::profoundFluxDeblend(mini_profound, image_reweight=TRUE)$image
   }
 
-  segID_tar = mini_profound$segim[cutbox[1] / 2, cutbox[2] / 2]
+  segID_tar = mini_profound$segim[ceiling(loc_cut[1]), ceiling(loc_cut[2])]
   if (segID_tar == 0) {
     message('Target appears to be sky! Consider using different ProFound parameters.')
     return(NULL)
@@ -173,7 +194,7 @@ profuseFound2Fit = function(image,
     N_ext = 0
   }
 
-  region = matrix(mini_profound$segim %in% c(segID_tar, segID_ext), nrow=cutbox[1], ncol=cutbox[2])
+  region = matrix(mini_profound$segim %in% c(segID_tar, segID_ext), nrow=dim(mini_profound$segim)[1], ncol=dim(mini_profound$segim)[2])
   if(!is.null(mini_profound$mask)){
     region = region & mini_profound$mask==0L
   }
@@ -191,22 +212,39 @@ profuseFound2Fit = function(image,
     cutseg = cutseg[xlo:xhi, ylo:yhi]
     cutmask = cutmask[xlo:xhi, ylo:yhi]
 
-    if(loc_use){
-      xcen = loc[1] - xlo + 1
-      ycen = loc[2] - ylo + 1
+    if(is.null(offset)){
+      if(loc_use){
+        xcen = loc[1] - xlo + 1L
+        ycen = loc[2] - ylo + 1L
+      }else{
+        xcen = mini_profound$segstats[loc_tar, 'xmax'] - xlo + 1L
+        ycen = mini_profound$segstats[loc_tar, 'ymax'] - ylo + 1L
+      }
       xcen_int = xcen + c(-pos_delta,pos_delta)
       ycen_int = ycen + c(-pos_delta,pos_delta)
     }else{
-      xcen = mini_profound$segstats[loc_tar, 'xmax'] - xlo + 1
-      ycen = mini_profound$segstats[loc_tar, 'ymax'] - ylo + 1
-      xcen_int = xcen + c(-pos_delta,pos_delta)
-      ycen_int = ycen + c(-pos_delta,pos_delta)
+      offset[1] = offset[1] - xlo + 1L
+      offset[2] = offset[2] - ylo + 1L
+      if(loc_use){
+        xcen = loc[1]
+        ycen = loc[2]
+      }else{
+        xcen = mini_profound$segstats[loc_tar, 'xmax']
+        ycen = mini_profound$segstats[loc_tar, 'ymax']
+      }
+      xcen_int = xcen + c(-pos_delta,pos_delta) + offset[1]
+      ycen_int = ycen + c(-pos_delta,pos_delta) + offset[2]
     }
   }else{
     xlo = 1L
     ylo = 1L
-    xcen = mini_profound$segstats[loc_tar, 'xmax']
-    ycen = mini_profound$segstats[loc_tar, 'ymax']
+    if(loc_use){
+      xcen = loc[1]
+      ycen = loc[2]
+    }else{
+      xcen = mini_profound$segstats[loc_tar, 'xmax']
+      ycen = mini_profound$segstats[loc_tar, 'ymax']
+    }
     xcen_int = xcen + c(-pos_delta,pos_delta)
     ycen_int = ycen + c(-pos_delta,pos_delta)
   }
@@ -596,20 +634,25 @@ profuseFound2Fit = function(image,
     rough = fit_rough
   )
   Data$Nmod = Ncomp + N_ext
-  return(invisible(list(profound = mini_profound, Data = Data)))
+
+  F2F_single = list(profound = mini_profound, Data = Data)
+  class(F2F_single) = c(class(F2F_single), 'F2F_single')
+
+  return(invisible(F2F_single))
 }
 
 profuseDoFit = function(image,
                        F2F = NULL,
                        Ncomp = 2,
                        psf = NULL,
-                       magzero = 0,
+                       magzero = NULL,
                        psf_dim = c(51,51),
                        plot = FALSE,
                        seed = 666,
                        optim_iters = 5,
                        Niters = c(200,200),
                        NfinalMCMC = 1000,
+                       keepall = FALSE,
                        ...) {
 
   timestart = proc.time()[3] # start timer
@@ -658,7 +701,8 @@ profuseDoFit = function(image,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
-    parm.names = Data$parm.names
+    parm.names = Data$parm.names,
+    keepall = keepall
   )
   names(highfit$parm) = names(Data$init)
 

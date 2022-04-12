@@ -3,38 +3,36 @@
 \alias{profuseDoFit}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-ProFound to ProFit Profile Fitting
+ProFound to ProFit Profile Fitting for Single Images
 }
 \description{
-Functions to easily take users from image pixel data all the way to fully fitted profiles.
+Functions to easily take users from single image pixel data all the way to fully fitted profiles.
 }
 \usage{
-profuseFound2Fit(image, sigma = NULL, loc = NULL, segim = NULL, mask = NULL, Ncomp = 2,
-    cutbox = dim(image), psf = NULL, magdiff = 2.5, magzero = 0,
+profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
+    loc = NULL, cutbox = NULL, psf = NULL, magdiff = 2.5, magzero = 0,
     gain = NULL, resamp = NULL, loc_use = FALSE, loc_fit = TRUE,
     mag_fit = TRUE, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
     sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
     bulge_circ = TRUE, nser_upper=5.3, star_rough = TRUE, fit_rough = FALSE,
     psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
     offset = NULL, tightcrop = TRUE, deblend_extra = FALSE, fit_extra = FALSE,
-    pos_delta = 10, autoclip = TRUE, ...)
+    pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
 
-profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = 0, psf_dim = c(51,51),
-  plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000, ...)
+profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = NULL, psf_dim = c(51,51),
+  plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000,
+  keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{image}{
 Numeric matrix; required for \code{profuseFound2Fit} and for \code{profuseDoFit} if \option{F2F} is not provided. The galaxy image we want to fit a galaxy of PSF/star model to. For convenience this can also be an Rfits_pointer object for very large on disk images. Critically, this input \option{image} needs to be well background subtracted (this is not done again internally).
 }
-  \item{sigma}{
-Numeric matrix; optional, the sigma map of the \option{image} data we want to fit a model to. If not provided this will be estimated by running \code{profoundProFound} (to find the sky and skyRMS), \code{profoundGainEst} (to find the gain) and \code{profoundMakeSigma} to make a decent effort at creating an appropriate sigma map. Users should usually try to provide this themselves for critical fitting, but the automatic sigma map is usually good enough for testing purposes. For convenience this can also be an Rfits_pointer object for very large on disk sigma maps.
-}
-  \item{loc}{
-Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
-}
   \item{F2F}{
 List; output of \code{profuseFound2Fit}. If this is provided then the \code{profuseFound2Fit} step of \code{profuseDoFit} is skipped and this object is used directly for inference. Note you may need to run \code{\link{profuseRegenPSF_F2F}} on the \option{F2F} object if you are using across different session to regenerate the PSF convolution pointer.
+}
+  \item{sigma}{
+Numeric matrix; optional, the sigma map of the \option{image} data we want to fit a model to. If not provided this will be estimated by running \code{profoundProFound} (to find the sky and skyRMS), \code{profoundGainEst} (to find the gain) and \code{profoundMakeSigma} to make a decent effort at creating an appropriate sigma map. Users should usually try to provide this themselves for critical fitting, but the automatic sigma map is usually good enough for testing purposes. For convenience this can also be an Rfits_pointer object for very large on disk sigma maps.
 }
   \item{segim}{
 Integer matrix; optional, users can pass in their own segmentation maps, which should be pixel matched to the input \option{image}. This will be used instead of the internal \code{ProFound} run, although the segmentation statistics will still be recomputed.
@@ -44,6 +42,9 @@ Boolean matrix or integer scalar (1,0); optional, parts of the image to mask out
 }
   \item{Ncomp}{
 Integer scalar; optional, number of components to fit to galaxy. Options for galaxies are "1" (single Sersic profile); "1.5" (disk Sersic profile with a central PSF to model the bulge); "2" (double Sersic profile, the default); and "3" (triple Sersic profile with one bulge and two [thin/thick] disks). In these cases an input \option{psf} should be supplied. To fit a star with a Moffat profile set Ncomp to "0.5". In this case no input \option{psf} should be supplied. To fit a star with a provided PSF set Ncomp to "0".
+}
+  \item{loc}{
+Numeric vector; optional, the [X,Y] location of our target galaxy on the original \option{image} which will be targetted and/or cut out. The default is NULL, which targets the galaxy at the centre of the original \option{image}.
 }
   \item{cutbox}{
 Numeric vector; optional, the dimensions of the box to cut out from \option{image} centred on \option{loc}. This is ignored if \option{loc} is NULL (default). This can be useful if the target \option{image} is very large since a part of this process is to run \code{profoundProFound}, where we only really care about the solution near our object of interest.
@@ -129,6 +130,12 @@ Logical; optional, should extra objects near to the primary target also be fitte
   \item{pos_delta}{
 Numeric scalar; allowed range of [x,y] centring compared to the initial guess. The default of 10 works well for most cases, but very large galaxies with complex structure might need this set higher to better allow the true centre to be recovered.
 }
+  \item{autoclip}{
+Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
+}
+  \item{roughpedestal}{
+Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
+}
   \item{plot}{
 Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
 }
@@ -144,8 +151,8 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
 }
-  \item{autoclip}{
-Logical; should ihe provided \option{image} by automatically clipped for bad pixels? If TRUE then the \option{image} median is subtracted from \option{image}, and pixels 10 times below the 0.1\% percentile and 10 times above the 99.9\% percentile are masked. if FALSE nothing is done (users should be careful to set bad pixels to NA in the \option{image}).
+  \item{keepall}{
+Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.
 }
   \item{\dots}{
 For \code{*DoFit} functions dots are passed into the similarly titled \code{*Found2Fit} function. For \code{*Found2Fit} functions, further arguments are passed to \code{profoundProFound} for making the segmentation maps. \option{tolerance} and \option{SBdilate} are two options that are usually worth experimenting with the get ideal segmentation results for fitting purposes.
@@ -191,6 +198,9 @@ The output of \code{profitDoFit}, \code{profitAllStarDoFit} and \code{profitMult
 \item{psf}{The model Moffat image of the PSF estimated from fitting a target star with \option{Ncomp} = 0.5 (only present in this scenario) or multiple stars when using \code{profitAllStarDoFIt}. This will be created with dimensions \option{psf_dim}. The sum of the image is forced to exactly equal 1, even if the Moffat profile extends outside of the image domain. This at least ensures flux conservation during any convolution routines.}
 \item{psf_modellist}{The model list for the PSF created in \option{psf}.}
 \item{psf_fluxcheck}{The sum of the original PSF image flux. If far from 1 (say less than 0.95) then it implies the \option{psf_dim} is too small. If very close to 1 (say less than 0.999) then \option{psf_dim} is probably larger than it needs to be.}
+}
+\references{
+None yet (paper submitted).
 }
 \author{
 Aaron Robotham

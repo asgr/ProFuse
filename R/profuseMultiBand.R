@@ -3,10 +3,10 @@ profuseMultiBandFound2Fit = function(image_list,
                                      segim_global = NULL,
                                     sky_list = NULL,
                                     skyRMS_list = NULL,
-                                    loc = NULL,
                                     parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
                                     Ncomp = 2,
-                                    cutbox = dim(image),
+                                    loc = NULL,
+                                    cutbox = NULL,
                                     psf_list = NULL,
                                     magdiff = 2.5,
                                     magzero = NULL,
@@ -34,6 +34,8 @@ profuseMultiBandFound2Fit = function(image_list,
                                     data_ProSpect = NULL, #perhaps need a way to specify extra data going to bulge/disk. Naming or list?
                                     logged_ProSpect = NULL,
                                     intervals_ProSpect = NULL,
+                                    autoclip = TRUE,
+                                    roughpedestal = TRUE,
                                     ...){
   Nim = length(image_list)
 
@@ -41,13 +43,25 @@ profuseMultiBandFound2Fit = function(image_list,
     magzero = rep(0, Nim)
   }
 
+  if(length(magzero) == 1){
+    magzero = rep(magzero, Nim)
+  }
+
   for(i in 1:Nim){
+    if(autoclip){
+      image_med = median(image_list[[i]], na.rm=TRUE)
+      image_list[[i]][image_list[[i]] - image_med < quantile(image_list[[i]] - image_med, 0.001, na.rm=TRUE)*100] = NA
+      image_list[[i]][image_list[[i]] - image_med > quantile(image_list[[i]] - image_med, 0.999, na.rm=TRUE)*100] = NA
+    }
+
     if(is.null(sky_list[i][[1]]) | is.null(skyRMS_list[i][[1]])){ #[i][[1]] looks silly, but it will return NULL when sky_list = NULL for any i (default). [[i]] will error in this case. This does not seem to be the case as of R v4.1.0, but probably leave to be safe for now.
       message("Image ",i,": running initial ProFound")
       profound = ProFound::profoundProFound(image = image_list[[i]],
+                                            segim = segim_list[[i]],
                                             sky = sky_list[i][[1]],
                                             skyRMS = skyRMS_list[i][[1]],
                                             magzero = magzero[i],
+                                            roughpedestal = roughpedestal,
                                             ...)
       if(is.null(sky_list[i])){
         image_list[[i]] = image_list[[i]] - profound$sky
@@ -69,6 +83,8 @@ profuseMultiBandFound2Fit = function(image_list,
                                          star_circ = star_circ,
                                          magzero = magzero[i],
                                          rough = star_rough,
+                                         autoclip = FALSE,
+                                         roughpedestal = roughpedestal,
                                          skycut = 2, #works well for stars
                                          SBdilate = 2)$psf #works well for stars
     }
@@ -117,9 +133,10 @@ profuseMultiBandFound2Fit = function(image_list,
 
   F2Fstack = profuseFound2Fit(image = multi_stack$image,
                              sigma = multi_stack$skyRMS, #not quite a sigma map, but doesn't matter for the stack F2F
-                             loc = loc,
                              segim = multi_stack_pro$segim,
                              Ncomp = Ncomp,
+                             loc = loc,
+                             cutbox = cutbox,
                              psf = matrix(1,1,1), #Doesn't matter what we pass in here
                              magzero = 0,
                              mag_fit = is.null(parm_ProSpect),
@@ -132,7 +149,9 @@ profuseMultiBandFound2Fit = function(image_list,
                              bulge_circ =  bulge_circ,
                              nser_upper = nser_upper,
                              tightcrop = FALSE,
-                             fit_extra = FALSE
+                             fit_extra = FALSE,
+                             autoclip = FALSE,
+                             roughpedestal = roughpedestal
   )
 
   if(tightcrop){
@@ -296,7 +315,9 @@ profuseMultiBandFound2Fit = function(image_list,
   }
 
   if(is.null(data_ProSpect$LumDist_Mpc)){
-    data_ProSpect$LumDist_Mpc = cosdistLumDist(data_ProSpect$z, H0 = 67.8, OmegaM = 0.308)
+    if(!is.null(data_ProSpect$z)){
+      data_ProSpect$LumDist_Mpc = cosdistLumDist(data_ProSpect$z, H0 = 67.8, OmegaM = 0.308)
+    }
   }
 
   if(is.null(data_ProSpect$magemax)){
@@ -324,7 +345,9 @@ profuseMultiBandFound2Fit = function(image_list,
   MF2F$logged_ProSpect = logged_ProSpect
   MF2F$intervals_ProSpect = intervals_ProSpect
 
-  return(MF2F)
+  class(MF2F) = c(class(MF2F), 'MF2F')
+
+  return(invisible(MF2F))
 }
 
 profuseMultiBandDoFit = function(image_list,
@@ -336,6 +359,7 @@ profuseMultiBandDoFit = function(image_list,
                                 optim_iters = 5,
                                 Niters = c(200,200),
                                 NfinalMCMC = 1000,
+                                keepall = FALSE,
                                 ...) {
 
   timestart = proc.time()[3] # start timer
@@ -354,27 +378,36 @@ profuseMultiBandDoFit = function(image_list,
     MF2F = profuseRegenPSF_MF2F(MF2F)
   }
 
-  lower_profit = {}
-  upper_profit = {}
-  logged_profit = {}
+  if(is.null(MF2F$smooth.parm)){
+    #This implies we are in ProSpect fitting mode (this is how we use it now)
+    lower_profit = {}
+    upper_profit = {}
+    logged_profit = {}
 
-  for(i in 1:length(MF2F[[1]]$intervals)){ #loop over profiles
-    for(j in 1:length(MF2F[[1]]$intervals[[i]])){ #loop over parameters
-      for(k in 1:length(MF2F[[1]]$intervals[[i]][[1]])){ #loop over components
-        if(isTRUE(MF2F[[1]]$tofit[[i]][[j]][[k]])){
-          lower_profit = c(lower_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][1])
-          upper_profit = c(upper_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][2])
-          logged_profit = c(logged_profit, MF2F[[1]]$tolog[[i]][[j]][[k]])
+    for(i in 1:length(MF2F[[1]]$intervals)){ #loop over profiles
+      for(j in 1:length(MF2F[[1]]$intervals[[i]])){ #loop over parameters
+        for(k in 1:length(MF2F[[1]]$intervals[[i]][[1]])){ #loop over components
+          if(isTRUE(MF2F[[1]]$tofit[[i]][[j]][[k]])){
+            lower_profit = c(lower_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][1])
+            upper_profit = c(upper_profit, MF2F[[1]]$intervals[[i]][[j]][[k]][2])
+            logged_profit = c(logged_profit, MF2F[[1]]$tolog[[i]][[j]][[k]])
+          }
         }
       }
     }
+
+    lower_profit[logged_profit] = log10(lower_profit[logged_profit])
+    upper_profit[logged_profit] = log10(upper_profit[logged_profit])
+
+    lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
+    upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
+
+  }else{
+    #This implies we are in smooth.spline fitting mode, i.e. not using ProSpect (we don't use this)
+    #Currently I have just set these to NULL to keep things working. These should really inherit sensible limits, but we aren't really using this functionality anyway.
+    lower = NULL
+    upper = NULL
   }
-
-  lower_profit[logged_profit] = log10(lower_profit[logged_profit])
-  upper_profit[logged_profit] = log10(upper_profit[logged_profit])
-
-  lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
-  upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
 
   message('Running Highander on multi-band data')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
@@ -390,7 +423,8 @@ profuseMultiBandDoFit = function(image_list,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
-    parm.names = MF2F$parm.names
+    parm.names = MF2F$parm.names,
+    keepall = FALSE
   )
 
   highfit$MF2F = MF2F
@@ -410,7 +444,6 @@ profuseMultiBandDoFit = function(image_list,
 
   highfit$time = (proc.time()[3]-timestart)/60
   highfit$date = date()
-  #highfit$call = call
   highfit$ProFit.version = packageVersion('ProFit')
   highfit$ProFound.version = packageVersion('ProFound')
   highfit$Highlander.version = packageVersion('Highlander')
