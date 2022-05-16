@@ -10,18 +10,18 @@ Functions to easily take users from single image pixel data all the way to fully
 }
 \usage{
 profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
-    loc = NULL, cutbox = NULL, psf = NULL, magdiff = 2.5, magzero = 0,
-    gain = NULL, resamp = NULL, loc_use = FALSE, loc_fit = TRUE,
-    mag_fit = TRUE, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
-    sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
-    bulge_circ = TRUE, nser_upper=5.3, star_rough = TRUE, fit_rough = FALSE,
-    psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
-    offset = NULL, tightcrop = TRUE, deblend_extra = FALSE, fit_extra = FALSE,
-    pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
+  loc = NULL, cutbox = NULL, psf = NULL, magdiff = 2.5, magzero = 0,
+  gain = NULL, resamp = NULL, loc_use = FALSE, loc_fit = TRUE,
+  mag_fit = TRUE, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
+  sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
+  bulge_circ = TRUE, nser_upper=5.3, star_rough = TRUE, fit_rough = FALSE,
+  psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
+  offset = NULL, tightcrop = TRUE, deblend_extra = FALSE, fit_extra = FALSE,
+  pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
 
-profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = NULL, psf_dim = c(51,51),
-  plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000,
-  keepall = FALSE, ...)
+profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = NULL,
+  psf_dim = c(51,51), plot = FALSE, seed = 666, optim_iters = 5,
+  Niters = c(200,200), NfinalMCMC = 1000, walltime = Inf, keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -150,6 +150,9 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
+}
+  \item{walltime}{
+Numeric scalar; the maximum allowed CPU time for \code{\link{Highlander}} in minutes. The function will stop with the best solution to date once the walltime has been exceeded (although it does not stop mid CMA or MCMC, so the walltime will usually be exceeded a bit).  
 }
   \item{keepall}{
 Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.

@@ -219,6 +219,7 @@ profuseAllStarDoFit = function(image,
                        optim_iters = 2,
                        Niters = c(100,100),
                        NfinalMCMC = 100,
+                       walltime = Inf,
                        keepall = FALSE,
                        ...) {
 
@@ -265,6 +266,7 @@ profuseAllStarDoFit = function(image,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
+    walltime = walltime,
     keepall = keepall
   )
   names(highfit$parm) = names(Data$init)

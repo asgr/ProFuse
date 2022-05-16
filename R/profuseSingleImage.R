@@ -652,6 +652,7 @@ profuseDoFit = function(image,
                        optim_iters = 5,
                        Niters = c(200,200),
                        NfinalMCMC = 1000,
+                       walltime = Inf,
                        keepall = FALSE,
                        ...) {
 
@@ -701,6 +702,7 @@ profuseDoFit = function(image,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
+    walltime = walltime,
     parm.names = Data$parm.names,
     keepall = keepall
   )

@@ -30,7 +30,7 @@ library(Rfits)
 Set global evaluate (basically TRUE for GitHub version and FALSE for CRAN):
 
 ```{r}
-evalglobal = TRUE
+evalglobal = FALSE
 ```
 
 ## Fitting Simple Offset Images
