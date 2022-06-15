@@ -359,6 +359,7 @@ profuseMultiBandDoFit = function(image_list,
                                 optim_iters = 5,
                                 Niters = c(200,200),
                                 NfinalMCMC = 1000,
+                                walltime = Inf,
                                 keepall = FALSE,
                                 ...) {
 
@@ -423,6 +424,7 @@ profuseMultiBandDoFit = function(image_list,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
+    walltime = walltime,
     parm.names = MF2F$parm.names,
     keepall = FALSE
   )

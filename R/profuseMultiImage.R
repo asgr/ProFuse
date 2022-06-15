@@ -110,6 +110,7 @@ profuseMultiImageDoFit = function(image_list,
                         optim_iters = 5,
                         Niters = c(200,200),
                         NfinalMCMC = 1000,
+                        walltime = Inf,
                         keepall = FALSE,
                         ...) {
 
@@ -167,11 +168,12 @@ profuseMultiImageDoFit = function(image_list,
     seed = seed,
     lower = lowers,
     upper = uppers,
-    applyintervals = FALSE,
+    applyintervals = TRUE,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
+    walltime = walltime,
     parm.names = Data$parm.names,
     keepall = keepall
   )

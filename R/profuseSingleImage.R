@@ -298,7 +298,7 @@ profuseFound2Fit = function(image,
         re = mini_profound$segstats[loc_tar, 'R50'] * c(0.5, 1.5),
         nser = c(bulge_nser, disk_nser),
         ang = c(ifelse(bulge_circ, 0, mini_profound$segstats[loc_tar, 'ang']), mini_profound$segstats[loc_tar, 'ang']),
-        axrat = c(1, mini_profound$segstats[loc_tar, 'axrat'])
+        axrat = c(ifelse(bulge_circ, 1, mini_profound$segstats[loc_tar, 'axrat']), mini_profound$segstats[loc_tar, 'axrat'])
       )
     )
   } else if (Ncomp == 1.5) {
@@ -327,7 +327,7 @@ profuseFound2Fit = function(image,
         re = mini_profound$segstats[loc_tar, 'R50'] * c(0.5, 2, 1),
         nser = c(bulge_nser, disk_nser, disk_nser),
         ang = c(ifelse(bulge_circ, 0, mini_profound$segstats[loc_tar, 'ang']), rep(mini_profound$segstats[loc_tar, 'ang'],2)),
-        axrat = c(1, rep(mini_profound$segstats[loc_tar, 'axrat'],2))
+        axrat = c(ifelse(bulge_circ, 1, mini_profound$segstats[loc_tar, 'axrat']), rep(mini_profound$segstats[loc_tar, 'axrat'],2))
       )
     )
   }
@@ -652,6 +652,7 @@ profuseDoFit = function(image,
                        optim_iters = 5,
                        Niters = c(200,200),
                        NfinalMCMC = 1000,
+                       walltime = Inf,
                        keepall = FALSE,
                        ...) {
 
@@ -696,11 +697,12 @@ profuseDoFit = function(image,
     seed = seed,
     lower = lowers,
     upper = uppers,
-    applyintervals = FALSE,
+    applyintervals = TRUE,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
+    walltime = walltime,
     parm.names = Data$parm.names,
     keepall = keepall
   )

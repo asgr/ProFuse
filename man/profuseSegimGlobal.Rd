@@ -5,7 +5,7 @@
 Make Global Segmentation Map
 }
 \description{
-Based on a list, this will make a maximal global segmentation map. This means the minimal cutout will definitely contain the largest segment in any of the provided pre-band segmentation maps in segim_list. This is mostly used internally to \code{\link{profuseMultiBandFound2Fit}}, but uses can use this more directly if they have a complicated use-case.
+Based on a list, this will make a maximal global segmentation map. This means the minimal cutout will definitely contain the largest segment in any of the provided pre-band segmentation maps in segim_list. This is mostly used internally by \code{\link{profuseMultiBandFound2Fit}}, but uses can use this more directly if they have a complicated use-case.
 }
 \usage{
 profuseSegimGlobal(segim_list)

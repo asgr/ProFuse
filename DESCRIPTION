@@ -1,7 +1,7 @@
 Package: ProFuse
 Type: Package
 Title: Physical Multi-Band Fitting
-Version: 0.4.3
+Version: 0.4.6
 Date: 2022-06-15
 Author: Aaron Robotham
 Maintainer: Aaron Robotham <aaron.robotham@uwa.edu.au>

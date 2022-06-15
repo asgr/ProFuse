@@ -11,11 +11,13 @@ Functions to easily take users from multiple image pixel data all the way to ful
 }
 \usage{
 profuseMultiImageFound2Fit(image_list, segim_list = NULL, mask_list = NULL,
-  Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, magzero = NULL, gain = NULL,
-  resamp = NULL, tightcrop = TRUE, offset_list = NULL, ...)
-profuseMultiImageDoFit(image_list, F2F = NULL, Ncomp = 2, psf_list = NULL, magzero = NULL,
-    psf_dim = c(51, 51), plot = FALSE, seed = 666, optim_iters = 5, Niters = c(200, 200),
-    NfinalMCMC = 1000, keepall = FALSE, ...)
+  Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, magzero = NULL,
+  gain = NULL, resamp = NULL, tightcrop = TRUE, offset_list = NULL, ...)
+
+profuseMultiImageDoFit(image_list, F2F = NULL, Ncomp = 2, psf_list = NULL,
+  magzero = NULL, psf_dim = c(51, 51), plot = FALSE, seed = 666,
+  optim_iters = 5, Niters = c(200, 200), NfinalMCMC = 1000, walltime = Inf,
+  keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -75,6 +77,9 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 }
   \item{NfinalMCMC}{
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
+}
+  \item{walltime}{
+Numeric scalar; the maximum allowed CPU time for \code{\link{Highlander}} in minutes. The function will stop with the best solution to date once the walltime has been exceeded (although it does not stop mid CMA or MCMC, so the walltime will usually be exceeded a bit).  
 }
   \item{keepall}{
 Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.
