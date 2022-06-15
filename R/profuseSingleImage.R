@@ -682,10 +682,10 @@ profuseDoFit = function(image,
 
   lowers = unlist(Data$intervals)[c(T, F)]
   lowers[unlist(Data$tolog) == T] = log10(lowers[unlist(Data$tolog) == T])
-  lowers = lowers[which(unlist(Data$tofit))]
+  lowers = as.numeric(lowers[which(unlist(Data$tofit))])
   uppers = unlist(Data$intervals)[c(F, T)]
   uppers[unlist(Data$tolog) == T] = log10(uppers[unlist(Data$tolog) == T])
-  uppers = uppers[which(unlist(Data$tofit))]
+  uppers = as.numeric(uppers[which(unlist(Data$tofit))])
 
   message('Running Highlander')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
