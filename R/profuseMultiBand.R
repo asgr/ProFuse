@@ -95,15 +95,19 @@ profuseMultiBandFound2Fit = function(image_list,
 
   message("Making image stack")
 
+  if(!requireNamespace("ProPane", quietly=TRUE)){
+    stop("Need ProPane package, get from Github asgr/ProPane!")
+  }
+
   if(is.null(doprofit)){
-    multi_stack = ProFound::profoundMakeStack(
+    multi_stack = ProPane::propaneStackFlatInVar(
       image_list = image_list,
       skyRMS_list = skyRMS_list,
       magzero_in = magzero,
       magzero_out = 0
     )
   }else{
-    multi_stack = ProFound::profoundMakeStack(
+    multi_stack = ProFound::propaneStackFlatInVar(
       image_list = image_list[doprofit],
       skyRMS_list = skyRMS_list[doprofit],
       magzero_in = magzero[doprofit],
