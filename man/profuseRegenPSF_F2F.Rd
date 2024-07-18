@@ -10,8 +10,8 @@ Regenerate PSF Convolvers
 Simple functions to rebuild the session dependent convolver kernels should the Found2Fit objects be loaded into a new session.
 }
 \usage{
-profuseRegenPSF_F2F(F2F)
-profuseRegenPSF_MF2F(MF2F)
+profuseRegenPSF_F2F(F2F, nbench = 0L)
+profuseRegenPSF_MF2F(MF2F, nbench = 0L)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,6 +20,9 @@ List; output of \code{\link{profuseFound2Fit}}.
 }
   \item{MF2F}{
 List; output of \code{\link{profuseMultiBandFound2Fit}}.
+}
+  \item{nbenchconv}{
+Integer; the number of times to benchmark the speed of the available convolution methods. The results of this benchmarking are saved, along with the optimal method and any additional data required for efficient convolution (such as the FFT of the PSF, if it is not variable). If set to 0L then a brute force convolver is used.
 }
 }
 \details{

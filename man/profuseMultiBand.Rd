@@ -12,7 +12,7 @@ Functions to easily take users from multi-band image pixel data all the way to f
 profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
   sky_list = NULL, skyRMS_list = NULL, parm_global = c("sersic.xcen1",
     "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
-  Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, magdiff = 2.5,
+  Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, nbenchconv = 0L, magdiff = 2.5,
   magzero = NULL, gain = NULL, resamp = NULL, doprofit = NULL, sing_nser = 2,
   bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
   disk_nser_fit = FALSE, bulge_circ = TRUE, nser_upper = 5.3, star_rough = TRUE,
@@ -60,6 +60,9 @@ Vector; optional, a vector specifying the positions or names of parameters that 
 }
   \item{psf_list}{
 List; optional, a list of numeric matrices (one PSF per target band). This list should exactly match the length of \option{sky_list}, \option{skyRMS_list}, \option{image_list}, \option{magzero} if these are supplied. If not present \code{profitAllStarDoFit} will be run to estimate the per band PSF.
+}
+  \item{nbenchconv}{
+Integer; the number of times to benchmark the speed of the available convolution methods. The results of this benchmarking are saved, along with the optimal method and any additional data required for efficient convolution (such as the FFT of the PSF, if it is not variable).
 }
   \item{magdiff}{
 Numeric scalar; optional, the maximum magnitude difference for modelling nearby objects (if \option{} = TRUE) that have a segment touching the object of interest. The default of 2.5 means objects have to have at least 10\% the flux of our target object to be modelled. Dropping this too low might mean a lot of time is spent modelling with ProFit for little gain in the fiddelity of the measurement.
@@ -158,7 +161,7 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
 }
   \item{walltime}{
-Numeric scalar; the maximum allowed CPU time for \code{\link{Highlander}} in minutes. The function will stop with the best solution to date once the walltime has been exceeded (although it does not stop mid CMA or MCMC, so the walltime will usually be exceeded a bit).  
+Numeric scalar; the maximum allowed CPU time for \code{\link{Highlander}} in minutes. The function will stop with the best solution to date once the walltime has been exceeded (although it does not stop mid CMA or MCMC, so the walltime will usually be exceeded a bit).
 }
   \item{keepall}{
 Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.

@@ -10,7 +10,7 @@ Functions to easily take users from single image pixel data all the way to fully
 }
 \usage{
 profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
-  loc = NULL, cutbox = NULL, psf = NULL, magdiff = 2.5, magzero = 0,
+  loc = NULL, cutbox = NULL, psf = NULL, nbenchconv = 0L, magdiff = 2.5, magzero = 0,
   gain = NULL, resamp = NULL, loc_use = FALSE, loc_fit = TRUE,
   mag_fit = TRUE, sing_nser = 2, bulge_nser = 4, disk_nser = 1,
   sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
@@ -51,6 +51,9 @@ Numeric vector; optional, the dimensions of the box to cut out from \option{imag
 }
   \item{psf}{
 Image matrix; required, an empirical point spread function (PSF) image matrix that ProFit will use to convolve the image
+}
+  \item{nbenchconv}{
+Integer; the number of times to benchmark the speed of the available convolution methods. The results of this benchmarking are saved, along with the optimal method and any additional data required for efficient convolution (such as the FFT of the PSF, if it is not variable).
 }
   \item{magdiff}{
 Numeric scalar; optional, the maximum magnitude difference for modelling nearby objects (if \option{} = TRUE) that have a segment touching the object of interest. The default of 2.5 means objects have to have at least 10\% the flux of our target object to be modelled. Dropping this too low might mean a lot of time is spent modelling with ProFit for little gain in the fiddelity of the measurement.
@@ -152,7 +155,7 @@ Integer vector; number of iterations per CMA and LD respectively (must be length
 Integer scalar; number of iterations to run for the final MCMC run. See \code{\link{Highlander}}.
 }
   \item{walltime}{
-Numeric scalar; the maximum allowed CPU time for \code{\link{Highlander}} in minutes. The function will stop with the best solution to date once the walltime has been exceeded (although it does not stop mid CMA or MCMC, so the walltime will usually be exceeded a bit).  
+Numeric scalar; the maximum allowed CPU time for \code{\link{Highlander}} in minutes. The function will stop with the best solution to date once the walltime has been exceeded (although it does not stop mid CMA or MCMC, so the walltime will usually be exceeded a bit).
 }
   \item{keepall}{
 Logical; if FALSE (default) then does nothing. If TRUE then output objects \option{CMA_all} and \option{LD_all} will be concatenated lists of all CMA and LD iterations respectively.

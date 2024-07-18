@@ -8,6 +8,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                     loc = NULL,
                                     cutbox = NULL,
                                     psf_list = NULL,
+                                    nbenchconv = 0L,
                                     magdiff = 2.5,
                                     magzero = NULL,
                                     gain = NULL,
@@ -266,7 +267,8 @@ profuseMultiBandFound2Fit = function(image_list,
       magzero = magzero[i],
       algo.func = 'LD',
       verbose = FALSE,
-      rough = fit_rough
+      rough = fit_rough,
+      nbenchconv = nbenchconv
     )
 
     #if(!is.null(doprofit)){

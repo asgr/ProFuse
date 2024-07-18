@@ -36,6 +36,7 @@ evalglobal = FALSE
 First load the libraries we need:
 
 ```{r}
+library(Rfits)
 library(ProFuse)
 library(ProFound)
 library(magicaxis)
@@ -45,7 +46,7 @@ library(Highlander)
 Load the data:
 
 ```{r}
-image = readFITS(system.file("extdata", 'VIKING/mystery_VIKING_Z.fits', package="ProFound"))$imDat
+image = Rfits_read_image(system.file("extdata", 'VIKING/mystery_VIKING_Z.fits', package="ProFound"))$imDat
 ```
 
 And take a look at what we have got:

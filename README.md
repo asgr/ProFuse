@@ -15,13 +15,22 @@ The key part here is that we now get separate star formation histories (SFHs) fo
 
 ## Installation
 
-If you are interested in trying **ProFuse** out then by all means have a try at installing this package. You will need a number of other packages first of course (**ProFound**, **ProFit**, **ProSpect** for starters):
+If you are interested in trying **ProFuse** out then by all means have a try at installing this package. You will need a number of other packages first of course. First some lower-level (general purpose) things:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("asgr/Rfits")
-remotes::install_github("asgr/celestial")
 remotes::install_github("asgr/magicaxis")
+remotes::install_github("asgr/ParmOff")
+remotes::install_github("asgr/cmaeshpc")
+remotes::install_github("asgr/LaplacesDemon")
+remotes::install_github("asgr/Highlander")
+```
+
+And now some of the core **ProTools** packages:
+
+```r
+remotes::install_github("asgr/celestial")
+remotes::install_github("asgr/Rfits")
 remotes::install_github("asgr/ProFound")
 remotes::install_github("ICRAR/ProFit") #confusingly I do not host the production version!
 remotes::install_github("asgr/ProSpect")

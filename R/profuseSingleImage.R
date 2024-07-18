@@ -6,6 +6,7 @@ profuseFound2Fit = function(image,
                            loc = NULL,
                            cutbox = NULL,
                            psf = NULL,
+                           nbenchconv = 0L,
                            magdiff = 2.5,
                            magzero = 0,
                            gain = NULL,
@@ -631,7 +632,8 @@ profuseFound2Fit = function(image,
     algo.func = 'LD',
     verbose = FALSE,
     offset = offset,
-    rough = fit_rough
+    rough = fit_rough,
+    nbenchconv = nbenchconv
   )
   Data$Nmod = Ncomp + N_ext
 
