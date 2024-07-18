@@ -108,7 +108,7 @@ profuseMultiBandFound2Fit = function(image_list,
       magzero_out = 0
     )
   }else{
-    multi_stack = ProFound::propaneStackFlatInVar(
+    multi_stack = ProPane::propaneStackFlatInVar(
       image_list = image_list[doprofit],
       skyRMS_list = skyRMS_list[doprofit],
       magzero_in = magzero[doprofit],

@@ -21,7 +21,7 @@ List; output of \code{\link{profuseFound2Fit}}.
   \item{MF2F}{
 List; output of \code{\link{profuseMultiBandFound2Fit}}.
 }
-  \item{nbenchconv}{
+  \item{nbench}{
 Integer; the number of times to benchmark the speed of the available convolution methods. The results of this benchmarking are saved, along with the optimal method and any additional data required for efficient convolution (such as the FFT of the PSF, if it is not variable). If set to 0L then a brute force convolver is used.
 }
 }
