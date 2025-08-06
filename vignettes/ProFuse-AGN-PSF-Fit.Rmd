@@ -160,7 +160,7 @@ For convenience we can also just pass our *MF2F* object into the *profuseMultiBa
 
 Check it:
 
-```{r}
+```{r, eval=evalglobal}
 profitLikeModel(MF2F$init, MF2F, makeplots=T)
 ```
 
@@ -173,7 +173,7 @@ highfit = profuseMultiBandDoFit(MF2F=MF2F)
 
 And check the final fit:
 
-```{r}
+```{r, eval=evalglobal}
 profitLikeModel(highfit$parm, MF2F, makeplots=T)
 ```
 
