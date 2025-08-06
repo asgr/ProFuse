@@ -28,6 +28,7 @@ evalglobal = FALSE
 Load the required packages (**ProTools** basically load all of my packages in one go):
 
 ```{r}
+library(Rfits)
 library(ProFuse)
 library(ProTools)
 library(ParmOff)
@@ -54,7 +55,7 @@ cenwaves = cenwave[match(filters, cenwave$filter),'cenwave']
 agemax = 13.3e9 - cosdistTravelTime(z=redshift, H0 = 67.8, OmegaM = 0.308)*1e9
 ```
 
-Cutout all of our images:
+Cut-out all of our images:
 
 ```{r, eval=evalglobal}
 image_list = list(
@@ -76,6 +77,7 @@ The reasonably minimal run of MultiBandFound2Fit, which sets everything up for l
 MF2F = profuseMultiBandFound2Fit(image_list=image_list,
                                     magzero=c(0,0,0,0,30,30,30,30,30),
                                     tolerance=20,
+                                    Ncomp = 2,
                                     parm_global = c("sersic.xcen1", "sersic.ycen1",
                                                     "sersic.re1", "sersic.re2",
                                                     "sersic.ang2", "sersic.axrat2"),
