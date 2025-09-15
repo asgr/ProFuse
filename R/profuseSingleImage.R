@@ -509,11 +509,6 @@ profuseFound2Fit = function(image,
     )
   } else if ((Ncomp == 1 | Ncomp == 2 | Ncomp == 3)) {
     tolog = list(
-      pointsource = list(
-        xcen = FALSE,
-        ycen = FALSE,
-        mag = FALSE
-      ),
       sersic = list(
         xcen = rep(FALSE, Ncomp),
         ycen = rep(FALSE, Ncomp),
@@ -528,6 +523,11 @@ profuseFound2Fit = function(image,
     )
   } else if ((Ncomp == 1.5 | Ncomp == 2.5 | Ncomp == 3.5)) {
     tolog = list(
+      pointsource = list(
+        xcen = FALSE,
+        ycen = FALSE,
+        mag = FALSE
+      ),
       sersic = list(
         xcen = rep(FALSE, Ncomp),
         ycen = rep(FALSE, Ncomp),
