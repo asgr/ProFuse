@@ -33,6 +33,7 @@ remotes::install_github("asgr/celestial")
 remotes::install_github("asgr/Rfits")
 remotes::install_github("asgr/ProFound")
 remotes::install_github("ICRAR/ProFit") #confusingly I do not host the production version!
+remotes::install_github("asgr/ProSpectData")
 remotes::install_github("asgr/ProSpect")
 remotes::install_github("asgr/ProFuse")
 ```
