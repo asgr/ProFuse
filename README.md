@@ -1,4 +1,7 @@
 # ProFuse
+<!-- badges: start -->
+![R-CMD-check](https://github.com/asgr/ProFuse/workflows/R-CMD-check/badge.svg)
+<!-- badges: end -->
 **ProFound** + **ProFit** + **ProSpect** = **ProFuse**
 
 This is the spectral spatial decomposition package **ProFuse** as discussed in Robotham+ 2022. This work was carried out in close collaboration with Sabine Bellstedt.
