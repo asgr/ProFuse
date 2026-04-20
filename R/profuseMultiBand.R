@@ -25,13 +25,14 @@ profuseMultiBandFound2Fit = function(image_list,
                                     star_rough = TRUE,
                                     fit_rough = FALSE,
                                     psf_dim = c(51, 51),
-                                    star_con = 2,
-                                    star_con_fit = TRUE,
-                                    star_circ = TRUE,
-                                    tightcrop = TRUE,
-                                    wave = NULL,
-                                    smooth.parm = NULL,
-                                    parm_ProSpect = NULL,
+                                     star_con = 2,
+                                     star_con_fit = TRUE,
+                                     star_circ = TRUE,
+                                     tightcrop = TRUE,
+                                     offset_list = NULL,
+                                     wave = NULL,
+                                     smooth.parm = NULL,
+                                     parm_ProSpect = NULL,
                                     data_ProSpect = NULL, #perhaps need a way to specify extra data going to bulge/disk. Naming or list?
                                     logged_ProSpect = NULL,
                                     intervals_ProSpect = NULL,
@@ -46,6 +47,17 @@ profuseMultiBandFound2Fit = function(image_list,
 
   if(length(magzero) == 1){
     magzero = rep(magzero, Nim)
+  }
+
+  if(is.null(offset_list)){
+    offset_list = vector("list", Nim)
+  }else{
+    if(length(offset_list) == 1){
+      offset_list = rep(offset_list, Nim)
+    }
+    if(length(offset_list) != Nim){
+      stop("offset_list must be NULL, length 1, or the same length as image_list.")
+    }
   }
 
   for(i in 1:Nim){
@@ -267,6 +279,7 @@ profuseMultiBandFound2Fit = function(image_list,
       magzero = magzero[i],
       algo.func = 'LD',
       verbose = FALSE,
+      offset = offset_list[[i]],
       rough = fit_rough,
       nbenchconv = nbenchconv
     )
