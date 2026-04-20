@@ -53,7 +53,7 @@ profuseMultiBandFound2Fit = function(image_list,
     offset_list = vector("list", Nim)
   }else{
     if(length(offset_list) == 1){
-      offset_list = rep(offset_list, Nim)
+      offset_list = rep(list(offset_list[[1]]), Nim)
     }
     if(length(offset_list) != Nim){
       stop("offset_list must be NULL, length 1, or the same length as image_list.")
