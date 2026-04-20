@@ -52,13 +52,6 @@ profuseMultiBandFound2Fit = function(image_list,
   if(is.null(offset_list)){
     offset_list = vector("list", Nim)
   }else{
-    if(is.numeric(offset_list)){
-      if(length(offset_list) == 2){
-        offset_list = list(offset_list)
-      }else{
-        stop("Numeric offset_list input must be a single [X,Y] vector.")
-      }
-    }
     if(!is.list(offset_list)){
       stop("offset_list must be a list when provided.")
     }
@@ -67,6 +60,11 @@ profuseMultiBandFound2Fit = function(image_list,
     }
     if(length(offset_list) != Nim){
       stop("offset_list must be NULL, length 1, or the same length as image_list.")
+    }
+    for(i in 1:Nim){
+      if(!is.null(offset_list[[i]]) && (!is.numeric(offset_list[[i]]) || length(offset_list[[i]]) != 2)){
+        stop("Each non-NULL offset_list element must be a numeric [X,Y] vector of length 2.")
+      }
     }
   }
 
