@@ -125,7 +125,7 @@ Logical; optional, should the star be forced to be circular? If TRUE this means 
 Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
 }
   \item{offset_list}{
-List; optional, per-band offsets to pass into \code{\link{profitSetupData}} \option{offset}. This can be used to track known [X,Y] positional shifts between images so a shared physical model is correctly projected into each band. If length 1 it is recycled to all bands.
+List; optional, per-band offsets to pass into \code{\link{profitSetupData}} \option{offset}. This can be used to track known [X,Y] positional shifts between images so a shared physical model is correctly projected into each band. If NULL (default) then no offsets are used. If length 1 it is recycled to all bands. A single numeric [X,Y] vector is also accepted and treated as length 1.
 }
   \item{wave}{
 Numeric vector; optional. This is only relevant if you are providing smoothing functions via \option{smooth.parm}. If provided it should be the wavelength of each image in \option{image_list}, where \option{image_list} then needs to be in ascending (blue to red) wavelength order.
