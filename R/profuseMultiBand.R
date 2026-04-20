@@ -25,14 +25,14 @@ profuseMultiBandFound2Fit = function(image_list,
                                     star_rough = TRUE,
                                     fit_rough = FALSE,
                                     psf_dim = c(51, 51),
-                                     star_con = 2,
-                                     star_con_fit = TRUE,
-                                     star_circ = TRUE,
-                                     tightcrop = TRUE,
-                                     offset_list = NULL,
-                                     wave = NULL,
-                                     smooth.parm = NULL,
-                                     parm_ProSpect = NULL,
+                                    star_con = 2,
+                                    star_con_fit = TRUE,
+                                    star_circ = TRUE,
+                                    tightcrop = TRUE,
+                                    offset_list = NULL,
+                                    wave = NULL,
+                                    smooth.parm = NULL,
+                                    parm_ProSpect = NULL,
                                     data_ProSpect = NULL, #perhaps need a way to specify extra data going to bulge/disk. Naming or list?
                                     logged_ProSpect = NULL,
                                     intervals_ProSpect = NULL,
@@ -52,8 +52,12 @@ profuseMultiBandFound2Fit = function(image_list,
   if(is.null(offset_list)){
     offset_list = vector("list", Nim)
   }else{
-    if(is.numeric(offset_list) && length(offset_list) == 2){
-      offset_list = list(offset_list)
+    if(is.numeric(offset_list)){
+      if(length(offset_list) == 2){
+        offset_list = list(offset_list)
+      }else{
+        stop("Numeric offset_list input must be a single [X,Y] vector.")
+      }
     }
     if(!is.list(offset_list)){
       stop("offset_list must be a list when provided.")
