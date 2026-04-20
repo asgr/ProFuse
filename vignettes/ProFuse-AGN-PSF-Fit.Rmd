@@ -25,12 +25,13 @@ Set global evaluate:
 evalglobal = FALSE
 ```
 
-Load the required packages (**ProTools** basically load all of my packages in one go):
+Load the required packages:
 
 ```{r}
+library(celestial)
 library(Rfits)
+library(ProSpect)
 library(ProFuse)
-library(ProTools)
 library(ParmOff)
 ```
 

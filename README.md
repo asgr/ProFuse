@@ -1,4 +1,7 @@
 # ProFuse
+<!-- badges: start -->
+![R-CMD-check](https://github.com/asgr/ProFuse/workflows/R-CMD-check/badge.svg)
+<!-- badges: end -->
 **ProFound** + **ProFit** + **ProSpect** = **ProFuse**
 
 This is the spectral spatial decomposition package **ProFuse** as discussed in Robotham+ 2022. This work was carried out in close collaboration with Sabine Bellstedt.
@@ -33,6 +36,7 @@ remotes::install_github("asgr/celestial")
 remotes::install_github("asgr/Rfits")
 remotes::install_github("asgr/ProFound")
 remotes::install_github("ICRAR/ProFit") #confusingly I do not host the production version!
+remotes::install_github("asgr/ProSpectData")
 remotes::install_github("asgr/ProSpect")
 remotes::install_github("asgr/ProFuse")
 ```
