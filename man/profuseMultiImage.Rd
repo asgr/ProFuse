@@ -61,7 +61,7 @@ Numeric scalar; optional, resampling factor to pass into \code{\link{profuseFoun
 Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.
 }
   \item{offset_list}{
-List; optional, offsets to pass into \code{\link{profuseFound2Fit}} \option{psf}.
+List; optional, offsets to pass into \code{\link{profuseFound2Fit}} \option{offset}.
 }
   \item{psf_dim}{
 Integer vector; optional, the dimensions of the output PSF generated when fitting a star with \option{Ncomp} = 0.5. The PSF will be centrally located in the image. The dimensions will be forced to be odd (adding 1 if required) to ensure the PSF mode is at the centre of the middle pixel.
