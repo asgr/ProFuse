@@ -3,7 +3,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                      segim_global = NULL,
                                     sky_list = NULL,
                                     skyRMS_list = NULL,
-                                    parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
+                                    parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.re2", "sersic.ang2", "sersic.axrat2"),
                                     Ncomp = 2,
                                     loc = NULL,
                                     cutbox = NULL,
@@ -358,15 +358,17 @@ profuseMultiBandFound2Fit = function(image_list,
 
 profuseMultiBandDoFit = function(image_list,
                                 MF2F = NULL,
-                                parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
+                                parm_global = c("sersic.xcen1", "sersic.ycen1", "sersic.re1", "sersic.re2", "sersic.ang2", "sersic.axrat2"),
                                 Ncomp = 2,
                                 magzero = NULL,
+                                Algorithm = "CHARM",
                                 seed = 666,
                                 optim_iters = 5,
                                 Niters = c(200,200),
                                 NfinalMCMC = 1000,
                                 walltime = Inf,
                                 keepall = FALSE,
+                                cores = 1L,
                                 ...) {
 
   timestart = proc.time()[3] # start timer
@@ -415,6 +417,32 @@ profuseMultiBandDoFit = function(image_list,
     lower = NULL
     upper = NULL
   }
+  
+  LDargs = list(control = list(abstol = 0.1),
+                Iterations = Niters[2], 
+                Algorithm = Algorithm,
+                Thinning = 1,
+                Specs = Specs_help(Algorithm=Algorithm, Data=MF2F)
+  )
+  
+  if(Algorithm == 'AIES'){
+    if(!is.null(lower) & !is.null(upper)){
+      message('Running Lowlander to get good Z matrix for AIES...')
+      temp_low = Lowlander(
+         lower = lower,
+         upper = upper,
+         Data = MF2F,
+         likefunc = function(parm, Data){profitLikeModel(parm, Data)$LP},
+         Nsamp = 2*length(lower)*10,
+         liketype = 'max'
+      )
+      lower = temp_low$lower
+      upper = temp_low$upper
+      Zmat = temp_low$latin_mod[temp_low$keep,,drop=FALSE]
+      
+      LDargs$Specs$Z = Zmat
+    }
+  }
 
   message('Running Highander on multi-band data')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
@@ -422,6 +450,7 @@ profuseMultiBandDoFit = function(image_list,
     parm = MF2F$init,
     Data = MF2F,
     likefunc = profitLikeModel,
+    Algorithm = Algorithm,
     seed = seed,
     lower = lower,
     upper = upper,
@@ -431,14 +460,19 @@ profuseMultiBandDoFit = function(image_list,
     Niters = Niters,
     NfinalMCMC = NfinalMCMC,
     walltime = walltime,
+    LDargs = LDargs,
     parm.names = MF2F$parm.names,
-    keepall = FALSE
+    keepall = keepall,
+    cores = cores
   )
 
   highfit$MF2F = MF2F
-  highfit$error = apply(highfit$LD_last$Posterior1,
-                        MARGIN = 2,
-                        FUN = 'sd')
+  
+  if(!is.null(highfit$LD_last)){
+    highfit$error = apply(highfit$LD_last$Posterior1,
+                          MARGIN = 2,
+                          FUN = 'sd')
+  }
 
   if(!is.null(MF2F$smooth.parm) & !is.null(MF2F$wave)){
     namevec = names(MF2F$smooth.parm)

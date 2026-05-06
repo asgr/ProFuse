@@ -11,7 +11,7 @@ Functions to easily take users from multi-band image pixel data all the way to f
 \usage{
 profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
   sky_list = NULL, skyRMS_list = NULL, parm_global = c("sersic.xcen1",
-    "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"),
+    "sersic.ycen1", "sersic.re1", "sersic.re2", "sersic.ang2", "sersic.axrat2"),
   Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, nbenchconv = 0L, magdiff = 2.5,
   magzero = NULL, gain = NULL, resamp = NULL, doprofit = NULL, sing_nser = 2,
   bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
@@ -22,8 +22,8 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
   intervals_ProSpect = NULL, autoclip = TRUE, roughpedestal = TRUE, ...)
 
 profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
-  "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
-  magzero = NULL, seed = 666, optim_iters = 5, Niters = c(200,200),
+  "sersic.ycen1", "sersic.re1", "sersic.re2", "sersic.ang2", "sersic.axrat2"),
+  Ncomp = 2, magzero = NULL, seed = 666, optim_iters = 5, Niters = c(200,200),
   NfinalMCMC = 1000, walltime = Inf, keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
