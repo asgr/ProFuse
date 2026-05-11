@@ -20,8 +20,9 @@ profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
   pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
 
 profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = NULL,
-  psf_dim = c(51,51), plot = FALSE, seed = 666, optim_iters = 5,
-  Niters = c(200,200), NfinalMCMC = 1000, walltime = Inf, keepall = FALSE, ...)
+  psf_dim = c(51,51), plot = FALSE, seed = 666, updateintervals = FALSE,
+  optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000, walltime = Inf,
+  keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -144,6 +145,9 @@ Logical; optional, should a before and after modelling plot be created? This is 
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
+}
+  \item{updateintervals}{
+Logical; can intervals be updated based on results of computing the Hessian after each CMA fit? See \code{\link{Highlander}}. 
 }
   \item{optim_iters}{
 Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.

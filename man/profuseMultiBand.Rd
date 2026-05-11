@@ -23,8 +23,9 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
 
 profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
   "sersic.ycen1", "sersic.re1", "sersic.re2", "sersic.ang2", "sersic.axrat2"),
-  Ncomp = 2, magzero = NULL, seed = 666, optim_iters = 5, Niters = c(200,200),
-  NfinalMCMC = 1000, walltime = Inf, keepall = FALSE, ...)
+  Ncomp = 2, magzero = NULL, seed = 666, updateintervals = FALSE,
+  optim_iters = 5, Niters = c(200,200), NfinalMCMC = 1000, walltime = Inf,
+  keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -150,6 +151,9 @@ Logical; when the initial "rough sky" is computed, should only a pedestal (based
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
+}
+  \item{updateintervals}{
+Logical; can intervals be updated based on results of computing the Hessian after each CMA fit? See \code{\link{Highlander}}. 
 }
   \item{optim_iters}{
 Integer scalar; number of CMA / LD loops. See \code{\link{Highlander}}. The default of 5 works pretty well in practice.
