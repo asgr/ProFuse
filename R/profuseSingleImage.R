@@ -35,6 +35,7 @@ profuseFound2Fit = function(image,
                            pos_delta = 10,
                            autoclip = TRUE,
                            roughpedestal = TRUE,
+                           scat_scale = FALSE,
                            ...) {
   if(autoclip){
     image_med = median(image, na.rm=TRUE)
@@ -732,6 +733,10 @@ profuseFound2Fit = function(image,
 
   Data$Nmod = Ncomp + N_ext
 
+  if(scat_scale){
+    Data$parm.names = c(Data$parm.names, 'log_scat_scale')
+  }
+
   F2F_single = list(profound = mini_profound, Data = Data)
   class(F2F_single) = c(class(F2F_single), 'F2F_single')
 
@@ -784,6 +789,11 @@ profuseDoFit = function(image,
   uppers = unlist(Data$intervals)[c(F, T)]
   uppers[unlist(Data$tolog) == T] = log10(uppers[unlist(Data$tolog) == T])
   uppers = as.numeric(uppers[which(unlist(Data$tofit))])
+
+  if('log_scat_scale' %in% Data$parm.names){
+    lowers = c(lowers, -2)
+    uppers = c(uppers, 2)
+  }
 
   message('Running Highlander')
   if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}

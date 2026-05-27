@@ -38,6 +38,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                     intervals_ProSpect = NULL,
                                     autoclip = TRUE,
                                     roughpedestal = TRUE,
+                                    scat_scale = FALSE,
                                     ...){
   Nim = length(image_list)
 
@@ -372,6 +373,10 @@ profuseMultiBandFound2Fit = function(image_list,
   MF2F$logged_ProSpect = logged_ProSpect
   MF2F$intervals_ProSpect = intervals_ProSpect
 
+  if(scat_scale){
+    MF2F$parm.names = c(MF2F$parm.names, 'log_scat_scale')
+  }
+
   class(MF2F) = c(class(MF2F), 'MF2F')
 
   return(invisible(MF2F))
@@ -427,8 +432,13 @@ profuseMultiBandDoFit = function(image_list,
     lower_profit[logged_profit] = log10(lower_profit[logged_profit])
     upper_profit[logged_profit] = log10(upper_profit[logged_profit])
 
-    lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
-    upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
+    lowers = c(lower_profit, MF2F$intervals_ProSpect$lo)
+    uppers = c(upper_profit, MF2F$intervals_ProSpect$hi)
+
+    if('log_scat_scale' %in% Data$parm.names){
+      lowers = c(lowers, -2)
+      uppers = c(uppers, 2)
+    }
 
   }else{
     #This implies we are in smooth.spline fitting mode, i.e. not using ProSpect (we don't use this)
@@ -444,8 +454,8 @@ profuseMultiBandDoFit = function(image_list,
     Data = MF2F,
     likefunc = profitLikeModel,
     seed = seed,
-    lower = lower,
-    upper = upper,
+    lower = lowers,
+    upper = uppers,
     applyintervals = TRUE,
     applyconstraints = FALSE,
     optim_iters = optim_iters,
