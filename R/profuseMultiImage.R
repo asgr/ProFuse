@@ -153,7 +153,7 @@ profuseMultiImageDoFit = function(image_list,
   uppers[unlist(Data$tolog) == T] = log10(uppers[unlist(Data$tolog) == T])
   uppers = as.numeric(uppers[which(unlist(Data$tofit))])
 
-  if('log_scat_scale' %in% F2F$parm.names){
+  if(!is.null(F2F$parm.names) && 'log_scat_scale' %in% F2F$parm.names){
     lowers = c(lowers, -2)
     uppers = c(uppers, 2)
   }
