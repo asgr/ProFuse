@@ -12,7 +12,8 @@ Functions to easily take users from multiple image pixel data all the way to ful
 \usage{
 profuseMultiImageFound2Fit(image_list, segim_list = NULL, mask_list = NULL,
   Ncomp = 2, loc = NULL, cutbox = NULL, psf_list = NULL, nbenchconv = 0L,
-  magzero = NULL, gain = NULL, resamp = NULL, tightcrop = TRUE, offset_list = NULL, ...)
+  magzero = NULL, gain = NULL, resamp = NULL, tightcrop = TRUE, offset_list = NULL,
+  scat_scale = FALSE, ...)
 
 profuseMultiImageDoFit(image_list, F2F = NULL, Ncomp = 2, psf_list = NULL,
   magzero = NULL, psf_dim = c(51, 51), plot = FALSE, seed = 666,
@@ -62,6 +63,9 @@ Logical; optional, should the image be cut down to the tightest fitting box that
 }
   \item{offset_list}{
 List; optional, offsets to pass into \code{\link{profuseFound2Fit}} \option{offset}.
+}
+  \item{scat_scale}{
+Logical; should \code{log_scat_scale} be included as a free parameter in fitting? If TRUE this passes a scatter scaling term through to \code{\link{profitLikeModel}}, allowing the effective likelihood scatter to be adjusted.
 }
   \item{psf_dim}{
 Integer vector; optional, the dimensions of the output PSF generated when fitting a star with \option{Ncomp} = 0.5. The PSF will be centrally located in the image. The dimensions will be forced to be odd (adding 1 if required) to ensure the PSF mode is at the centre of the middle pixel.

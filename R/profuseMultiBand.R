@@ -435,7 +435,7 @@ profuseMultiBandDoFit = function(image_list,
     lowers = c(lower_profit, MF2F$intervals_ProSpect$lo)
     uppers = c(upper_profit, MF2F$intervals_ProSpect$hi)
 
-    if('log_scat_scale' %in% Data$parm.names){
+    if('log_scat_scale' %in% MF2F$parm.names){
       lowers = c(lowers, -2)
       uppers = c(uppers, 2)
     }
