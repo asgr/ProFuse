@@ -12,6 +12,7 @@ profuseMultiImageFound2Fit = function(
     resamp = NULL,
     tightcrop = TRUE,
     offset_list = NULL,
+    scat_scale = FALSE,
     ...
 ){
   Nim = length(image_list)
@@ -95,6 +96,10 @@ profuseMultiImageFound2Fit = function(
   F2F_multi$N = F2F_multi[[1]]$N
   F2F_multi$Nim = Nim
 
+  if(scat_scale){
+    F2F_multi$parm.names = c(F2F_multi$parm.names, 'log_scat_scale')
+  }
+
   names(F2F_multi)[1:Nim] = paste('image', 1:Nim, sep='')
   class(F2F_multi) = c(class(F2F_multi), 'F2F_multi')
 
@@ -147,6 +152,11 @@ profuseMultiImageDoFit = function(image_list,
   uppers = unlist(Data$intervals)[c(F, T)]
   uppers[unlist(Data$tolog) == T] = log10(uppers[unlist(Data$tolog) == T])
   uppers = as.numeric(uppers[which(unlist(Data$tofit))])
+
+  if(!is.null(F2F$parm.names) && 'log_scat_scale' %in% F2F$parm.names){
+    lowers = c(lowers, -2)
+    uppers = c(uppers, 2)
+  }
 
   if(!is.null(Data$offset)){
     xcen_loc = grep('xcen',Data$parm.names)
