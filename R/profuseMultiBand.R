@@ -29,6 +29,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                     star_con_fit = TRUE,
                                     star_circ = TRUE,
                                     log_scat_scale = FALSE,
+                                    offset_list = NULL,
                                     tightcrop = TRUE,
                                     wave = NULL,
                                     smooth.parm = NULL,
@@ -47,6 +48,25 @@ profuseMultiBandFound2Fit = function(image_list,
 
   if(length(magzero) == 1){
     magzero = rep(magzero, Nim)
+  }
+
+  if(is.null(offset_list)){
+    offset_list = vector("list", Nim)
+  }else{
+    if(!is.list(offset_list)){
+      stop("offset_list must be a list when provided.")
+    }
+    if(length(offset_list) == 1){
+      offset_list = rep(list(offset_list[[1]]), Nim)
+    }
+    if(length(offset_list) != Nim){
+      stop("offset_list must be NULL, length 1, or the same length as image_list.")
+    }
+    for(i in 1:Nim){
+      if(!is.null(offset_list[[i]]) && (!is.numeric(offset_list[[i]]) || length(offset_list[[i]]) != 2)){
+        stop("Each non-NULL offset_list element must be a numeric [X,Y] vector of length 2.")
+      }
+    }
   }
 
   if('log_scat_scale' %in% parm_global){
@@ -279,6 +299,7 @@ profuseMultiBandFound2Fit = function(image_list,
       algo.func = 'LD',
       log_scat_scale = log_scat_scale,
       verbose = FALSE,
+      offset = offset_list[[i]],
       rough = fit_rough,
       nbenchconv = nbenchconv
     )
