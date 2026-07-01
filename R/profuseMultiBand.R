@@ -28,6 +28,7 @@ profuseMultiBandFound2Fit = function(image_list,
                                     star_con = 2,
                                     star_con_fit = TRUE,
                                     star_circ = TRUE,
+                                    log_scat_scale = FALSE,
                                     tightcrop = TRUE,
                                     wave = NULL,
                                     smooth.parm = NULL,
@@ -46,6 +47,15 @@ profuseMultiBandFound2Fit = function(image_list,
 
   if(length(magzero) == 1){
     magzero = rep(magzero, Nim)
+  }
+
+  if('log_scat_scale' %in% parm_global){
+    stop('log_scat_scale should not be in parm_global, instead set log_scat_scale argument to TRUE')
+  }
+
+  if(log_scat_scale){
+    #Put log_scat_scale at the end of parm_global
+    parm_global = c(parm_global, 'log_scat_scale')
   }
 
   for(i in 1:Nim){
@@ -153,6 +163,7 @@ profuseMultiBandFound2Fit = function(image_list,
                              disk_nser_fit = disk_nser_fit,
                              bulge_circ =  bulge_circ,
                              nser_upper = nser_upper,
+                             log_scat_scale = log_scat_scale,
                              tightcrop = FALSE,
                              fit_extra = FALSE,
                              autoclip = FALSE,
@@ -266,6 +277,7 @@ profuseMultiBandFound2Fit = function(image_list,
       constraints = F2Fstack$Data$constraints,
       magzero = magzero[i],
       algo.func = 'LD',
+      log_scat_scale = log_scat_scale,
       verbose = FALSE,
       rough = fit_rough,
       nbenchconv = nbenchconv
@@ -406,8 +418,13 @@ profuseMultiBandDoFit = function(image_list,
     lower_profit[logged_profit] = log10(lower_profit[logged_profit])
     upper_profit[logged_profit] = log10(upper_profit[logged_profit])
 
-    lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
-    upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
+    if('log_scat_scale' %in% MF2F$parm.names){
+      lower = c(lower_profit, -2, MF2F$intervals_ProSpect$lo)
+      upper = c(upper_profit, 1, MF2F$intervals_ProSpect$hi)
+    }else{
+      lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
+      upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
+    }
 
   }else{
     #This implies we are in smooth.spline fitting mode, i.e. not using ProSpect (we don't use this)
