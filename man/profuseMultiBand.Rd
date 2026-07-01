@@ -17,9 +17,10 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
   bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
   disk_nser_fit = FALSE, bulge_circ = TRUE, nser_upper = 5.3, star_rough = TRUE,
   fit_rough = FALSE, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
-  star_circ = TRUE, offset_list = NULL, tightcrop = TRUE, wave = NULL, smooth.parm = NULL,
-  parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
-  intervals_ProSpect = NULL, autoclip = TRUE, roughpedestal = TRUE, ...)
+  star_circ = TRUE, log_scat_scale = FALSE, offset_list = NULL, tightcrop = TRUE,
+  wave = NULL, smooth.parm = NULL, parm_ProSpect = NULL, data_ProSpect = NULL,
+  logged_ProSpect = NULL, intervals_ProSpect = NULL, autoclip = TRUE,
+  roughpedestal = TRUE, ...)
 
 profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
   "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
