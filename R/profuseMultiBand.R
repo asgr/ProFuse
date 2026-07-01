@@ -73,9 +73,12 @@ profuseMultiBandFound2Fit = function(image_list,
     stop('log_scat_scale should not be in parm_global, instead set log_scat_scale argument to TRUE')
   }
 
-  if(log_scat_scale){
-    #Put log_scat_scale at the end of parm_global
-    parm_global = c(parm_global, 'log_scat_scale')
+  if (isTRUE(log_scat_scale)) {
+    if (!is.null(parm_global) && !is.character(parm_global)) {
+      stop("When log_scat_scale=TRUE, parm_global must be NULL or a character vector of parameter names.")
+    }
+    # Put log_scat_scale at the end of parm_global
+    parm_global = c(parm_global, "log_scat_scale")
   }
 
   for(i in 1:Nim){

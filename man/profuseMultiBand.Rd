@@ -121,6 +121,9 @@ Logical; optional, should the Moffat profile concentration index be optimised du
   \item{star_circ}{
 Logical; optional, should the star be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
 }
+  \item{log_scat_scale}{
+Logical; optional. If TRUE, include a log scatter scale hyper-parameter in the likelihood evaluation (see \code{profitLikeModel}) to improve sampling when the image likelihood is under/over-dispersed.
+}
   \item{offset_list}{
 List; optional, per-band offsets to pass into \code{\link{profitSetupData}} \option{offset}. This can be used to track known [X,Y] positional shifts between images so a shared physical model is correctly projected into each band. If NULL (default) then no offsets are used. If length 1 it is recycled to all bands. Otherwise, \option{offset_list} must have the same length as \option{image_list}. Each non-NULL element should be a numeric [X,Y] vector of length 2.
 }
