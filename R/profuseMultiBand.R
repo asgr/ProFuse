@@ -458,7 +458,7 @@ profuseMultiBandDoFit = function(image_list,
   }
 
   message('Running Highander on multi-band data')
-  if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
+  if(!requireNamespace("Highlander", quietly = TRUE)){stop('The Highlander package is required to run this function!')}
   highfit = Highlander::Highlander(
     parm = MF2F$init,
     Data = MF2F,
