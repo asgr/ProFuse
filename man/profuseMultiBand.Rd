@@ -17,9 +17,10 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
   bulge_nser = 4, disk_nser = 1, sing_nser_fit = TRUE, bulge_nser_fit = FALSE,
   disk_nser_fit = FALSE, bulge_circ = TRUE, nser_upper = 5.3, star_rough = TRUE,
   fit_rough = FALSE, psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE,
-  star_circ = TRUE, tightcrop = TRUE, wave = NULL, smooth.parm = NULL,
-  parm_ProSpect = NULL, data_ProSpect = NULL, logged_ProSpect = NULL,
-  intervals_ProSpect = NULL, autoclip = TRUE, roughpedestal = TRUE, ...)
+  star_circ = TRUE, log_scat_scale = FALSE, offset_list = NULL, tightcrop = TRUE,
+  wave = NULL, smooth.parm = NULL, parm_ProSpect = NULL, data_ProSpect = NULL,
+  logged_ProSpect = NULL, intervals_ProSpect = NULL, autoclip = TRUE,
+  roughpedestal = TRUE, ...)
 
 profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
   "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
@@ -120,6 +121,12 @@ Logical; optional, should the Moffat profile concentration index be optimised du
 }
   \item{star_circ}{
 Logical; optional, should the star be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
+}
+  \item{log_scat_scale}{
+Logical; optional. If TRUE, include a log scatter scale hyper-parameter in the likelihood evaluation (see \code{profitLikeModel}) to improve sampling when the image likelihood is under/over-dispersed.
+}
+  \item{offset_list}{
+List; optional, per-band offsets to pass into \code{\link{profitSetupData}} \option{offset}. This can be used to track known [X,Y] positional shifts between images so a shared physical model is correctly projected into each band. If NULL (default) then no offsets are used. If length 1 it is recycled to all bands. Otherwise, \option{offset_list} must have the same length as \option{image_list}. Each non-NULL element should be a numeric [X,Y] vector of length 2.
 }
   \item{tightcrop}{
 Logical; optional, should the image be cut down to the tightest fitting box that fully contains the segmentation map? This might be a good idea if the parent image is very large (cuts down on memory allocation etc), but might be a bad idea if you want to know the exact position of your source with the frame, e.g. \option{xcen} and \option{ycen} in the \option{modellist} are relative to the new tightly cropped image not the original cropped image.

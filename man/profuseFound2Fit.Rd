@@ -16,8 +16,8 @@ profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
   sing_nser_fit = TRUE, bulge_nser_fit = FALSE, disk_nser_fit = FALSE,
   bulge_circ = TRUE, nser_upper=5.3, star_rough = TRUE, fit_rough = FALSE,
   psf_dim = c(51, 51), star_con = 2, star_con_fit = TRUE, star_circ = TRUE,
-  offset = NULL, tightcrop = TRUE, deblend_extra = FALSE, fit_extra = FALSE,
-  pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
+  log_scat_scale = FALSE, offset = NULL, tightcrop = TRUE, deblend_extra = FALSE,
+  fit_extra = FALSE, pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
 
 profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = NULL,
   psf_dim = c(51,51), plot = FALSE, seed = 666, optim_iters = 5,
@@ -117,6 +117,9 @@ Logical; optional, should the Moffat profile concentration index be optimised du
 }
   \item{star_circ}{
 Logical; optional, should the star be forced to be circular? If TRUE this means the \option{axrat} is fixed to be 1. This is only relevant if the \option{psf} has not been provided and we need to calculate ourself using \code{\link{profuseAllStarDoFit}}.
+}
+  \item{log_scat_scale}{
+Logical; optional. If TRUE, include a log scatter scale hyper-parameter in the likelihood evaluation (see \code{profitLikeModel}) to improve sampling when the image likelihood is under/over-dispersed.
 }
   \item{offset}{
 Numeric vector; optional. Offset argument to be passed to \code{\link{profitSetupData}} (see description there).

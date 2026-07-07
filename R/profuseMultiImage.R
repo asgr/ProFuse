@@ -10,8 +10,9 @@ profuseMultiImageFound2Fit = function(
     magzero = NULL,
     gain = NULL,
     resamp = NULL,
-    tightcrop = TRUE,
+    log_scat_scale = FALSE,
     offset_list = NULL,
+    tightcrop = TRUE,
     ...
 ){
   Nim = length(image_list)
@@ -82,8 +83,9 @@ profuseMultiImageFound2Fit = function(
                            magzero = magzero[[i]],
                            gain = gain[[i]],
                            resamp = resamp[[i]],
-                           tightcrop = tightcrop,
+                           log_scat_scale = log_scat_scale,
                            offset = offset_list[[i]],
+                           tightcrop = tightcrop,
                            ...
     )$Data
 

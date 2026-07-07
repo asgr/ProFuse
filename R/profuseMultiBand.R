@@ -28,6 +28,8 @@ profuseMultiBandFound2Fit = function(image_list,
                                     star_con = 2,
                                     star_con_fit = TRUE,
                                     star_circ = TRUE,
+                                    log_scat_scale = FALSE,
+                                    offset_list = NULL,
                                     tightcrop = TRUE,
                                     wave = NULL,
                                     smooth.parm = NULL,
@@ -46,6 +48,37 @@ profuseMultiBandFound2Fit = function(image_list,
 
   if(length(magzero) == 1){
     magzero = rep(magzero, Nim)
+  }
+
+  if(is.null(offset_list)){
+    offset_list = vector("list", Nim)
+  }else{
+    if(!is.list(offset_list)){
+      stop("offset_list must be a list when provided.")
+    }
+    if(length(offset_list) == 1){
+      offset_list = rep(list(offset_list[[1]]), Nim)
+    }
+    if(length(offset_list) != Nim){
+      stop("offset_list must be NULL, length 1, or the same length as image_list.")
+    }
+    for(i in 1:Nim){
+      if(!is.null(offset_list[[i]]) && (!is.numeric(offset_list[[i]]) || length(offset_list[[i]]) != 2)){
+        stop("Each non-NULL offset_list element must be a numeric [X,Y] vector of length 2.")
+      }
+    }
+  }
+
+  if('log_scat_scale' %in% parm_global){
+    stop('log_scat_scale should not be in parm_global, instead set log_scat_scale argument to TRUE')
+  }
+
+  if (isTRUE(log_scat_scale)) {
+    if (!is.null(parm_global) && !is.character(parm_global)) {
+      stop("When log_scat_scale=TRUE, parm_global must be NULL or a character vector of parameter names.")
+    }
+    # Put log_scat_scale at the end of parm_global
+    parm_global = c(parm_global, "log_scat_scale")
   }
 
   for(i in 1:Nim){
@@ -153,6 +186,7 @@ profuseMultiBandFound2Fit = function(image_list,
                              disk_nser_fit = disk_nser_fit,
                              bulge_circ =  bulge_circ,
                              nser_upper = nser_upper,
+                             log_scat_scale = log_scat_scale,
                              tightcrop = FALSE,
                              fit_extra = FALSE,
                              autoclip = FALSE,
@@ -266,7 +300,9 @@ profuseMultiBandFound2Fit = function(image_list,
       constraints = F2Fstack$Data$constraints,
       magzero = magzero[i],
       algo.func = 'LD',
+      log_scat_scale = log_scat_scale,
       verbose = FALSE,
+      offset = offset_list[[i]],
       rough = fit_rough,
       nbenchconv = nbenchconv
     )
@@ -406,8 +442,13 @@ profuseMultiBandDoFit = function(image_list,
     lower_profit[logged_profit] = log10(lower_profit[logged_profit])
     upper_profit[logged_profit] = log10(upper_profit[logged_profit])
 
-    lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
-    upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
+    if('log_scat_scale' %in% MF2F$parm.names){
+      lower = c(lower_profit, -2, MF2F$intervals_ProSpect$lo)
+      upper = c(upper_profit, 1, MF2F$intervals_ProSpect$hi)
+    }else{
+      lower = c(lower_profit, MF2F$intervals_ProSpect$lo)
+      upper = c(upper_profit, MF2F$intervals_ProSpect$hi)
+    }
 
   }else{
     #This implies we are in smooth.spline fitting mode, i.e. not using ProSpect (we don't use this)
@@ -417,7 +458,7 @@ profuseMultiBandDoFit = function(image_list,
   }
 
   message('Running Highander on multi-band data')
-  if(!requireNamespace("ProFound", quietly = TRUE)){stop('The Highander package is required to run this function!')}
+  if(!requireNamespace("Highlander", quietly = TRUE)){stop('The Highlander package is required to run this function!')}
   highfit = Highlander::Highlander(
     parm = MF2F$init,
     Data = MF2F,
