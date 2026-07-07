@@ -20,7 +20,7 @@ profuseFound2Fit(image, sigma = NULL, segim = NULL, mask = NULL, Ncomp = 2,
   fit_extra = FALSE, pos_delta = 10, autoclip = TRUE, roughpedestal = TRUE, ...)
 
 profuseDoFit(image, F2F = NULL, Ncomp = 2, psf = NULL, magzero = NULL,
-  psf_dim = c(51,51), plot = FALSE, seed = 666, optim_iters = 5,
+  psf_dim = c(51,51), plot = FALSE, Algorithm = 'CHARM', seed = 666, optim_iters = 5,
   Niters = c(200,200), NfinalMCMC = 1000, walltime = Inf, keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -144,6 +144,15 @@ Logical; when the initial "rough sky" is computed, should only a pedestal (based
 }
   \item{plot}{
 Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
+}
+  \item{Algorithm}{
+Character scalar; the short algorithm name recognised by
+\code{\link[LaplacesDemon]{LaplacesDemon}}, e.g. \option{CHARM},
+\option{AIES}, \option{MWG}. Defaults to \option{CHARM}. Supported values
+are: ADMG, AFSS, AGG, AHMC, AIES, AM, AMM, AMWG, CHARM, DEMC, DRAM, DRM,
+ESS, GG, Gibbs, HARM, HMC, HMCDA, IM, INCA, MALA, MCMCMC, MTM, MWG, NUTS,
+OHSS, pCN, RAM, RDMH, Refractive, RJ, RSS, RWM, SAMWG, SGLD, Slice, SMWG,
+THMC, twalk, UESS, USAMWG, USMWG.
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.

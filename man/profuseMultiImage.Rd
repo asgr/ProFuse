@@ -16,7 +16,7 @@ profuseMultiImageFound2Fit(image_list, segim_list = NULL, mask_list = NULL,
   offset_list = NULL, tightcrop = TRUE, ...)
 
 profuseMultiImageDoFit(image_list, F2F = NULL, Ncomp = 2, psf_list = NULL,
-  magzero = NULL, psf_dim = c(51, 51), plot = FALSE, seed = 666,
+  magzero = NULL, psf_dim = c(51, 51), plot = FALSE, Algorithm = 'CHARM', seed = 666,
   optim_iters = 5, Niters = c(200, 200), NfinalMCMC = 1000, walltime = Inf,
   keepall = FALSE, ...)
 }
@@ -72,6 +72,15 @@ Integer vector; optional, the dimensions of the output PSF generated when fittin
 }
   \item{plot}{
 Logical; optional, should a before and after modelling plot be created? This is useful when testing, but should be set to FALSE (default) for big runs.
+}
+  \item{Algorithm}{
+Character scalar; the short algorithm name recognised by
+\code{\link[LaplacesDemon]{LaplacesDemon}}, e.g. \option{CHARM},
+\option{AIES}, \option{MWG}. Defaults to \option{CHARM}. Supported values
+are: ADMG, AFSS, AGG, AHMC, AIES, AM, AMM, AMWG, CHARM, DEMC, DRAM, DRM,
+ESS, GG, Gibbs, HARM, HMC, HMCDA, IM, INCA, MALA, MCMCMC, MTM, MWG, NUTS,
+OHSS, pCN, RAM, RDMH, Refractive, RJ, RSS, RWM, SAMWG, SGLD, Slice, SMWG,
+THMC, twalk, UESS, USAMWG, USMWG.
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.

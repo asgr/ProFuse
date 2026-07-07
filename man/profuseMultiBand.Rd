@@ -24,7 +24,7 @@ profuseMultiBandFound2Fit(image_list, segim_list = NULL, segim_global = NULL,
 
 profuseMultiBandDoFit(image_list, MF2F = NULL, parm_global = c("sersic.xcen1",
   "sersic.ycen1", "sersic.re1", "sersic.ang2", "sersic.axrat2"), Ncomp = 2,
-  magzero = NULL, seed = 666, optim_iters = 5, Niters = c(200,200),
+  magzero = NULL, Algorithm = 'CHARM', seed = 666, optim_iters = 5, Niters = c(200,200),
   NfinalMCMC = 1000, walltime = Inf, keepall = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -154,6 +154,15 @@ Logical; should ihe provided \option{image} by automatically clipped for bad pix
 }
   \item{roughpedestal}{
 Logical; when the initial "rough sky" is computed, should only a pedestal (based on the median of the sky map) be used for the sky? This is a good option if the image is known to contain a *very* large (many times the box size) galaxy that might otherwise be over subtracted by the initial rough sky map. This is the only \code{\link{profoundProFound}} option that is changed from the default, since our requirement is that all \option{image} inputs are already sky subracted properly.
+}
+  \item{Algorithm}{
+Character scalar; the short algorithm name recognised by
+\code{\link[LaplacesDemon]{LaplacesDemon}}, e.g. \option{CHARM},
+\option{AIES}, \option{MWG}. Defaults to \option{CHARM}. Supported values
+are: ADMG, AFSS, AGG, AHMC, AIES, AM, AMM, AMWG, CHARM, DEMC, DRAM, DRM,
+ESS, GG, Gibbs, HARM, HMC, HMCDA, IM, INCA, MALA, MCMCMC, MTM, MWG, NUTS,
+OHSS, pCN, RAM, RDMH, Refractive, RJ, RSS, RWM, SAMWG, SGLD, Slice, SMWG,
+THMC, twalk, UESS, USAMWG, USMWG.
 }
   \item{seed}{
 Integer scalar; random seed to start the \code{Highlander} function with.
