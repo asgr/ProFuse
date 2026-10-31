@@ -11,7 +11,7 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.6)
 Imports: ProFit (>= 2.2.5), ProFound (>= 1.18.2), ProSpect (>= 1.2.7), ParmOff (>= 0.1.2), Highlander (>= 0.2.5), magicaxis (>= 2.3.3), celestial (>= 1.5.2), foreach
-Suggests: Rfits, knitr, rmarkdown, ProTools, imager, ProPane
+Suggests: testthat (>= 3.0.0), Rfits, knitr, rmarkdown, ProTools, imager, ProPane
 Remotes:
   asgr/celestial,
   asgr/cmaeshpc,
@@ -26,3 +26,4 @@ Remotes:
   asgr/ProTools,
   asgr/Rfits
 VignetteBuilder: knitr
+Config/testthat/edition: 3
